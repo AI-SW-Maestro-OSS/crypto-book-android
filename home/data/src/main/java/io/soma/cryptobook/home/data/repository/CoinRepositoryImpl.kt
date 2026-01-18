@@ -1,8 +1,7 @@
 package io.soma.cryptobook.home.data.repository
 
-import android.util.Log.w
 import io.soma.cryptobook.core.data.model.toCoinPriceVO
-import io.soma.cryptobook.core.domain.error.WebSocketDisconnectedException
+import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import io.soma.cryptobook.core.domain.model.CoinInfoVO
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import io.soma.cryptobook.core.domain.repository.CoinRepository
@@ -56,7 +55,12 @@ constructor(
                     if (cache.isNotEmpty()) emit(cache.values.toList())
                 }
 
-                is CoinListStreamDataSource.State.Error,
+                is CoinListStreamDataSource.State.Error -> {
+                    if (state.throwable is WebSocketReconnectExhaustedException) {
+                        throw state.throwable
+                    }
+                }
+
                 is CoinListStreamDataSource.State.Disconnected -> {}
             }
         }

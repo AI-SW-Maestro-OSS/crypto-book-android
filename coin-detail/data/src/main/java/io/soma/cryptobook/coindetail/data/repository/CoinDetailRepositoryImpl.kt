@@ -3,7 +3,7 @@ package io.soma.cryptobook.coindetail.data.repository
 import io.soma.cryptobook.coindetail.data.datasource.CoinDetailStreamDataSource
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
 import io.soma.cryptobook.core.data.model.toCoinPriceVO
-import io.soma.cryptobook.core.domain.error.WebSocketDisconnectedException
+import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +32,12 @@ constructor(
                     cachedDetail?.let { emit(it) }
                 }
 
-                is CoinDetailStreamDataSource.State.Error,
+                is CoinDetailStreamDataSource.State.Error -> {
+                    if (state.throwable is WebSocketReconnectExhaustedException) {
+                        throw state.throwable
+                    }
+                }
+
                 is CoinDetailStreamDataSource.State.Disconnected -> {
                 }
             }

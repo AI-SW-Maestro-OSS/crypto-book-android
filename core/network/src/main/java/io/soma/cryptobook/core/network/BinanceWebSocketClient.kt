@@ -1,6 +1,7 @@
 package io.soma.cryptobook.core.network
 
 import android.util.Log
+import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -135,6 +136,7 @@ class BinanceWebSocketClient @Inject constructor(
         val currentRetry = retryCount.incrementAndGet()
         if (currentRetry > MAX_RETRY_COUNT) {
             Log.w(TAG, "Reconnect gave up after $MAX_RETRY_COUNT retries")
+            _events.tryEmit(Event.Error(WebSocketReconnectExhaustedException()))
             return
         }
 
