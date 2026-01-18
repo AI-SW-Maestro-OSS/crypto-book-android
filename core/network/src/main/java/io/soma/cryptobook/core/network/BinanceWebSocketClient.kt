@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.math.pow
-import kotlin.random.Random
 
 class BinanceWebSocketClient @Inject constructor(
     private val client: OkHttpClient,
@@ -40,7 +39,6 @@ class BinanceWebSocketClient @Inject constructor(
     private val retryCount = AtomicInteger(0)
     private var reconnectJob: Job? = null
     private val intentionalDisconnect = AtomicBoolean(false)
-
 
     private val _events = MutableSharedFlow<Event>(
         extraBufferCapacity = 64,
@@ -87,8 +85,9 @@ class BinanceWebSocketClient @Inject constructor(
             _isConnected.set(false)
             _events.tryEmit(Event.Disconnected)
             this@BinanceWebSocketClient.webSocket = null
-            if (code != 1000 && !intentionalDisconnect.get())
+            if (code != 1000 && !intentionalDisconnect.get()) {
                 reconnect()
+            }
         }
     }
 
@@ -140,7 +139,7 @@ class BinanceWebSocketClient @Inject constructor(
             return
         }
 
-        val delayMs = (INITIAL_DELAY_MS * BACKOFF_MULTIPLIER.pow(currentRetry-1))
+        val delayMs = (INITIAL_DELAY_MS * BACKOFF_MULTIPLIER.pow(currentRetry - 1))
             .toLong().coerceAtMost(MAX_DELAY_MS)
         Log.d(TAG, "Reconnecting #$currentRetry in ${delayMs}ms")
 

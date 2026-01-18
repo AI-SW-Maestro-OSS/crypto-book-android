@@ -1,5 +1,5 @@
 package io.soma.cryptobook.core.domain.error
 
-class WebSocketReconnectExhaustedException: Exception(
-    "WebSocket reconnection attempts exhausted"
+class WebSocketReconnectExhaustedException : Exception(
+    "WebSocket reconnection attempts exhausted",
 )
