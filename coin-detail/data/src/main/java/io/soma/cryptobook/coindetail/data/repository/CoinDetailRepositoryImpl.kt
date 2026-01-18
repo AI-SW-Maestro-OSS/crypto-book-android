@@ -17,23 +17,24 @@ constructor(
     private val coinDetailStreamDataSource: CoinDetailStreamDataSource,
     private val ioDispatcher: CoroutineDispatcher,
 ) : CoinDetailRepository {
+    private var cachedDetail: CoinPriceVO? = null
 
     override fun observeCoinDetail(symbol: String): Flow<CoinPriceVO> = flow {
         coinDetailStreamDataSource.observeCoinDetail(symbol).collect { state ->
             when (state) {
                 is CoinDetailStreamDataSource.State.Success -> {
-                    emit(state.ticker.toCoinPriceVO())
+                    val coinPrice = state.ticker.toCoinPriceVO()
+                    cachedDetail = coinPrice
+                    emit(coinPrice)
                 }
 
-                is CoinDetailStreamDataSource.State.Error -> {
-                    throw state.throwable
+                is CoinDetailStreamDataSource.State.Connected -> {
+                    cachedDetail?.let { emit(it) }
                 }
 
+                is CoinDetailStreamDataSource.State.Error,
                 is CoinDetailStreamDataSource.State.Disconnected -> {
-                    throw WebSocketDisconnectedException()
                 }
-
-                is CoinDetailStreamDataSource.State.Connected -> {}
             }
         }
     }.flowOn(ioDispatcher)
