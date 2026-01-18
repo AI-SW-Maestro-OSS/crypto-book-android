@@ -1,8 +1,13 @@
 package io.soma.cryptobook.core.network
 
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -13,9 +18,12 @@ import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+import kotlin.math.pow
+import kotlin.random.Random
 
 class BinanceWebSocketClient @Inject constructor(
     private val client: OkHttpClient,
+    private val scope: CoroutineScope,
 ) {
     sealed class Event {
         data class Message(val message: String) : Event()
@@ -28,7 +36,10 @@ class BinanceWebSocketClient @Inject constructor(
 
     private val _isConnected = AtomicBoolean(false)
     val isConnected: Boolean get() = _isConnected.get()
-//    private var retryCount = 0
+    private val retryCount = AtomicInteger(0)
+    private var reconnectJob: Job? = null
+    private val intentionalDisconnect = AtomicBoolean(false)
+
 
     private val _events = MutableSharedFlow<Event>(
         extraBufferCapacity = 64,
@@ -37,14 +48,24 @@ class BinanceWebSocketClient @Inject constructor(
     val events = _events.asSharedFlow()
 
     companion object {
+        private const val TAG = "BinanceWS"
         private const val BASE_URL = "wss://fstream.binance.com/ws"
+
+        // 재연결 상수
+        private const val INITIAL_DELAY_MS = 1000L
+        private const val MAX_DELAY_MS = 30_000L
+        private const val MAX_RETRY_COUNT = 5
+        private const val BACKOFF_MULTIPLIER = 2.0
     }
 
     private var webSocket: WebSocket? = null
 
     private val listener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
+            Log.d(TAG, "Connected")
             _isConnected.set(true)
+            retryCount.set(0)
+            reconnectJob?.cancel()
             _events.tryEmit(Event.Connected)
         }
 
@@ -52,27 +73,36 @@ class BinanceWebSocketClient @Inject constructor(
             _events.tryEmit(Event.Message(text))
         }
 
-        // TODO: 재시도 로직 추가(exponential backoff)
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            Log.e(TAG, "Failed: ${t.message}")
             _isConnected.set(false)
             _events.tryEmit(Event.Error(t))
             this@BinanceWebSocketClient.webSocket = null
+            reconnect()
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            Log.d(TAG, "Closed: code=$code")
             _isConnected.set(false)
             _events.tryEmit(Event.Disconnected)
             this@BinanceWebSocketClient.webSocket = null
+            if (code != 1000 && !intentionalDisconnect.get())
+                reconnect()
         }
     }
 
     fun connect() {
         if (webSocket != null) return
+        Log.d(TAG, "Connecting... retry=${retryCount.get()}")
+        intentionalDisconnect.set(false)
         val request = Request.Builder().url(BASE_URL).build()
         webSocket = client.newWebSocket(request, listener)
     }
 
     fun disconnect() {
+        intentionalDisconnect.set(true)
+        reconnectJob?.cancel()
+        retryCount.set(0)
         _isConnected.set(false)
         webSocket?.close(1000, "Normal closure")
         webSocket = null
@@ -99,14 +129,25 @@ class BinanceWebSocketClient @Inject constructor(
             put("id", id)
         }.toString()
 
-//    private fun reconnectWithBackoff() {
-//        retryCount++
-//        val baseDelay = 1000L * 2.0.pow(retryCount.coerceAtMost(5)).toLong()
-//        val jitter = (0..1000).random()
-//        val delayMs = (baseDelay + jitter).coerceAtMost(6000L)
-//        CoroutineScope(Dispatchers.IO).launch {
-//            delay(delayMs)
-//            connect()
-//        }
-//    }
+    private fun reconnect() {
+        if (intentionalDisconnect.get()) return
+
+        val currentRetry = retryCount.incrementAndGet()
+        if (currentRetry > MAX_RETRY_COUNT) {
+            Log.w(TAG, "Reconnect gave up after $MAX_RETRY_COUNT retries")
+            return
+        }
+
+        val delayMs = (INITIAL_DELAY_MS * BACKOFF_MULTIPLIER.pow(currentRetry-1))
+            .toLong().coerceAtMost(MAX_DELAY_MS)
+        Log.d(TAG, "Reconnecting #$currentRetry in ${delayMs}ms")
+
+        reconnectJob?.cancel()
+        reconnectJob = scope.launch {
+            delay(delayMs)
+            if (!intentionalDisconnect.get()) {
+                connect()
+            }
+        }
+    }
 }
