@@ -8,6 +8,7 @@ import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.home.data.network.BinanceApiService
 import io.soma.cryptobook.splash.data.network.CryptoBookApiService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -70,7 +71,8 @@ object NetworkModule {
     @Singleton
     fun provideBinanceWebSocketClient(
         @BinanceNetwork okHttpClient: OkHttpClient,
-    ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient)
+        @ApplicationScope scope: CoroutineScope,
+    ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient, scope)
 
 // ========================================================================
 
