@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.soma.cryptobook.core.data.image.CoinImageResolverImpl
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
-import io.soma.cryptobook.home.data.image.CoinImageResolverImpl
 
 @Module
 @InstallIn(SingletonComponent::class)

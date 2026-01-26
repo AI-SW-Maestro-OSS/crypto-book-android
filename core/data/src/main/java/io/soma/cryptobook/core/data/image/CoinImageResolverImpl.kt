@@ -1,4 +1,4 @@
-package io.soma.cryptobook.home.data.image
+package io.soma.cryptobook.core.data.image
 
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import javax.inject.Inject
