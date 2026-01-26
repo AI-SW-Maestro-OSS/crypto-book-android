@@ -1,11 +1,11 @@
 import com.android.build.api.dsl.LibraryExtension
 import io.soma.cryptobook.configureKotlinAndroid
+import io.soma.cryptobook.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getByType
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.gradle.kotlin.dsl.dependencies
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -15,11 +15,12 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 36
+                testOptions.targetSdk = 36
             }
 
-            extensions.getByType<KotlinAndroidProjectExtension>().apply {
-                configureKotlinAndroid(this)
+            dependencies {
+                "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
+                "testImplementation"(libs.findLibrary("kotlin.test").get())
             }
         }
     }

@@ -90,6 +90,8 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+
 
 
 [plugins]
@@ -110,4 +112,5 @@ cryptobook-android-library = { id = "cryptobook.android.library" }
 cryptobook-hilt = { id = "cryptobook.hilt" }
 cryptobook-android-library-compose = { id = "cryptobook.android.library.compose" }
 cryptobook-android-presentation = { id = "cryptobook.android.presentation" }
+cryptobook-jvm-library = { id = "cryptobook.jvm.library" }
 cryptobook-spotless = { id = "cryptobook.spotless" }
