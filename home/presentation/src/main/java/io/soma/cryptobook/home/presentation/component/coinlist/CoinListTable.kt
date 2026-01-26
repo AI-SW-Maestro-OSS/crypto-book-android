@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 data class CoinListItemData(
     val symbol: String,
     val name: String,
+    val imageUrl: String,
     val price: String,
     val changePercent: Double,
 )
@@ -61,6 +62,7 @@ fun CoinListTable(
             CoinListItem(
                 symbol = coin.symbol,
                 name = coin.name,
+                imageUrl = coin.imageUrl,
                 price = coin.price,
                 changePercent = coin.changePercent,
                 onClick = { onCoinClick(coin.symbol) },
@@ -73,11 +75,11 @@ fun CoinListTable(
 @Composable
 private fun CoinListTablePreview() {
     val sampleCoins = listOf(
-        CoinListItemData("BTCUSDT", "Bitcoin", "$68500.52", 0.0),
-        CoinListItemData("ETHUSDT", "Ethereum", "$3500.25", 1.75),
-        CoinListItemData("BNBUSDT", "BNB", "$580.10", -1.75),
-        CoinListItemData("SOLUSDT", "Solana", "$145.30", 0.0),
-        CoinListItemData("XRPUSDT", "XRP", "$0.52", 2.50),
+        CoinListItemData("BTCUSDT", "Bitcoin", "", "$68500.52", 0.0),
+        CoinListItemData("ETHUSDT", "Ethereum", "", "$3500.25", 1.75),
+        CoinListItemData("BNBUSDT", "BNB", "", "$580.10", -1.75),
+        CoinListItemData("SOLUSDT", "Solana", "", "$145.30", 0.0),
+        CoinListItemData("XRPUSDT", "XRP", "", "$0.52", 2.50),
     )
 
     CoinListTable(

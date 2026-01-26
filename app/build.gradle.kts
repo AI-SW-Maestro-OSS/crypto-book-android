@@ -63,4 +63,9 @@ dependencies {
 
     implementation(libs.androidx.dataStore)
     implementation(libs.androidx.core.ktx)
+
+    // Coil (Image Loading)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.svg)
 }
