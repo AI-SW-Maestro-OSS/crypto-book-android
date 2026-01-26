@@ -29,4 +29,7 @@ dependencies {
     implementation(libs.androidx.compose.material3.navigationSuite)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.core.splashscreen)
+
+    // Coil (Image Loading)
+    implementation(libs.coil.compose)
 }

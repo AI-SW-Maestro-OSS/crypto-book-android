@@ -10,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import dagger.hilt.android.AndroidEntryPoint
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
@@ -36,9 +38,14 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var navigationHelper: NavigationHelper
 
+    @Inject
+    lateinit var imageLoader: ImageLoader
+
     private val splashViewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        SingletonImageLoader.setSafe { imageLoader }
+
         val splashScreen = installSplashScreen()
 
         splashScreen.setKeepOnScreenCondition {
