@@ -14,6 +14,21 @@ data class CoinTickerDto(
 
     /** 24시간 변동률 */
     @SerialName("P") val priceChangePercent: String,
+
+    /** 24시간 변동 가격 */
+    @SerialName("p") val priceChange: String,
+
+    /** 24시간 최저가 */
+    @SerialName("l") val lowPrice: String,
+
+    /** 24시간 최고가 */
+    @SerialName("h") val highPrice: String,
+
+    /** 24시간 총 거래대금 */
+    @SerialName("q") val quoteAssetVolume: String,
+
+    /** 24시간 전 시가 */
+    @SerialName("o") val openPrice: String,
 )
 
 fun CoinTickerDto.toCoinPriceVO() = CoinPriceVO(

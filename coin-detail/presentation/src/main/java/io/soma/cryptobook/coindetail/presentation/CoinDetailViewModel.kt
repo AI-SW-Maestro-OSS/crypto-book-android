@@ -5,6 +5,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveCoinDetailUseCase
+import io.soma.cryptobook.coindetail.presentation.mapper.CoinDetailPresentationModelMapper
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.presentation.MviViewModel
@@ -13,6 +14,7 @@ import io.soma.cryptobook.core.presentation.MviViewModel
 class CoinDetailViewModel @AssistedInject constructor(
     @Assisted private val coinName: String,
     private val observeCoinDetailUseCase: ObserveCoinDetailUseCase,
+    private val mapper: CoinDetailPresentationModelMapper,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
 ) : MviViewModel<CoinDetailEvent, CoinDetailUiState, CoinDetailSideEffect>(
@@ -41,12 +43,10 @@ class CoinDetailViewModel @AssistedInject constructor(
                 when (result) {
                     is ObserveCoinDetailUseCase.Result.Success -> {
                         reduce {
-                            copy(
+                            mapper.toUiState(
+                                vo = result.coinDetail,
                                 isLoading = false,
                                 errorMsg = null,
-                                price = result.coinDetail.price,
-                                priceChangePercentage24h =
-                                result.coinDetail.priceChangePercentage24h,
                             )
                         }
                     }
