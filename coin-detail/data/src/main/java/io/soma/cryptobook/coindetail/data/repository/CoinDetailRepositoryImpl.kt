@@ -1,10 +1,10 @@
 package io.soma.cryptobook.coindetail.data.repository
 
 import io.soma.cryptobook.coindetail.data.datasource.CoinDetailStreamDataSource
+import io.soma.cryptobook.coindetail.data.mapper.CoinDetailDomainModelMapper
+import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
-import io.soma.cryptobook.core.data.model.toCoinPriceVO
 import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
-import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -15,17 +15,18 @@ class CoinDetailRepositoryImpl
 @Inject
 constructor(
     private val coinDetailStreamDataSource: CoinDetailStreamDataSource,
+    private val coinDetailDomainModelMapper: CoinDetailDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : CoinDetailRepository {
-    private var cachedDetail: CoinPriceVO? = null
+    private var cachedDetail: CoinDetailVO? = null
 
-    override fun observeCoinDetail(symbol: String): Flow<CoinPriceVO> = flow {
+    override fun observeCoinDetail(symbol: String): Flow<CoinDetailVO> = flow {
         coinDetailStreamDataSource.observeCoinDetail(symbol).collect { state ->
             when (state) {
                 is CoinDetailStreamDataSource.State.Success -> {
-                    val coinPrice = state.ticker.toCoinPriceVO()
-                    cachedDetail = coinPrice
-                    emit(coinPrice)
+                    val coinDetail = coinDetailDomainModelMapper.toDomainModel(state.ticker)
+                    cachedDetail = coinDetail
+                    emit(coinDetail)
                 }
 
                 is CoinDetailStreamDataSource.State.Connected -> {
