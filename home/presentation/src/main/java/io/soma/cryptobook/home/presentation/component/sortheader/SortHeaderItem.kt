@@ -80,7 +80,7 @@ fun SortHeaderItem(
             text = label,
             fontFamily = fontFamily,
             fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
+            fontSize = 12.sp,
             lineHeight = 20.sp,
             color = textColor,
         )

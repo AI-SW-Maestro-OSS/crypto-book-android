@@ -64,14 +64,21 @@ internal fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifi
             }
         }
 
-        // Sort Header (TODO: 정렬 기능 구현)
+        // Sort Header
+        val symbolSort =
+            if (state.sortField == SortField.Symbol) state.sortDirection else SortDirection.None
+        val priceSort =
+            if (state.sortField == SortField.Price) state.sortDirection else SortDirection.None
+        val changeSort =
+            if (state.sortField == SortField.Change) state.sortDirection else SortDirection.None
+
         SortHeader(
-            symbolSort = SortDirection.None,
-            priceSort = SortDirection.Desc,
-            changeSort = SortDirection.None,
-            onSymbolClick = { /* TODO: 정렬 기능 구현 */ },
-            onPriceClick = { /* TODO: 정렬 기능 구현 */ },
-            onChangeClick = { /* TODO: 정렬 기능 구현 */ },
+            symbolSort = symbolSort,
+            priceSort = priceSort,
+            changeSort = changeSort,
+            onSymbolClick = { onEvent(HomeEvent.OnSortClicked(SortField.Symbol)) },
+            onPriceClick = { onEvent(HomeEvent.OnSortClicked(SortField.Price)) },
+            onChangeClick = { onEvent(HomeEvent.OnSortClicked(SortField.Change)) },
         )
 
         // Coin List
