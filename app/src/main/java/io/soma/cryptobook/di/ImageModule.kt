@@ -24,7 +24,7 @@ object ImageModule {
     @Singleton
     fun provideImageLoader(
         @ApplicationContext context: Context,
-        @BinanceNetwork okHttpClient: OkHttpClient,
+        okHttpClient: OkHttpClient,
     ): ImageLoader {
         return ImageLoader.Builder(context)
             .components {
