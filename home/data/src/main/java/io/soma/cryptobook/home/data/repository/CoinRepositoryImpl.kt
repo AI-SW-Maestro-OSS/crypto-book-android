@@ -1,12 +1,12 @@
 package io.soma.cryptobook.home.data.repository
 
-import io.soma.cryptobook.core.data.model.toCoinPriceVO
 import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import io.soma.cryptobook.core.domain.model.CoinInfoVO
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import io.soma.cryptobook.core.domain.repository.CoinRepository
 import io.soma.cryptobook.home.data.datasource.CoinListRemoteDataSource
 import io.soma.cryptobook.home.data.datasource.CoinListStreamDataSource
+import io.soma.cryptobook.home.data.mapper.CoinPriceDomainModelMapper
 import io.soma.cryptobook.home.data.model.toCoinPriceVO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +20,7 @@ class CoinRepositoryImpl
 constructor(
     private val coinListRemoteDataSource: CoinListRemoteDataSource,
     private val coinListStreamDataSource: CoinListStreamDataSource,
+    private val coinPriceDomainModelMapper: CoinPriceDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : CoinRepository {
 
@@ -46,7 +47,7 @@ constructor(
             when (state) {
                 is CoinListStreamDataSource.State.Success -> {
                     state.tickers.forEach { ticker ->
-                        cache[ticker.symbol] = ticker.toCoinPriceVO()
+                        cache[ticker.symbol] = coinPriceDomainModelMapper.toDomainModel(ticker)
                     }
                     emit(cache.values.toList())
                 }
