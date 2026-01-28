@@ -23,11 +23,13 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
      */
     fun toUiState(
         vo: CoinDetailVO,
+        imageUrl: String,
         isLoading: Boolean = false,
         errorMsg: String? = null,
     ): CoinDetailUiState {
         return CoinDetailUiState(
             symbol = vo.symbol,
+            imageUrl = imageUrl,
             currentPrice = formatPrice(vo.currentPrice),
             priceChangeText = formatPriceChange(vo.priceChange, vo.priceChangePercent),
             priceChangePercent = vo.priceChangePercent,
