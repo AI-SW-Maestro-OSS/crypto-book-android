@@ -6,6 +6,7 @@ import io.soma.cryptobook.core.presentation.UiState
 
 data class CoinDetailUiState(
     val symbol: String = "",
+    val imageUrl: String = "",
     val currentPrice: String = "",
     val priceChangeText: String = "",
     val priceChangePercent: Double = 0.0,

@@ -86,6 +86,7 @@ private fun CoinDetailContent(state: CoinDetailUiState, modifier: Modifier = Mod
         modifier = modifier.padding(16.dp),
     ) {
         PriceChange(
+            imageUrl = state.imageUrl,
             price = state.currentPrice,
             priceChangeText = state.priceChangeText,
             priceChangeType = priceChangeType,
@@ -106,6 +107,7 @@ private fun CoinDetailScreenPreview() {
     CoinDetailScreen(
         state = CoinDetailUiState(
             symbol = "BTCUSDT",
+            imageUrl = "",
             currentPrice = "$73,500.89",
             priceChangeText = "+$1,840.55 (+2.58%)",
             priceChangePercent = 2.58,

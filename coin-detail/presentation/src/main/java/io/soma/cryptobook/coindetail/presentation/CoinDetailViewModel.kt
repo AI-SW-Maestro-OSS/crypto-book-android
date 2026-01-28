@@ -6,6 +6,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveCoinDetailUseCase
 import io.soma.cryptobook.coindetail.presentation.mapper.CoinDetailPresentationModelMapper
+import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.presentation.MviViewModel
@@ -15,10 +16,14 @@ class CoinDetailViewModel @AssistedInject constructor(
     @Assisted private val coinName: String,
     private val observeCoinDetailUseCase: ObserveCoinDetailUseCase,
     private val mapper: CoinDetailPresentationModelMapper,
+    private val coinImageResolver: CoinImageResolver,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
 ) : MviViewModel<CoinDetailEvent, CoinDetailUiState, CoinDetailSideEffect>(
-    CoinDetailUiState(symbol = coinName),
+    CoinDetailUiState(
+        symbol = coinName,
+        imageUrl = coinImageResolver.getImageUrl(coinName)
+    ),
 ) {
     @AssistedFactory
     interface Factory {
@@ -45,6 +50,7 @@ class CoinDetailViewModel @AssistedInject constructor(
                         reduce {
                             mapper.toUiState(
                                 vo = result.coinDetail,
+                                imageUrl = imageUrl,
                                 isLoading = false,
                                 errorMsg = null,
                             )
