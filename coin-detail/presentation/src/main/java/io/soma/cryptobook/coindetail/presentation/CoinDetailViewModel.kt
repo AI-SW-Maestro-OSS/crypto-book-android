@@ -22,7 +22,7 @@ class CoinDetailViewModel @AssistedInject constructor(
 ) : MviViewModel<CoinDetailEvent, CoinDetailUiState, CoinDetailSideEffect>(
     CoinDetailUiState(
         symbol = coinName,
-        imageUrl = coinImageResolver.getImageUrl(coinName)
+        imageUrl = coinImageResolver.getImageUrl(coinName),
     ),
 ) {
     @AssistedFactory
