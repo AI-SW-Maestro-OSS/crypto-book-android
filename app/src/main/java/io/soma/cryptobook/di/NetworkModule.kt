@@ -39,8 +39,15 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideDefaultOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    @Provides
+    @Singleton
     @BinanceNetwork
-    fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+    fun provideBinanceOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .pingInterval(3, TimeUnit.MINUTES)
         .build()
 
