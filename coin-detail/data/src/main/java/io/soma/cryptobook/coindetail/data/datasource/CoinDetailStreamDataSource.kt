@@ -1,69 +1,51 @@
 package io.soma.cryptobook.coindetail.data.datasource
 
 import io.soma.cryptobook.core.data.model.CoinTickerDto
-import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.BinanceConnectionManager
+import io.soma.cryptobook.core.network.SubscriptionManager
+import io.soma.cryptobook.core.network.table.WebSocketTableManager
+import io.soma.cryptobook.core.network.table.WebSocketTableManager.TableState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class CoinDetailStreamDataSource @Inject constructor(
-    private val webSocketClient: BinanceWebSocketClient,
+    private val tableManager: WebSocketTableManager,
+    private val subscriptionManager: SubscriptionManager,
+    private val connectionManager: BinanceConnectionManager,
     private val json: Json,
 ) {
     sealed interface State {
+        data object Loading : State
         data class Success(val ticker: CoinTickerDto) : State
         data class Error(val throwable: Throwable) : State
-        data object Connected : State
-        data object Disconnected : State
     }
 
-    fun observeCoinDetail(symbol: String): Flow<State> = flow {
-        val targetStream = "${symbol.lowercase()}@ticker"
-        val targetSymbol = symbol.uppercase()
+    fun observeCoinDetail(symbol: String): Flow<State> {
+        val streamName = "${symbol.lowercase()}@ticker"
 
-        webSocketClient.connect()
-
-        if (webSocketClient.isConnected) {
-            webSocketClient.sendSubscribe(targetStream)
-            emit(State.Connected)
-        }
-
-        try {
-            webSocketClient.events.collect { event ->
-                when (event) {
-                    is BinanceWebSocketClient.Event.Message -> {
-                        val isTargetEvent = event.message.trim()
-                            .startsWith("{") && event.message.contains("24hrTicker")
-                        if (isTargetEvent) {
-                            try {
-                                val ticker =
-                                    json.decodeFromString<CoinTickerDto>(event.message)
-                                // target symbol만 emit
-                                if (ticker.symbol == targetSymbol) {
-                                    emit(State.Success(ticker))
-                                }
-                            } catch (e: Exception) { // 파싱 실패 무시
-                            }
-                        }
-                    }
-
-                    is BinanceWebSocketClient.Event.Connected -> {
-                        webSocketClient.sendSubscribe(targetStream)
-                        emit(State.Connected)
-                    }
-
-                    is BinanceWebSocketClient.Event.Disconnected -> {
-                        emit(State.Disconnected)
-                    }
-
-                    is BinanceWebSocketClient.Event.Error -> {
-                        emit(State.Error(event.throwable))
+        return tableManager
+            .getTable(streamName)
+            .map { tableState ->
+                when (tableState) {
+                    is TableState.Empty -> State.Loading
+                    is TableState.Data -> {
+                        val ticker = json.decodeFromString<CoinTickerDto>(tableState.rawJson)
+                        State.Success(ticker)
                     }
                 }
             }
-        } finally {
-            webSocketClient.sendUnsubscribe(targetStream)
-        }
+            .catch { e -> emit(State.Error(e)) }
+            .onStart {
+                connectionManager.connect()
+                subscriptionManager.subscribe(streamName)
+            }
+            .onCompletion {
+                subscriptionManager.unsubscribe(streamName)
+            }
     }
 }

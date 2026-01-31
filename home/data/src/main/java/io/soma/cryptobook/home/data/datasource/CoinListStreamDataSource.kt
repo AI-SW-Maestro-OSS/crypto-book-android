@@ -1,7 +1,7 @@
 package io.soma.cryptobook.home.data.datasource
 
 import io.soma.cryptobook.core.data.model.CoinTickerDto
-import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.BinanceConnectionManager
 import io.soma.cryptobook.core.network.SubscriptionManager
 import io.soma.cryptobook.core.network.table.WebSocketTableManager
 import io.soma.cryptobook.core.network.table.WebSocketTableManager.TableState
@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 class CoinListStreamDataSource(
     private val tableManager: WebSocketTableManager,
     private val subscriptionManager: SubscriptionManager,
-    private val webSocketClient: BinanceWebSocketClient,
+    private val connectionManager: BinanceConnectionManager,
     private val json: Json,
 ) {
     sealed class State {
@@ -37,7 +37,7 @@ class CoinListStreamDataSource(
         }
         .catch { e -> emit(State.Error(e)) }
         .onStart {
-            webSocketClient.connect()
+            connectionManager.connect()
             subscriptionManager.subscribe(STREAM_NAME)
         }
         .onCompletion {

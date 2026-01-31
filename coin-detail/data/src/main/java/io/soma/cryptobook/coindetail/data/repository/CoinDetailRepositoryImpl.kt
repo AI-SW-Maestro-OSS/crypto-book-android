@@ -29,7 +29,7 @@ constructor(
                     emit(coinDetail)
                 }
 
-                is CoinDetailStreamDataSource.State.Connected -> {
+                is CoinDetailStreamDataSource.State.Loading -> {
                     cachedDetail?.let { emit(it) }
                 }
 
@@ -37,9 +37,6 @@ constructor(
                     if (state.throwable is WebSocketReconnectExhaustedException) {
                         throw state.throwable
                     }
-                }
-
-                is CoinDetailStreamDataSource.State.Disconnected -> {
                 }
             }
         }

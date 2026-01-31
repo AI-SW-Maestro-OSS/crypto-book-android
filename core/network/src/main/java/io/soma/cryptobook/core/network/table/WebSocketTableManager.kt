@@ -1,6 +1,6 @@
 package io.soma.cryptobook.core.network.table
 
-import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.BinanceConnectionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class WebSocketTableManager @Inject constructor(
-    private val webSocketClient: BinanceWebSocketClient,
+    private val connectionManager: BinanceConnectionManager,
     private val scope: CoroutineScope,
 ) {
     sealed class TableState {
@@ -21,10 +21,10 @@ class WebSocketTableManager @Inject constructor(
 
     init {
         scope.launch {
-            webSocketClient.events.collect { event ->
+            connectionManager.events.collect { event ->
                 when (event) {
-                    is BinanceWebSocketClient.Event.Message -> routeMessage(event.message)
-                    is BinanceWebSocketClient.Event.Disconnected -> clearAllTables()
+                    is BinanceConnectionManager.Event.Message -> routeMessage(event.message)
+                    is BinanceConnectionManager.Event.Disconnected -> clearAllTables()
                     else -> { }
                 }
             }

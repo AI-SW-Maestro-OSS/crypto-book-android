@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.math.pow
 
-class BinanceWebSocketClient @Inject constructor(
+class BinanceConnectionManager @Inject constructor(
     private val client: OkHttpClient,
     private val scope: CoroutineScope,
 ) {
@@ -76,7 +76,7 @@ class BinanceWebSocketClient @Inject constructor(
             Log.e(TAG, "Failed: ${t.message}")
             _isConnected.set(false)
             _events.tryEmit(Event.Error(t))
-            this@BinanceWebSocketClient.webSocket = null
+            this@BinanceConnectionManager.webSocket = null
             reconnect()
         }
 
@@ -84,7 +84,7 @@ class BinanceWebSocketClient @Inject constructor(
             Log.d(TAG, "Closed: code=$code")
             _isConnected.set(false)
             _events.tryEmit(Event.Disconnected)
-            this@BinanceWebSocketClient.webSocket = null
+            this@BinanceConnectionManager.webSocket = null
             if (code != 1000 && !intentionalDisconnect.get()) {
                 reconnect()
             }

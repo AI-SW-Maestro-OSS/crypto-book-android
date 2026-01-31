@@ -8,15 +8,15 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 class SubscriptionManager @Inject constructor(
-    private val webSocketClient: BinanceWebSocketClient,
+    private val connectionManager: BinanceConnectionManager,
     private val scope: CoroutineScope,
 ) {
     private val counts = ConcurrentHashMap<String, AtomicInteger>()
 
     init {
         scope.launch {
-            webSocketClient.events.collect { event ->
-                if (event is BinanceWebSocketClient.Event.Connected) {
+            connectionManager.events.collect { event ->
+                if (event is BinanceConnectionManager.Event.Connected) {
                     resubscribeAll()
                 }
             }
@@ -27,7 +27,7 @@ class SubscriptionManager @Inject constructor(
         val count = counts.getOrPut(stream) { AtomicInteger(0) }
         if (count.incrementAndGet() == 1) {
             Log.d(TAG, "Subscribe: $stream")
-            webSocketClient.sendSubscribe(stream)
+            connectionManager.sendSubscribe(stream)
         }
     }
 
@@ -36,7 +36,7 @@ class SubscriptionManager @Inject constructor(
         if (count.decrementAndGet() == 0) {
             counts.remove(stream)
             Log.d(TAG, "Unsubscribe: $stream")
-            webSocketClient.sendUnsubscribe(stream)
+            connectionManager.sendUnsubscribe(stream)
         }
     }
 
@@ -44,7 +44,7 @@ class SubscriptionManager @Inject constructor(
         val streams = counts.keys.toList()
         if (streams.isNotEmpty()) {
             Log.d(TAG, "Resubscribe all: $streams")
-            webSocketClient.sendSubscribe(streams)
+            connectionManager.sendSubscribe(streams)
         }
     }
 

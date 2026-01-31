@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.BinanceConnectionManager
 import io.soma.cryptobook.core.network.SubscriptionManager
 import io.soma.cryptobook.core.network.table.WebSocketTableManager
 import io.soma.cryptobook.home.data.datasource.CoinListStreamDataSource
@@ -19,12 +19,12 @@ object DataSourceModule {
     fun provideCoinListStreamDataSource(
         tableManager: WebSocketTableManager,
         subscriptionManager: SubscriptionManager,
-        webSocketClient: BinanceWebSocketClient,
+        connectionManager: BinanceConnectionManager,
         json: Json,
     ): CoinListStreamDataSource = CoinListStreamDataSource(
         tableManager = tableManager,
         subscriptionManager = subscriptionManager,
-        webSocketClient = webSocketClient,
+        connectionManager = connectionManager,
         json = json,
     )
 }

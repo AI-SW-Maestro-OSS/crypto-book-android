@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.core.data.network.ExchangeApiService
-import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.BinanceConnectionManager
 import io.soma.cryptobook.core.network.SubscriptionManager
 import io.soma.cryptobook.core.network.table.WebSocketTableManager
 import io.soma.cryptobook.home.data.network.BinanceApiService
@@ -78,10 +78,10 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideBinanceWebSocketClient(
+    fun provideBinanceConnectionManager(
         @BinanceNetwork okHttpClient: OkHttpClient,
         @ApplicationScope scope: CoroutineScope,
-    ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient, scope)
+    ): BinanceConnectionManager = BinanceConnectionManager(okHttpClient, scope)
 
 // ========================================================================
 
@@ -144,15 +144,15 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideSubscriptionManager(
-        webSocketClient: BinanceWebSocketClient,
+        connectionManager: BinanceConnectionManager,
         @ApplicationScope scope: CoroutineScope,
-    ): SubscriptionManager = SubscriptionManager(webSocketClient, scope)
+    ): SubscriptionManager = SubscriptionManager(connectionManager, scope)
 
     @Provides
     @Singleton
     fun provideWebSocketTableManager(
-        webSocketClient: BinanceWebSocketClient,
+        connectionManager: BinanceConnectionManager,
         @ApplicationScope scope: CoroutineScope,
-    ): WebSocketTableManager = WebSocketTableManager(webSocketClient, scope)
+    ): WebSocketTableManager = WebSocketTableManager(connectionManager, scope)
 
 }
