@@ -25,7 +25,7 @@ class CoinDetailStreamDataSource @Inject constructor(
         webSocketClient.connect()
 
         if (webSocketClient.isConnected) {
-            webSocketClient.subscribe(listOf(targetStream))
+            webSocketClient.sendSubscribe(targetStream)
             emit(State.Connected)
         }
 
@@ -49,7 +49,7 @@ class CoinDetailStreamDataSource @Inject constructor(
                     }
 
                     is BinanceWebSocketClient.Event.Connected -> {
-                        webSocketClient.subscribe(listOf(targetStream))
+                        webSocketClient.sendSubscribe(targetStream)
                         emit(State.Connected)
                     }
 
@@ -63,7 +63,7 @@ class CoinDetailStreamDataSource @Inject constructor(
                 }
             }
         } finally {
-            webSocketClient.unsubscribe(listOf(targetStream))
+            webSocketClient.sendUnsubscribe(targetStream)
         }
     }
 }

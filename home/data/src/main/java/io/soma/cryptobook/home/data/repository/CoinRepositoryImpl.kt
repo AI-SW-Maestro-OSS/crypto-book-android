@@ -10,8 +10,11 @@ import io.soma.cryptobook.home.data.mapper.CoinPriceDomainModelMapper
 import io.soma.cryptobook.home.data.model.toCoinPriceVO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -30,42 +33,36 @@ constructor(
         coinListRemoteDataSource.getAllTickerPrices().map { it.toCoinPriceVO() }
     }
 
-    override fun observeCoinPrices(): Flow<List<CoinPriceVO>> = flow {
-        if (cache.isEmpty()) {
-            try {
-                val initialData = getCoinPrices()
-                initialData.forEach { cache[it.symbol] = it }
-            } catch (e: Exception) {
+    override fun observeCoinPrices(): Flow<List<CoinPriceVO>> =
+        coinListStreamDataSource.observeTickers()
+            .onEach { state ->
+                if (state is CoinListStreamDataSource.State.Error &&
+                    state.throwable is WebSocketReconnectExhaustedException
+                ) {
+                    throw state.throwable
+                }
             }
-        }
-
-        if (cache.isNotEmpty()) {
-            emit(cache.values.toList())
-        }
-
-        coinListStreamDataSource.observeCoinList().collect { state ->
-            when (state) {
-                is CoinListStreamDataSource.State.Success -> {
-                    state.tickers.forEach { ticker ->
-                        cache[ticker.symbol] = coinPriceDomainModelMapper.toDomainModel(ticker)
+            .filterIsInstance<CoinListStreamDataSource.State.Success>()
+            .map { state ->
+                state.tickers.forEach { ticker ->
+                    cache[ticker.symbol] = coinPriceDomainModelMapper.toDomainModel(ticker)
+                }
+                cache.values.toList()
+            }
+            .onStart {
+                if (cache.isEmpty()) {
+                    try {
+                        val initialData = getCoinPrices()
+                        initialData.forEach { cache[it.symbol] = it }
+                    } catch (e: Exception) {
+                        // initial load failed, will retry on stream
                     }
+                }
+                if (cache.isNotEmpty()) {
                     emit(cache.values.toList())
                 }
-
-                is CoinListStreamDataSource.State.Connected -> {
-                    if (cache.isNotEmpty()) emit(cache.values.toList())
-                }
-
-                is CoinListStreamDataSource.State.Error -> {
-                    if (state.throwable is WebSocketReconnectExhaustedException) {
-                        throw state.throwable
-                    }
-                }
-
-                is CoinListStreamDataSource.State.Disconnected -> {}
             }
-        }
-    }.flowOn(ioDispatcher)
+            .flowOn(ioDispatcher)
 
     override suspend fun getCoinInfoList(): List<CoinInfoVO> {
         TODO("Not yet implemented")

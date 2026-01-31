@@ -108,14 +108,22 @@ class BinanceWebSocketClient @Inject constructor(
         webSocket = null
     }
 
-    fun subscribe(streams: List<String>) {
+    fun sendSubscribe(stream: String) {
+        sendSubscribe(listOf(stream))
+    }
+
+    fun sendSubscribe(streams: List<String>) {
         if (!isConnected) return
         val id = requestIdCounter.getAndIncrement()
         val json = createSubscriptionJson("SUBSCRIBE", streams, id)
         webSocket?.send(json)
     }
 
-    fun unsubscribe(streams: List<String>) {
+    fun sendUnsubscribe(stream: String) {
+        sendUnsubscribe(listOf(stream))
+    }
+
+    fun sendUnsubscribe(streams: List<String>) {
         if (!isConnected) return
         val id = requestIdCounter.getAndIncrement()
         val json = createSubscriptionJson("UNSUBSCRIBE", streams, id)
