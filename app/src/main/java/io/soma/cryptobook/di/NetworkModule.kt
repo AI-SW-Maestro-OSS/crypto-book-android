@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.SubscriptionManager
+import io.soma.cryptobook.core.network.table.WebSocketTableManager
 import io.soma.cryptobook.home.data.network.BinanceApiService
 import io.soma.cryptobook.splash.data.network.CryptoBookApiService
 import kotlinx.coroutines.CoroutineScope
@@ -82,13 +83,6 @@ object NetworkModule {
         @ApplicationScope scope: CoroutineScope,
     ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient, scope)
 
-    @Provides
-    @Singleton
-    fun provideSubscriptionManager(
-        webSocketClient: BinanceWebSocketClient,
-        @ApplicationScope scope: CoroutineScope,
-    ): SubscriptionManager = SubscriptionManager(webSocketClient, scope)
-
 // ========================================================================
 
     @Provides
@@ -144,4 +138,21 @@ object NetworkModule {
     @Singleton
     fun provideExchangeApiService(@KoreaEximNetwork retrofit: Retrofit): ExchangeApiService =
         retrofit.create(ExchangeApiService::class.java)
+
+    // ========================================================================
+
+    @Provides
+    @Singleton
+    fun provideSubscriptionManager(
+        webSocketClient: BinanceWebSocketClient,
+        @ApplicationScope scope: CoroutineScope,
+    ): SubscriptionManager = SubscriptionManager(webSocketClient, scope)
+
+    @Provides
+    @Singleton
+    fun provideWebSocketTableManager(
+        webSocketClient: BinanceWebSocketClient,
+        @ApplicationScope scope: CoroutineScope,
+    ): WebSocketTableManager = WebSocketTableManager(webSocketClient, scope)
+
 }
