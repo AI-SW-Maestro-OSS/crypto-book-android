@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
-class SubscriptionTable @Inject constructor(
+class SubscriptionManager @Inject constructor(
     private val webSocketClient: BinanceWebSocketClient,
     private val scope: CoroutineScope,
 ) {
@@ -49,6 +49,6 @@ class SubscriptionTable @Inject constructor(
     }
 
     companion object {
-        private const val TAG = "SubscriptionTable"
+        private const val TAG = "SubscriptionManager"
     }
 }

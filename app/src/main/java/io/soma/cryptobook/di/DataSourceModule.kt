@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
-import io.soma.cryptobook.core.network.SubscriptionTable
+import io.soma.cryptobook.core.network.SubscriptionManager
 import io.soma.cryptobook.home.data.datasource.CoinListStreamDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
@@ -18,12 +18,12 @@ object DataSourceModule {
     @Singleton
     fun provideCoinListStreamDataSource(
         webSocketClient: BinanceWebSocketClient,
-        subscriptionTable: SubscriptionTable,
+        subscriptionManager: SubscriptionManager,
         json: Json,
         @ApplicationScope scope: CoroutineScope,
     ): CoinListStreamDataSource = CoinListStreamDataSource(
         webSocketClient = webSocketClient,
-        subscriptionTable = subscriptionTable,
+        subscriptionManager = subscriptionManager,
         json = json,
         scope = scope,
     )

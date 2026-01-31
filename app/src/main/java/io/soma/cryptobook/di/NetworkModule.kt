@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
-import io.soma.cryptobook.core.network.SubscriptionTable
+import io.soma.cryptobook.core.network.SubscriptionManager
 import io.soma.cryptobook.home.data.network.BinanceApiService
 import io.soma.cryptobook.splash.data.network.CryptoBookApiService
 import kotlinx.coroutines.CoroutineScope
@@ -84,10 +84,10 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideSubscriptionTable(
+    fun provideSubscriptionManager(
         webSocketClient: BinanceWebSocketClient,
         @ApplicationScope scope: CoroutineScope,
-    ): SubscriptionTable = SubscriptionTable(webSocketClient, scope)
+    ): SubscriptionManager = SubscriptionManager(webSocketClient, scope)
 
 // ========================================================================
 

@@ -2,7 +2,7 @@ package io.soma.cryptobook.home.data.datasource
 
 import io.soma.cryptobook.core.data.model.CoinTickerDto
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
-import io.soma.cryptobook.core.network.SubscriptionTable
+import io.soma.cryptobook.core.network.SubscriptionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
 
 class CoinListStreamDataSource(
     private val webSocketClient: BinanceWebSocketClient,
-    private val subscriptionTable: SubscriptionTable,
+    private val subscriptionManager: SubscriptionManager,
     private val json: Json,
     private val scope: CoroutineScope,
 ) {
@@ -64,10 +64,10 @@ class CoinListStreamDataSource(
     fun observeTickers(): Flow<State> = tickerState
         .onSubscription {
             webSocketClient.connect()
-            subscriptionTable.subscribe(STREAM_NAME)
+            this@CoinListStreamDataSource.subscriptionManager.subscribe(STREAM_NAME)
         }
         .onCompletion {
-            subscriptionTable.unsubscribe(STREAM_NAME)
+            this@CoinListStreamDataSource.subscriptionManager.unsubscribe(STREAM_NAME)
         }
 
     companion object {
