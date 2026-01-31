@@ -3,71 +3,45 @@ package io.soma.cryptobook.home.data.datasource
 import io.soma.cryptobook.core.data.model.CoinTickerDto
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.SubscriptionManager
-import kotlinx.coroutines.CoroutineScope
+import io.soma.cryptobook.core.network.table.WebSocketTableManager
+import io.soma.cryptobook.core.network.table.WebSocketTableManager.TableState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onSubscription
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.serialization.json.Json
 
 class CoinListStreamDataSource(
-    private val webSocketClient: BinanceWebSocketClient,
+    private val tableManager: WebSocketTableManager,
     private val subscriptionManager: SubscriptionManager,
+    private val webSocketClient: BinanceWebSocketClient,
     private val json: Json,
-    private val scope: CoroutineScope,
 ) {
     sealed class State {
+        data object Loading : State()
         data class Success(val tickers: List<CoinTickerDto>) : State()
         data class Error(val throwable: Throwable) : State()
-        data object Connected : State()
-        data object Disconnected : State()
-        data object Idle : State()
     }
 
-    private val tickerState = MutableStateFlow<State>(State.Idle)
-
-    init {
-        scope.launch {
-            webSocketClient.events.collect { event ->
-                when (event) {
-                    is BinanceWebSocketClient.Event.Message -> {
-                        val isTargetEvent = event.message.trim()
-                            .startsWith("[") && event.message.contains("24hrTicker")
-                        if (isTargetEvent) {
-                            try {
-                                val tickers =
-                                    json.decodeFromString<List<CoinTickerDto>>(event.message)
-                                tickerState.value = State.Success(tickers)
-                            } catch (e: Exception) {
-                                // parsing error ignored
-                            }
-                        }
-                    }
-
-                    is BinanceWebSocketClient.Event.Connected -> {
-                        tickerState.value = State.Connected
-                    }
-
-                    is BinanceWebSocketClient.Event.Disconnected -> {
-                        tickerState.value = State.Disconnected
-                    }
-
-                    is BinanceWebSocketClient.Event.Error -> {
-                        tickerState.value = State.Error(event.throwable)
-                    }
+    fun observeTickers(): Flow<State> = tableManager
+        .getTable(STREAM_NAME)
+        .map { tableState ->
+            when (tableState) {
+                is TableState.Empty -> State.Loading
+                is TableState.Data -> {
+                    val tickers = json.decodeFromString<List<CoinTickerDto>>(tableState.rawJson)
+                    State.Success(tickers)
                 }
             }
         }
-    }
-
-    fun observeTickers(): Flow<State> = tickerState
-        .onSubscription {
+        .catch { e -> emit(State.Error(e)) }
+        .onStart {
             webSocketClient.connect()
-            this@CoinListStreamDataSource.subscriptionManager.subscribe(STREAM_NAME)
+            subscriptionManager.subscribe(STREAM_NAME)
         }
         .onCompletion {
-            this@CoinListStreamDataSource.subscriptionManager.unsubscribe(STREAM_NAME)
+            subscriptionManager.unsubscribe(STREAM_NAME)
         }
 
     companion object {
