@@ -35,6 +35,10 @@ gradlePlugin {
             id = libs.plugins.cryptobook.android.presentation.get().pluginId
             implementationClass = "AndroidPresentationConventionPlugin"
         }
+        register("jvmLibrary") {
+            id = libs.plugins.cryptobook.jvm.library.get().pluginId
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
         register("spotless") {
             id = libs.plugins.cryptobook.spotless.get().pluginId
             implementationClass = "SpotlessConventionPlugin"

@@ -28,6 +28,7 @@ protobuf = "4.29.2"
 protobufPlugin = "0.9.5"
 kotlinxSerializationJson = "1.9.0"
 kotlinxAtomicfu = "0.29.0"
+coil = "3.2.0"
 coroutines = "1.10.2"
 navigation3 = "1.0.0"
 spotless = "6.25.0"
@@ -76,6 +77,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinxAtomicfu" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "navigation3" }
 androidx-lifecycle-viewmodel-navigation3 = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "navigation3" }
@@ -90,6 +94,8 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+
 
 
 [plugins]
@@ -110,4 +116,5 @@ cryptobook-android-library = { id = "cryptobook.android.library" }
 cryptobook-hilt = { id = "cryptobook.hilt" }
 cryptobook-android-library-compose = { id = "cryptobook.android.library.compose" }
 cryptobook-android-presentation = { id = "cryptobook.android.presentation" }
+cryptobook-jvm-library = { id = "cryptobook.jvm.library" }
 cryptobook-spotless = { id = "cryptobook.spotless" }

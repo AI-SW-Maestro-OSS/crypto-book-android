@@ -104,6 +104,7 @@ internal fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifi
 private fun CoinItem.toCoinListItemData() = CoinListItemData(
     symbol = symbol,
     name = symbol.removeSuffix("USDT"),
+    imageUrl = imageUrl,
     price = "$${price.setScale(2, RoundingMode.HALF_UP)}",
     changePercent = priceChangePercentage24h,
 )
@@ -112,11 +113,11 @@ private fun CoinItem.toCoinListItemData() = CoinListItemData(
 @Composable
 private fun HomeScreenPreview() {
     val sampleCoins = listOf(
-        CoinItem("BTCUSDT", BigDecimal("68500.52"), 2.35),
-        CoinItem("ETHUSDT", BigDecimal("3500.25"), -1.75),
-        CoinItem("BNBUSDT", BigDecimal("580.10"), 0.0),
-        CoinItem("SOLUSDT", BigDecimal("145.30"), 5.20),
-        CoinItem("XRPUSDT", BigDecimal("0.52"), -0.85),
+        CoinItem("BTCUSDT", "", BigDecimal("68500.52"), 2.35),
+        CoinItem("ETHUSDT", "", BigDecimal("3500.25"), -1.75),
+        CoinItem("BNBUSDT", "", BigDecimal("580.10"), 0.0),
+        CoinItem("SOLUSDT", "", BigDecimal("145.30"), 5.20),
+        CoinItem("XRPUSDT", "", BigDecimal("0.52"), -0.85),
     )
 
     HomeScreen(

@@ -2,7 +2,6 @@ package io.soma.cryptobook.coindetail.presentation.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,18 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.theme.PriceDown
 import io.soma.cryptobook.core.designsystem.theme.PriceFlat
 import io.soma.cryptobook.core.designsystem.theme.PriceUp
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
 import io.soma.cryptobook.core.designsystem.theme.textPrimary
-import io.soma.cryptobook.core.designsystem.theme.textSecondary
 
 /**
  * Price change type for color variation
@@ -66,6 +67,7 @@ enum class PriceChangeType {
  */
 @Composable
 fun PriceChange(
+    imageUrl: String,
     price: String,
     priceChangeText: String,
     priceChangeType: PriceChangeType,
@@ -85,13 +87,16 @@ fun PriceChange(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Avatar placeholder
-        Box(
+        AsyncImage(
+            model = imageUrl,
+            placeholder = painterResource(R.drawable.ic_coin_placeholder),
+            error = painterResource(R.drawable.ic_coin_placeholder),
+            fallback = painterResource(R.drawable.ic_coin_placeholder),
+            contentDescription = "coin icon",
             modifier = Modifier
                 .size(56.dp)
-                .clip(CircleShape)
-                .background(textSecondary.copy(alpha = 0.3f)),
+                .clip(CircleShape),
         )
-
         // Price Info
         Column(
             modifier = Modifier.weight(1f),
@@ -129,6 +134,7 @@ fun PriceChange(
 @Composable
 private fun PriceChangeUpPreview() {
     PriceChange(
+        imageUrl = "",
         price = "$73,500.89",
         priceChangeText = "+1,840.55 (+2.58%)",
         priceChangeType = PriceChangeType.Up,
@@ -139,6 +145,7 @@ private fun PriceChangeUpPreview() {
 @Composable
 private fun PriceChangeDownPreview() {
     PriceChange(
+        imageUrl = "",
         price = "$73,500.89",
         priceChangeText = "-1,840.55 (-2.58%)",
         priceChangeType = PriceChangeType.Down,
@@ -149,6 +156,7 @@ private fun PriceChangeDownPreview() {
 @Composable
 private fun PriceChangeFlatPreview() {
     PriceChange(
+        imageUrl = "",
         price = "$73,500.89",
         priceChangeText = "+0.00 (0.00%)",
         priceChangeType = PriceChangeType.Flat,

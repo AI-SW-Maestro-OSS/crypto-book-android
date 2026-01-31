@@ -17,6 +17,7 @@ data class HomeUiState(
 
 data class CoinItem(
     val symbol: String,
+    val imageUrl: String,
     val price: BigDecimal,
     val priceChangePercentage24h: Double,
 )
@@ -36,8 +37,9 @@ sealed interface HomeEvent : Event {
 
 sealed interface HomeSideEffect : SideEffect
 
-fun CoinPriceVO.toCoinItem() = CoinItem(
+fun CoinPriceVO.toCoinItem(imageUrl: String) = CoinItem(
     symbol = symbol,
+    imageUrl = imageUrl,
     price = price,
     priceChangePercentage24h = priceChangePercentage24h,
 )

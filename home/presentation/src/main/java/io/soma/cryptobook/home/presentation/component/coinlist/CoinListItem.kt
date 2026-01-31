@@ -3,7 +3,6 @@ package io.soma.cryptobook.home.presentation.component.coinlist
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.theme.PriceDown
 import io.soma.cryptobook.core.designsystem.theme.PriceFlat
 import io.soma.cryptobook.core.designsystem.theme.PriceUp
@@ -59,6 +62,7 @@ import io.soma.cryptobook.core.designsystem.theme.textSecondary
  *
  * @param symbol Coin symbol (e.g., "BTCUSDT")
  * @param name Coin name (e.g., "Bitcoin")
+ * @param imageUrl Coin image URL
  * @param price Formatted price string (e.g., "$68500.52")
  * @param changePercent Change percentage value
  * @param onClick Callback when item is clicked
@@ -68,6 +72,7 @@ import io.soma.cryptobook.core.designsystem.theme.textSecondary
 fun CoinListItem(
     symbol: String,
     name: String,
+    imageUrl: String,
     price: String,
     changePercent: Double,
     onClick: () -> Unit,
@@ -97,12 +102,17 @@ fun CoinListItem(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Avatar placeholder
-            Box(
+            // Coin image
+            AsyncImage(
+                model = imageUrl,
+                placeholder = painterResource(R.drawable.ic_coin_placeholder),
+                error = painterResource(R.drawable.ic_coin_placeholder),
+                fallback = painterResource(R.drawable.ic_coin_placeholder),
+                contentDescription = "$name coin icon",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(textSecondary.copy(alpha = 0.3f)),
+                    .clip(RoundedCornerShape(18.dp)),
             )
 
             Spacer(modifier = Modifier.width(11.dp))
@@ -160,6 +170,7 @@ private fun CoinListItemUpPreview() {
     CoinListItem(
         symbol = "BTCUSDT",
         name = "Bitcoin",
+        imageUrl = "",
         price = "$68500.52",
         changePercent = 1.75,
         onClick = {},
@@ -172,6 +183,7 @@ private fun CoinListItemDownPreview() {
     CoinListItem(
         symbol = "BTCUSDT",
         name = "Bitcoin",
+        imageUrl = "",
         price = "$68500.52",
         changePercent = -1.75,
         onClick = {},
@@ -184,6 +196,7 @@ private fun CoinListItemFlatPreview() {
     CoinListItem(
         symbol = "BTCUSDT",
         name = "Bitcoin",
+        imageUrl = "",
         price = "$68500.52",
         changePercent = 0.0,
         onClick = {},

@@ -1,6 +1,7 @@
 package io.soma.cryptobook.home.presentation
 
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
@@ -12,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val observeCoinListUseCase: ObserveCoinListUseCase,
+    private val coinImageResolver: CoinImageResolver,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
 ) : MviViewModel<HomeEvent, HomeUiState, HomeSideEffect>(HomeUiState()) {
@@ -48,7 +50,9 @@ class HomeViewModel @Inject constructor(
                             copy(
                                 isLoading = false,
                                 errorMsg = null,
-                                coins = sortedCoins,
+                                coins = sortedCoins.coinList.map {
+                                    it.toCoinItem(coinImageResolver.getImageUrl(it.symbol))
+                                },
                             )
                         }
                     }

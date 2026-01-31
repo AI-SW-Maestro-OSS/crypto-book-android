@@ -11,11 +11,11 @@ class CoinDetailStreamDataSource @Inject constructor(
     private val webSocketClient: BinanceWebSocketClient,
     private val json: Json,
 ) {
-    sealed class State {
-        data class Success(val ticker: CoinTickerDto) : State()
-        data class Error(val throwable: Throwable) : State()
-        data object Connected : State()
-        data object Disconnected : State()
+    sealed interface State {
+        data class Success(val ticker: CoinTickerDto) : State
+        data class Error(val throwable: Throwable) : State
+        data object Connected : State
+        data object Disconnected : State
     }
 
     fun observeCoinDetail(symbol: String): Flow<State> = flow {
