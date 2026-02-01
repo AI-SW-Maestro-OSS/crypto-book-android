@@ -154,5 +154,4 @@ object NetworkModule {
         connectionManager: BinanceConnectionManager,
         @ApplicationScope scope: CoroutineScope,
     ): WebSocketTableManager = WebSocketTableManager(connectionManager, scope)
-
 }

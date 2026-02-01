@@ -54,7 +54,7 @@ class WebSocketTableManager @Inject constructor(
             // 개별 티커: "s" 필드(Symbol)로 스트림 이름 추론
             trimmed.startsWith("{") && trimmed.contains("\"24hrTicker\"") -> {
                 val regex = """"s"\s*:\s*"([^"]+)"""".toRegex()
-                regex.find(trimmed)?.groupValues?.get(1)?.lowercase()?.let { "${it}@ticker" }
+                regex.find(trimmed)?.groupValues?.get(1)?.lowercase()?.let { "$it@ticker" }
             }
             else -> null
         }
