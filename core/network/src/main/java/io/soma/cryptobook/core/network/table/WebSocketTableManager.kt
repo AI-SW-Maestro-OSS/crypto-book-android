@@ -51,10 +51,10 @@ class WebSocketTableManager @Inject constructor(
         return when {
             // 배열 형식: !ticker@arr
             trimmed.startsWith("[") && trimmed.contains("24hrTicker") -> "!ticker@arr"
-            // 개별 스트림: stream 필드 파싱
-            trimmed.startsWith("{") && trimmed.contains("\"stream\"") -> {
-                val regex = """"stream"\s*:\s*"([^"]+)"""".toRegex()
-                regex.find(trimmed)?.groupValues?.get(1)
+            // 개별 티커: "s" 필드(Symbol)로 스트림 이름 추론
+            trimmed.startsWith("{") && trimmed.contains("\"24hrTicker\"") -> {
+                val regex = """"s"\s*:\s*"([^"]+)"""".toRegex()
+                regex.find(trimmed)?.groupValues?.get(1)?.lowercase()?.let { "${it}@ticker" }
             }
             else -> null
         }
