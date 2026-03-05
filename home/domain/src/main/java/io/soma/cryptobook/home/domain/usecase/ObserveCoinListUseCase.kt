@@ -1,6 +1,5 @@
 package io.soma.cryptobook.home.domain.usecase
 
-import io.soma.cryptobook.core.domain.error.WebSocketDisconnectedException
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import io.soma.cryptobook.core.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +14,6 @@ class ObserveCoinListUseCase @Inject constructor(
         data class Success(val coinList: List<CoinPriceVO>) : Result()
         sealed class Error : Result() {
             data class Connection(val throwable: Throwable) : Error()
-            object Disconnected : Error()
         }
     }
 
@@ -24,15 +22,7 @@ class ObserveCoinListUseCase @Inject constructor(
             .map<List<CoinPriceVO>, Result> { coins ->
                 Result.Success(coins)
             }.catch { e ->
-                when (e) {
-                    is WebSocketDisconnectedException -> {
-                        emit(Result.Error.Disconnected)
-                    }
-
-                    else -> {
-                        emit(Result.Error.Connection(e))
-                    }
-                }
+                emit(Result.Error.Connection(e))
             }
     }
 }

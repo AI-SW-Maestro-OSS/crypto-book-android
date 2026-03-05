@@ -33,6 +33,7 @@ constructor(
 
     override fun observeCoinPrices(): Flow<List<CoinPriceVO>> = channelFlow {
         val initialPrices = LinkedHashMap<String, CoinPriceVO>()
+        var hasInitialEmission = false
 
         runCatching { getCoinPrices() }
             .getOrNull()
@@ -40,7 +41,12 @@ constructor(
             ?.let { initial ->
                 initial.forEach { initialPrices[it.symbol] = it }
                 send(initial)
+                hasInitialEmission = true
             }
+
+        if (!hasInitialEmission) {
+            send(emptyList())
+        }
 
         val streamJob = launch {
             coinListStreamDataSource.observeCoinList().collect { state ->
