@@ -7,6 +7,8 @@ interface BinanceFuturesKlineClient {
     suspend fun getKlines(
         symbol: String,
         interval: String,
+        startTime: Long?,
+        endTime: Long?,
         limit: Int,
     ): List<List<JsonElement>>
 }

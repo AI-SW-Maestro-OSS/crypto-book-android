@@ -55,7 +55,7 @@ internal fun rememberCoinCandlestickChartRenderState(
     zoomState: VicoZoomState,
 ): CoinCandlestickChartRenderState {
     val density = LocalDensity.current
-    val timeFormatter = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+    val timeFormatter = remember { SimpleDateFormat("yy.MM.dd", Locale.getDefault()) }
     val priceFormatter = remember { DecimalFormat("#,##0.########") }
     val candleBodyWidthPx = remember(density) {
         with(density) { DEFAULT_CANDLE_BODY_WIDTH.toPx() }
@@ -206,4 +206,3 @@ private fun List<CandleUiModel>.toPriceRange(): ChartPriceRange? {
         max = paddedMax,
     )
 }
-

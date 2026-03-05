@@ -12,10 +12,6 @@ import javax.inject.Singleton
 
 @Singleton
 class InMemoryWsKlineTable @Inject constructor() : WsKlineTable {
-    private companion object {
-        private const val MAX_CANDLES = 120
-    }
-
     private val _table = MutableStateFlow<Map<KlineKey, List<CoinKlineDto>>>(emptyMap())
     override val table: StateFlow<Map<KlineKey, List<CoinKlineDto>>> = _table
 
@@ -33,7 +29,6 @@ class InMemoryWsKlineTable @Inject constructor() : WsKlineTable {
 
             val updated = current
                 .sortedBy { it.openTime }
-                .takeLast(MAX_CANDLES)
 
             LinkedHashMap(old).apply {
                 this[key] = updated
@@ -46,7 +41,6 @@ class InMemoryWsKlineTable @Inject constructor() : WsKlineTable {
         val normalized = candles
             .map { it.copy(symbol = key.symbol, interval = key.interval) }
             .sortedBy { it.openTime }
-            .takeLast(MAX_CANDLES)
         _table.update { old ->
             LinkedHashMap(old).apply {
                 this[key] = normalized

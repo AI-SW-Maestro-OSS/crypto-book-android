@@ -15,6 +15,8 @@ interface BinanceFuturesApiService {
     suspend fun getKlines(
         @Query("symbol") symbol: String,
         @Query("interval") interval: String,
+        @Query("startTime") startTime: Long?,
+        @Query("endTime") endTime: Long?,
         @Query("limit") limit: Int,
     ): Response<List<List<JsonElement>>>
 
@@ -30,11 +32,15 @@ class DefaultBinanceFuturesKlineClient @Inject constructor(
     override suspend fun getKlines(
         symbol: String,
         interval: String,
+        startTime: Long?,
+        endTime: Long?,
         limit: Int,
     ): List<List<JsonElement>> = checkResponse(
         apiService.getKlines(
             symbol = symbol,
             interval = interval,
+            startTime = startTime,
+            endTime = endTime,
             limit = limit,
         ),
     )
