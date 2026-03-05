@@ -6,6 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.market.DefaultWsMarketMessageRouter
+import io.soma.cryptobook.core.network.market.WsMarketMessageParser
+import io.soma.cryptobook.core.network.market.WsMarketMessageRouter
 import io.soma.cryptobook.core.network.session.DefaultWsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionPolicy
@@ -118,6 +121,22 @@ object NetworkModule {
         transport = webSocketClient,
         scope = scope,
         policy = policy,
+    )
+
+    @Provides
+    @Singleton
+    fun provideWsMarketMessageParser(json: Json): WsMarketMessageParser = WsMarketMessageParser(json)
+
+    @Provides
+    @Singleton
+    fun provideWsMarketMessageRouter(
+        sessionManager: WsSessionManager,
+        parser: WsMarketMessageParser,
+        @ApplicationScope scope: CoroutineScope,
+    ): WsMarketMessageRouter = DefaultWsMarketMessageRouter(
+        sessionManager = sessionManager,
+        parser = parser,
+        scope = scope,
     )
 
     @Provides
