@@ -1,9 +1,13 @@
 package io.soma.cryptobook.coindetail.data.datasource
 
+import android.util.Log
+import io.soma.cryptobook.core.data.model.CoinKlineDto
 import io.soma.cryptobook.core.data.model.CoinTickerDto
+import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
 import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.market.WsKlineEventPayload
 import io.soma.cryptobook.core.network.market.WsMarketMessage
 import io.soma.cryptobook.core.network.market.WsMarketMessageRouter
 import io.soma.cryptobook.core.network.market.WsMarketStreamEvent
@@ -22,8 +26,15 @@ class CoinDetailStreamDataSource @Inject constructor(
     private val sessionManager: WsSessionManager,
     private val subscriptionManager: WsSubscriptionManager,
     private val tickerTable: WsTickerTable,
+    private val klineTable: WsKlineTable,
+    private val klineBackfillDataSource: CoinDetailKlineBackfillDataSource,
     private val marketMessageRouter: WsMarketMessageRouter,
 ) {
+    private companion object {
+        private const val TAG = "CoinDetailStream"
+        private const val TARGET_INTERVAL = "1m"
+    }
+
     sealed interface State {
         data class Success(val ticker: CoinTickerDto) : State
         data class Error(val throwable: Throwable) : State
@@ -32,11 +43,31 @@ class CoinDetailStreamDataSource @Inject constructor(
     }
 
     fun observeCoinDetail(symbol: String): Flow<State> = flow {
-        val targetStream = "${symbol.lowercase()}@ticker"
+        val tickerStream = "${symbol.lowercase()}@ticker"
+        val klineStream = "${symbol.lowercase()}@kline_$TARGET_INTERVAL"
+        val targetStreams = setOf(tickerStream, klineStream)
         val targetSymbol = symbol.uppercase()
 
         sessionManager.acquire()
-        subscriptionManager.retain(setOf(targetStream))
+        subscriptionManager.retain(targetStreams)
+
+        runCatching {
+            klineBackfillDataSource.getKlines(
+                symbol = targetSymbol,
+                interval = TARGET_INTERVAL,
+                limit = 120,
+            )
+        }.onSuccess { candles ->
+            if (candles.isNotEmpty()) {
+                klineTable.replace(
+                    symbol = targetSymbol,
+                    interval = TARGET_INTERVAL,
+                    candles = candles,
+                )
+            }
+        }.onFailure { throwable ->
+            Log.d(TAG, "Kline backfill failed: ${throwable.message}")
+        }
 
         if (sessionManager.isConnected) {
             emit(State.Connected)
@@ -63,6 +94,16 @@ class CoinDetailStreamDataSource @Inject constructor(
                                         emit(State.Success(ticker))
                                     }
                                 }
+                                if (message is WsMarketMessage.SymbolKline) {
+                                    val candle = message.klineEvent.toCoinKlineDto()
+                                    if (candle.symbol == targetSymbol && candle.interval == TARGET_INTERVAL) {
+                                        klineTable.upsert(
+                                            symbol = targetSymbol,
+                                            interval = TARGET_INTERVAL,
+                                            candle = candle,
+                                        )
+                                    }
+                                }
                             }
 
                             is WsMarketStreamEvent.Transport -> {
@@ -73,12 +114,14 @@ class CoinDetailStreamDataSource @Inject constructor(
 
                                     is BinanceWebSocketClient.Event.Disconnected -> {
                                         tickerTable.clear()
+                                        klineTable.clear()
                                         emit(State.Disconnected)
                                     }
 
                                     is BinanceWebSocketClient.Event.Error -> {
                                         if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
                                             tickerTable.clear()
+                                            klineTable.clear()
                                         }
                                         emit(State.Error(transportEvent.throwable))
                                     }
@@ -93,11 +136,12 @@ class CoinDetailStreamDataSource @Inject constructor(
                         val failure = streamEvent.failure
                         val isGlobalFailure =
                             failure.method == WsSubscriptionMethod.ListSubscriptions
-                        val isTargetFailure = targetStream in failure.streams
+                        val isTargetFailure = failure.streams.any { it in targetStreams }
 
                         if (isGlobalFailure || isTargetFailure) {
                             if (failure.cause is WebSocketReconnectExhaustedException) {
                                 tickerTable.clear()
+                                klineTable.clear()
                             }
                             emit(State.Error(failure.cause))
                         }
@@ -105,7 +149,7 @@ class CoinDetailStreamDataSource @Inject constructor(
                 }
             }
         } finally {
-            subscriptionManager.release(setOf(targetStream))
+            subscriptionManager.release(targetStreams)
             sessionManager.release()
         }
     }
@@ -124,5 +168,18 @@ class CoinDetailStreamDataSource @Inject constructor(
         highPrice = highPrice,
         quoteAssetVolume = quoteAssetVolume,
         openPrice = openPrice,
+    )
+
+    private fun WsKlineEventPayload.toCoinKlineDto(): CoinKlineDto = CoinKlineDto(
+        symbol = symbol.uppercase(),
+        interval = kline.interval.lowercase(),
+        openTime = kline.openTime,
+        closeTime = kline.closeTime,
+        openPrice = kline.openPrice,
+        closePrice = kline.closePrice,
+        highPrice = kline.highPrice,
+        lowPrice = kline.lowPrice,
+        volume = kline.volume,
+        isClosed = kline.isClosed,
     )
 }

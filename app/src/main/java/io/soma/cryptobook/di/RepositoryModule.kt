@@ -6,6 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.coindetail.data.repository.CoinDetailRepositoryImpl
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
+import io.soma.cryptobook.core.data.realtime.kline.InMemoryWsKlineTable
+import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.ticker.InMemoryWsTickerTable
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
 import io.soma.cryptobook.core.data.repository.ExchangeRateRepositoryImpl
@@ -34,4 +36,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindWsTickerTable(impl: InMemoryWsTickerTable): WsTickerTable
+
+    @Binds
+    @Singleton
+    abstract fun bindWsKlineTable(impl: InMemoryWsKlineTable): WsKlineTable
 }
