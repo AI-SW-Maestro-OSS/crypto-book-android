@@ -1,6 +1,7 @@
 package io.soma.cryptobook.core.network
 
 import android.util.Log
+import io.soma.cryptobook.core.network.subscription.WsControlTransport
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 class BinanceWebSocketClient @Inject constructor(
     private val client: OkHttpClient,
-) {
+) : WsControlTransport {
     sealed interface Event {
         data class Message(val message: String) : Event
         data class Error(val throwable: Throwable) : Event
@@ -28,6 +29,7 @@ class BinanceWebSocketClient @Inject constructor(
 
     private val isConnectedRef = atomic(false)
     val isConnected: Boolean get() = isConnectedRef.value
+    override val isSocketReady: Boolean get() = isConnected
 
     private val _events = MutableSharedFlow<Event>(
         extraBufferCapacity = 64,
@@ -84,21 +86,27 @@ class BinanceWebSocketClient @Inject constructor(
     fun subscribe(streams: List<String>) {
         if (!isConnected) return
         val id = requestIdCounter.getAndIncrement()
-        val json = createSubscriptionJson("SUBSCRIBE", streams, id)
-        webSocket?.send(json)
+        sendCommand("SUBSCRIBE", streams, id)
     }
 
     fun unsubscribe(streams: List<String>) {
         if (!isConnected) return
         val id = requestIdCounter.getAndIncrement()
-        val json = createSubscriptionJson("UNSUBSCRIBE", streams, id)
-        webSocket?.send(json)
+        sendCommand("UNSUBSCRIBE", streams, id)
     }
 
-    private fun createSubscriptionJson(method: String, params: List<String>, id: Int): String =
+    override fun sendCommand(method: String, params: List<Any>, id: Int): Boolean {
+        if (!isConnected) return false
+        val json = createCommandJson(method = method, params = params, id = id)
+        return webSocket?.send(json) == true
+    }
+
+    private fun createCommandJson(method: String, params: List<Any>, id: Int): String =
         JSONObject().apply {
             put("method", method)
-            put("params", JSONArray(params))
+            if (params.isNotEmpty()) {
+                put("params", JSONArray(params))
+            }
             put("id", id)
         }.toString()
 }
