@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.cryptobook.android.library)
     alias(libs.plugins.cryptobook.hilt)
+    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.cryptobook.spotless)
 }
 

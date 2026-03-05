@@ -86,7 +86,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideBinanceApiService(@BinanceNetwork retrofit: Retrofit): BinanceApiService =
+    fun provideBinanceApiService(@BinanceFuturesNetwork retrofit: Retrofit): BinanceApiService =
         retrofit.create(BinanceApiService::class.java)
 
     @Provides
