@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.soma.cryptobook.coindetail.data.network.BinanceFuturesKlineClient
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.market.DefaultWsMarketMessageRouter
@@ -33,6 +34,10 @@ annotation class BinanceNetwork
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class BinanceFuturesNetwork
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class CryptoBookNetwork
 
 @Qualifier
@@ -43,6 +48,7 @@ annotation class KoreaEximNetwork
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     private const val BINANCE_BASE_URL = "https://api.binance.com/"
+    private const val BINANCE_FUTURES_BASE_URL = "https://fapi.binance.com/"
     private const val CRYPTOBOOK_BASE_URL = "https://cryptobook.soma.io/"
     private const val KOREA_EXIM_BASE_URL = "https://oapi.koreaexim.go.kr/"
 
@@ -82,6 +88,33 @@ object NetworkModule {
     @Singleton
     fun provideBinanceApiService(@BinanceNetwork retrofit: Retrofit): BinanceApiService =
         retrofit.create(BinanceApiService::class.java)
+
+    @Provides
+    @Singleton
+    @BinanceFuturesNetwork
+    fun provideBinanceFuturesRetrofit(
+        @BinanceNetwork okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit {
+        val contentType = "application/json".toMediaType()
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(BINANCE_FUTURES_BASE_URL)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBinanceFuturesApiService(
+        @BinanceFuturesNetwork retrofit: Retrofit,
+    ): BinanceFuturesApiService = retrofit.create(BinanceFuturesApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideBinanceFuturesKlineClient(
+        apiService: BinanceFuturesApiService,
+    ): BinanceFuturesKlineClient = DefaultBinanceFuturesKlineClient(apiService)
 
     @Provides
     @Singleton

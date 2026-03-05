@@ -10,6 +10,7 @@ data class CoinDetailUiState(
     val currentPrice: String = "",
     val priceChangeText: String = "",
     val priceChangePercent: Double = 0.0,
+    val candles: List<CandleUiModel> = emptyList(),
     val high24h: String = "",
     val low24h: String = "",
     val volume24h: String = "",
@@ -17,6 +18,15 @@ data class CoinDetailUiState(
     val isLoading: Boolean = true,
     val errorMsg: String? = null,
 ) : UiState
+
+data class CandleUiModel(
+    val openTime: Long,
+    val closeTime: Long,
+    val open: Double,
+    val close: Double,
+    val high: Double,
+    val low: Double,
+)
 
 sealed interface CoinDetailEvent : Event {
     data object OnBackClicked : CoinDetailEvent

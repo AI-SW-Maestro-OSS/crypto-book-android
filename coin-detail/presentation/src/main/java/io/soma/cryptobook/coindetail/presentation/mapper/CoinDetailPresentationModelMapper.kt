@@ -1,6 +1,8 @@
 package io.soma.cryptobook.coindetail.presentation.mapper
 
+import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
+import io.soma.cryptobook.coindetail.presentation.CandleUiModel
 import io.soma.cryptobook.coindetail.presentation.CoinDetailUiState
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -23,6 +25,7 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
      */
     fun toUiState(
         vo: CoinDetailVO,
+        candles: List<CoinCandleVO>,
         imageUrl: String,
         isLoading: Boolean = false,
         errorMsg: String? = null,
@@ -33,6 +36,7 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
             currentPrice = formatPrice(vo.currentPrice),
             priceChangeText = formatPriceChange(vo.priceChange, vo.priceChangePercent),
             priceChangePercent = vo.priceChangePercent,
+            candles = candles.map { it.toUiModel() },
             high24h = formatPrice(vo.high24h),
             low24h = formatPrice(vo.low24h),
             volume24h = formatVolume(vo.volume24h),
@@ -93,4 +97,13 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
 
         return "$sign$$priceChangeFormatted ($sign$percentFormatted%)"
     }
+
+    private fun CoinCandleVO.toUiModel(): CandleUiModel = CandleUiModel(
+        openTime = openTime,
+        closeTime = closeTime,
+        open = open,
+        close = close,
+        high = high,
+        low = low,
+    )
 }

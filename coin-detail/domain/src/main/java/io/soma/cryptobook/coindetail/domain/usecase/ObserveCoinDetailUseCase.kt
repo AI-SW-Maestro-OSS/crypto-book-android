@@ -1,5 +1,6 @@
 package io.soma.cryptobook.coindetail.domain.usecase
 
+import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailStreamState
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
@@ -13,7 +14,11 @@ class ObserveCoinDetailUseCase @Inject constructor(
 ) {
     sealed interface Result {
         data object Loading : Result
-        data class Success(val coinDetail: CoinDetailVO) : Result
+        data class Success(
+            val coinDetail: CoinDetailVO,
+            val candles: List<CoinCandleVO>,
+        ) : Result
+
         sealed interface Error : Result {
             data class Connection(val throwable: Throwable) : Error
         }
@@ -23,7 +28,10 @@ class ObserveCoinDetailUseCase @Inject constructor(
         .map<CoinDetailStreamState, Result> { state ->
             when (state) {
                 is CoinDetailStreamState.Loading -> Result.Loading
-                is CoinDetailStreamState.Data -> Result.Success(state.value)
+                is CoinDetailStreamState.Data -> Result.Success(
+                    coinDetail = state.value,
+                    candles = state.candles,
+                )
             }
         }.catch { e ->
             emit(Result.Error.Connection(e))

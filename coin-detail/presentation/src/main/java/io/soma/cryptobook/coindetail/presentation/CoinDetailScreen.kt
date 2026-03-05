@@ -3,7 +3,9 @@ package io.soma.cryptobook.coindetail.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContainer
+import io.soma.cryptobook.coindetail.presentation.component.CoinCandlestickChart
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
@@ -90,6 +93,13 @@ private fun CoinDetailContent(state: CoinDetailUiState, modifier: Modifier = Mod
             price = state.currentPrice,
             priceChangeText = state.priceChangeText,
             priceChangeType = priceChangeType,
+        )
+
+        CoinCandlestickChart(
+            candles = state.candles,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp),
         )
 
         MetricCardGridContainer(
