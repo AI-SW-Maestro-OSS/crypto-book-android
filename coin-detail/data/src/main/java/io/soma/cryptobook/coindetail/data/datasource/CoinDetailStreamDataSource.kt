@@ -17,9 +17,13 @@ import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionMethod
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CoinDetailStreamDataSource @Inject constructor(
@@ -27,6 +31,7 @@ class CoinDetailStreamDataSource @Inject constructor(
     private val subscriptionManager: WsSubscriptionManager,
     private val tickerTable: WsTickerTable,
     private val klineTable: WsKlineTable,
+    private val tickerSnapshotDataSource: CoinDetailTickerSnapshotDataSource,
     private val klineBackfillDataSource: CoinDetailKlineBackfillDataSource,
     private val marketMessageRouter: WsMarketMessageRouter,
 ) {
@@ -42,114 +47,135 @@ class CoinDetailStreamDataSource @Inject constructor(
         data object Disconnected : State
     }
 
-    fun observeCoinDetail(symbol: String): Flow<State> = flow {
+    fun observeCoinDetail(symbol: String): Flow<State> = channelFlow {
         val tickerStream = "${symbol.lowercase()}@ticker"
         val klineStream = "${symbol.lowercase()}@kline_$TARGET_INTERVAL"
         val targetStreams = setOf(tickerStream, klineStream)
         val targetSymbol = symbol.uppercase()
 
         sessionManager.acquire()
-        subscriptionManager.retain(targetStreams)
-
-        runCatching {
-            klineBackfillDataSource.getKlines(
-                symbol = targetSymbol,
-                interval = TARGET_INTERVAL,
-                limit = 120,
-            )
-        }.onSuccess { candles ->
-            if (candles.isNotEmpty()) {
-                klineTable.replace(
-                    symbol = targetSymbol,
-                    interval = TARGET_INTERVAL,
-                    candles = candles,
-                )
-            }
-        }.onFailure { throwable ->
-            Log.d(TAG, "Kline backfill failed: ${throwable.message}")
-        }
-
-        if (sessionManager.isConnected) {
-            emit(State.Connected)
-        }
-
         try {
-            merge(
+            launch {
+                merge(
                 marketMessageRouter.streamEvents.map<WsMarketStreamEvent, StreamEvent> {
                     StreamEvent.Router(it)
                 },
                 subscriptionManager.failures.map<WsSubscriptionFailure, StreamEvent> {
                     StreamEvent.SubscriptionFailure(it)
                 },
-            ).collect { streamEvent ->
-                when (streamEvent) {
-                    is StreamEvent.Router -> {
-                        when (val event = streamEvent.event) {
-                            is WsMarketStreamEvent.Market -> {
-                                val message = event.message
-                                if (message is WsMarketMessage.SymbolTicker) {
-                                    val ticker = message.ticker.toCoinTickerDto()
-                                    if (ticker.symbol == targetSymbol) {
-                                        tickerTable.upsert(ticker)
-                                        emit(State.Success(ticker))
+                ).collect { streamEvent ->
+                    when (streamEvent) {
+                        is StreamEvent.Router -> {
+                            when (val event = streamEvent.event) {
+                                is WsMarketStreamEvent.Market -> {
+                                    val message = event.message
+                                    if (message is WsMarketMessage.SymbolTicker) {
+                                        val ticker = message.ticker.toCoinTickerDto()
+                                        if (ticker.symbol == targetSymbol) {
+                                            tickerTable.upsert(ticker)
+                                            trySend(State.Success(ticker))
+                                        }
+                                    }
+
+                                    if (message is WsMarketMessage.SymbolKline) {
+                                        val candle = message.klineEvent.toCoinKlineDto()
+                                        if (candle.symbol == targetSymbol && candle.interval == TARGET_INTERVAL) {
+                                            klineTable.upsert(
+                                                symbol = targetSymbol,
+                                                interval = TARGET_INTERVAL,
+                                                candle = candle,
+                                            )
+                                        }
                                     }
                                 }
-                                if (message is WsMarketMessage.SymbolKline) {
-                                    val candle = message.klineEvent.toCoinKlineDto()
-                                    if (candle.symbol == targetSymbol && candle.interval == TARGET_INTERVAL) {
-                                        klineTable.upsert(
-                                            symbol = targetSymbol,
-                                            interval = TARGET_INTERVAL,
-                                            candle = candle,
-                                        )
-                                    }
-                                }
-                            }
 
-                            is WsMarketStreamEvent.Transport -> {
-                                when (val transportEvent = event.event) {
-                                    is BinanceWebSocketClient.Event.Connected -> {
-                                        emit(State.Connected)
-                                    }
+                                is WsMarketStreamEvent.Transport -> {
+                                    when (val transportEvent = event.event) {
+                                        is BinanceWebSocketClient.Event.Connected -> {
+                                            trySend(State.Connected)
+                                        }
 
-                                    is BinanceWebSocketClient.Event.Disconnected -> {
-                                        tickerTable.clear()
-                                        klineTable.clear()
-                                        emit(State.Disconnected)
-                                    }
-
-                                    is BinanceWebSocketClient.Event.Error -> {
-                                        if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
+                                        is BinanceWebSocketClient.Event.Disconnected -> {
                                             tickerTable.clear()
                                             klineTable.clear()
+                                            trySend(State.Disconnected)
                                         }
-                                        emit(State.Error(transportEvent.throwable))
-                                    }
 
-                                    is BinanceWebSocketClient.Event.Message -> Unit
+                                        is BinanceWebSocketClient.Event.Error -> {
+                                            if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
+                                                tickerTable.clear()
+                                                klineTable.clear()
+                                            }
+                                            trySend(State.Error(transportEvent.throwable))
+                                        }
+
+                                        is BinanceWebSocketClient.Event.Message -> Unit
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    is StreamEvent.SubscriptionFailure -> {
-                        val failure = streamEvent.failure
-                        val isGlobalFailure =
-                            failure.method == WsSubscriptionMethod.ListSubscriptions
-                        val isTargetFailure = failure.streams.any { it in targetStreams }
+                        is StreamEvent.SubscriptionFailure -> {
+                            val failure = streamEvent.failure
+                            val isGlobalFailure =
+                                failure.method == WsSubscriptionMethod.ListSubscriptions
+                            val isTargetFailure = failure.streams.any { it in targetStreams }
 
-                        if (isGlobalFailure || isTargetFailure) {
-                            if (failure.cause is WebSocketReconnectExhaustedException) {
-                                tickerTable.clear()
-                                klineTable.clear()
+                            if (isGlobalFailure || isTargetFailure) {
+                                if (failure.cause is WebSocketReconnectExhaustedException) {
+                                    tickerTable.clear()
+                                    klineTable.clear()
+                                }
+                                trySend(State.Error(failure.cause))
                             }
-                            emit(State.Error(failure.cause))
                         }
                     }
                 }
             }
+
+            subscriptionManager.retain(targetStreams)
+
+            launch {
+                runCatching {
+                    tickerSnapshotDataSource.getTicker(targetSymbol)
+                }.onSuccess { ticker ->
+                    tickerTable.upsert(ticker)
+                    trySend(State.Success(ticker))
+                }.onFailure { throwable ->
+                    Log.d(TAG, "Ticker snapshot failed: ${throwable.message}")
+                    trySend(State.Error(throwable))
+                }
+            }
+
+            launch {
+                runCatching {
+                    klineBackfillDataSource.getKlines(
+                        symbol = targetSymbol,
+                        interval = TARGET_INTERVAL,
+                        limit = 120,
+                    )
+                }.onSuccess { candles ->
+                    if (candles.isNotEmpty()) {
+                        klineTable.replace(
+                            symbol = targetSymbol,
+                            interval = TARGET_INTERVAL,
+                            candles = candles,
+                        )
+                    }
+                }.onFailure { throwable ->
+                    Log.d(TAG, "Kline backfill failed: ${throwable.message}")
+                }
+            }
+
+            if (sessionManager.isConnected) {
+                trySend(State.Connected)
+            }
+
+            awaitCancellation()
         } finally {
-            subscriptionManager.release(targetStreams)
+            withContext(NonCancellable) {
+                subscriptionManager.release(targetStreams)
+            }
             sessionManager.release()
         }
     }

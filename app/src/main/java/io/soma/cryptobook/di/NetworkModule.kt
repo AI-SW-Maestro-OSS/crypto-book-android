@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.coindetail.data.network.BinanceFuturesKlineClient
+import io.soma.cryptobook.coindetail.data.network.BinanceFuturesTickerClient
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.market.DefaultWsMarketMessageRouter
@@ -115,6 +116,12 @@ object NetworkModule {
     fun provideBinanceFuturesKlineClient(
         apiService: BinanceFuturesApiService,
     ): BinanceFuturesKlineClient = DefaultBinanceFuturesKlineClient(apiService)
+
+    @Provides
+    @Singleton
+    fun provideBinanceFuturesTickerClient(
+        apiService: BinanceFuturesApiService,
+    ): BinanceFuturesTickerClient = DefaultBinanceFuturesTickerClient(apiService)
 
     @Provides
     @Singleton
