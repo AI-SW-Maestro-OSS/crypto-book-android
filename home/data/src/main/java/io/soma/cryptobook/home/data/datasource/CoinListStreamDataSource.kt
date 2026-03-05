@@ -1,6 +1,8 @@
 package io.soma.cryptobook.home.data.datasource
 
 import io.soma.cryptobook.core.data.model.CoinTickerDto
+import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
+import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
@@ -16,6 +18,7 @@ import javax.inject.Inject
 class CoinListStreamDataSource @Inject constructor(
     private val sessionManager: WsSessionManager,
     private val subscriptionManager: WsSubscriptionManager,
+    private val tickerTable: WsTickerTable,
     private val json: Json,
 ) {
     sealed interface State {
@@ -54,6 +57,7 @@ class CoinListStreamDataSource @Inject constructor(
                                     try {
                                         val tickers =
                                             json.decodeFromString<List<CoinTickerDto>>(event.message)
+                                        tickerTable.upsertAll(tickers)
                                         emit(State.Success(tickers))
                                     } catch (e: Exception) {
                                     }
@@ -65,10 +69,14 @@ class CoinListStreamDataSource @Inject constructor(
                             }
 
                             is BinanceWebSocketClient.Event.Disconnected -> {
+                                tickerTable.clear()
                                 emit(State.Disconnected)
                             }
 
                             is BinanceWebSocketClient.Event.Error -> {
+                                if (event.throwable is WebSocketReconnectExhaustedException) {
+                                    tickerTable.clear()
+                                }
                                 emit(State.Error(event.throwable))
                             }
                         }
@@ -81,6 +89,9 @@ class CoinListStreamDataSource @Inject constructor(
                         val isTargetFailure = targetStream in failure.streams
 
                         if (isGlobalFailure || isTargetFailure) {
+                            if (failure.cause is WebSocketReconnectExhaustedException) {
+                                tickerTable.clear()
+                            }
                             emit(State.Error(failure.cause))
                         }
                     }

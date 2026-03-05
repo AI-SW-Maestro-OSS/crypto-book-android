@@ -41,7 +41,7 @@ class HomeViewModel @Inject constructor(
                     is ObserveCoinListUseCase.Result.Success -> {
                         reduce {
                             copy(
-                                isLoading = false,
+                                isLoading = result.coinList.isEmpty(),
                                 errorMsg = null,
                                 coins = result.coinList.map {
                                     it.toCoinItem(coinImageResolver.getImageUrl(it.symbol))
@@ -56,7 +56,7 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is ObserveCoinListUseCase.Result.Error.Disconnected -> {
-                        reduce { copy(errorMsg = "연결 끊김") }
+                        reduce { copy(isLoading = true, errorMsg = null) }
                         messageHelper.showToast("실시간 연결이 끊겼습니다")
                     }
                 }
