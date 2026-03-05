@@ -50,7 +50,7 @@ class WsMarketMessageParser @Inject constructor(
             WsMarketMessage.AllTickers(payload)
         }
     }.getOrElse { throwable ->
-        Log.d(TAG, "Ignored market array message: ${throwable.message}")
+        Log.d(TAG, "[WS_PARSE] action=ignored kind=array reason=${throwable.message}")
         WsMarketMessage.Ignored
     }
 
@@ -71,7 +71,7 @@ class WsMarketMessageParser @Inject constructor(
             else -> WsMarketMessage.Ignored
         }
     }.getOrElse { throwable ->
-        Log.d(TAG, "Ignored market object message: ${throwable.message}")
+        Log.d(TAG, "[WS_PARSE] action=ignored kind=object reason=${throwable.message}")
         WsMarketMessage.Ignored
     }
 }

@@ -1,5 +1,6 @@
 package io.soma.cryptobook.core.network.subscription
 
+import android.util.Log
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import kotlinx.atomicfu.atomic
@@ -33,6 +34,10 @@ class DefaultWsSubscriptionManager @Inject constructor(
     private val scope: CoroutineScope,
     private val policy: WsSubscriptionPolicy,
 ) : WsSubscriptionManager {
+    companion object {
+        private const val TAG = "WsSubscription"
+    }
+
     private val requestIdCounter = atomic(1)
     private val mutex = Mutex()
     private val commandMutex = Mutex()
@@ -74,6 +79,11 @@ class DefaultWsSubscriptionManager @Inject constructor(
             refreshStateLocked()
             delta
         }
+        logSubscriptionState(
+            action = "retain",
+            method = WsSubscriptionMethod.Subscribe,
+            streams = subscribeDelta,
+        )
 
         if (subscribeDelta.isEmpty()) return
         if (!sessionManager.isConnected) return
@@ -107,6 +117,11 @@ class DefaultWsSubscriptionManager @Inject constructor(
             refreshStateLocked()
             delta
         }
+        logSubscriptionState(
+            action = "release",
+            method = WsSubscriptionMethod.Unsubscribe,
+            streams = unsubscribeDelta,
+        )
 
         if (unsubscribeDelta.isEmpty()) return
         if (!sessionManager.isConnected) return
@@ -200,6 +215,12 @@ class DefaultWsSubscriptionManager @Inject constructor(
 
         for (attempt in 1..policy.maxRequestRetry) {
             val id = requestIdCounter.getAndIncrement()
+            logSubscriptionState(
+                action = "send",
+                method = method,
+                streams = streams,
+                attempt = attempt,
+            )
             when (val ack = sendAndAwait(method, streams, id)) {
                 is RequestAck.Success -> {
                     applySuccess(method, streams)
@@ -230,6 +251,13 @@ class DefaultWsSubscriptionManager @Inject constructor(
         mutex.withLock {
             refreshStateLocked(lastFailure = failure)
         }
+        logSubscriptionState(
+            action = "fail",
+            method = method,
+            streams = streams,
+            attempt = policy.maxRequestRetry,
+            cause = lastCause,
+        )
         _failures.tryEmit(failure)
         return RequestAck.Failure(lastCause)
     }
@@ -324,6 +352,11 @@ class DefaultWsSubscriptionManager @Inject constructor(
             }
             refreshStateLocked(lastFailure = null)
         }
+        logSubscriptionState(
+            action = "ack",
+            method = method,
+            streams = streams,
+        )
     }
 
     private suspend fun applyListResult(streams: Set<String>) {
@@ -332,6 +365,11 @@ class DefaultWsSubscriptionManager @Inject constructor(
             confirmed.addAll(streams)
             refreshStateLocked(lastFailure = null)
         }
+        logSubscriptionState(
+            action = "ack",
+            method = WsSubscriptionMethod.ListSubscriptions,
+            streams = streams,
+        )
     }
 
     private fun parseControlMessage(message: String): ControlMessage? {
@@ -371,6 +409,28 @@ class DefaultWsSubscriptionManager @Inject constructor(
             confirmedStreams = confirmed.toSet(),
             pendingRequestIds = pendingById.keys.toSet(),
             lastFailure = lastFailure,
+        )
+    }
+
+    private fun logSubscriptionState(
+        action: String,
+        method: WsSubscriptionMethod,
+        streams: Set<String>,
+        attempt: Int? = null,
+        cause: Throwable? = null,
+    ) {
+        val state = _state.value
+        val desired = state.desiredStreams.sorted()
+        val confirmed = state.confirmedStreams.sorted()
+        val pending = state.pendingRequestIds.sorted()
+
+        val attemptPart = attempt?.let { " attempt=$it" }.orEmpty()
+        val causePart = cause?.message?.let { " cause=$it" }.orEmpty()
+
+        Log.d(
+            TAG,
+            "[WS_SUB] action=$action method=${method.wireValue} streams=${streams.sorted()}$attemptPart$causePart " +
+                "desired=${desired.size}:$desired confirmed=${confirmed.size}:$confirmed pending=${pending.size}:$pending",
         )
     }
 

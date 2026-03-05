@@ -14,6 +14,8 @@ class DefaultWsMarketMessageRouter(
     private val parser: WsMarketMessageParser,
     scope: CoroutineScope,
 ) : WsMarketMessageRouter {
+    private val debugLogger = WsMarketDebugLogger()
+
     private val _streamEvents = MutableSharedFlow<WsMarketStreamEvent>(
         extraBufferCapacity = 64,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -31,7 +33,10 @@ class DefaultWsMarketMessageRouter(
             sessionManager.events.collect { event ->
                 when (event) {
                     is BinanceWebSocketClient.Event.Message -> {
+                        val sequence = debugLogger.nextSequence()
+                        debugLogger.logRaw(seq = sequence, raw = event.message)
                         val message = parser.parse(event.message)
+                        debugLogger.logParsed(seq = sequence, message = message)
                         if (message !is WsMarketMessage.Ignored) {
                             _events.tryEmit(message)
                             _streamEvents.tryEmit(WsMarketStreamEvent.Market(message))
