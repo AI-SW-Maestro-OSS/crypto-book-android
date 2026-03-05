@@ -8,14 +8,14 @@ import kotlinx.serialization.Serializable
 data class BinanceTickerDto(
     @SerialName("symbol")
     val symbol: String,
-    @SerialName("price")
-    val price: String,
+    @SerialName("lastPrice")
+    val lastPrice: String,
     @SerialName("priceChangePercent")
     val priceChangePercent: String,
 )
 
 fun BinanceTickerDto.toCoinPriceVO() = CoinPriceVO(
     symbol = symbol,
-    price = price.toBigDecimal(),
+    price = lastPrice.toBigDecimal(),
     priceChangePercentage24h = priceChangePercent.toDouble(),
 )
