@@ -46,6 +46,10 @@ class CoinDetailViewModel @AssistedInject constructor(
         intent {
             observeCoinDetailUseCase(symbol = coinName).collect { result ->
                 when (result) {
+                    is ObserveCoinDetailUseCase.Result.Loading -> {
+                        reduce { copy(isLoading = true, errorMsg = null) }
+                    }
+
                     is ObserveCoinDetailUseCase.Result.Success -> {
                         reduce {
                             mapper.toUiState(
@@ -60,11 +64,6 @@ class CoinDetailViewModel @AssistedInject constructor(
                     is ObserveCoinDetailUseCase.Result.Error.Connection -> {
                         reduce { copy(isLoading = false, errorMsg = "연결 오류") }
                         messageHelper.showToast("연결 오류가 발생했습니다")
-                    }
-
-                    is ObserveCoinDetailUseCase.Result.Error.Disconnected -> {
-                        reduce { copy(isLoading = true, errorMsg = null) }
-                        messageHelper.showToast("실시간 연결이 끊겼습니다")
                     }
                 }
             }
