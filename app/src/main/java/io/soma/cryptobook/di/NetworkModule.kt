@@ -9,6 +9,9 @@ import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.session.DefaultWsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionPolicy
+import io.soma.cryptobook.core.network.subscription.DefaultWsSubscriptionManager
+import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
+import io.soma.cryptobook.core.network.subscription.WsSubscriptionPolicy
 import io.soma.cryptobook.home.data.network.BinanceApiService
 import io.soma.cryptobook.splash.data.network.CryptoBookApiService
 import kotlinx.coroutines.CoroutineScope
@@ -94,6 +97,24 @@ object NetworkModule {
         @ApplicationScope scope: CoroutineScope,
         policy: WsSessionPolicy,
     ): WsSessionManager = DefaultWsSessionManager(
+        transport = webSocketClient,
+        scope = scope,
+        policy = policy,
+    )
+
+    @Provides
+    @Singleton
+    fun provideWsSubscriptionPolicy(): WsSubscriptionPolicy = WsSubscriptionPolicy()
+
+    @Provides
+    @Singleton
+    fun provideWsSubscriptionManager(
+        sessionManager: WsSessionManager,
+        webSocketClient: BinanceWebSocketClient,
+        @ApplicationScope scope: CoroutineScope,
+        policy: WsSubscriptionPolicy,
+    ): WsSubscriptionManager = DefaultWsSubscriptionManager(
+        sessionManager = sessionManager,
         transport = webSocketClient,
         scope = scope,
         policy = policy,
