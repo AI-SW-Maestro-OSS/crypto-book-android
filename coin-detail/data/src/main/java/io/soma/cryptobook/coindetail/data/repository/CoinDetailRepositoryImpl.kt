@@ -26,10 +26,10 @@ constructor(
     private val klineTable: WsKlineTable,
     private val coinDetailDomainModelMapper: CoinDetailDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
-) : CoinDetailRepository {
+    ) : CoinDetailRepository {
     override fun observeCoinDetail(symbol: String): Flow<CoinDetailStreamState> = channelFlow {
         val targetSymbol = symbol.uppercase()
-        val targetInterval = "1m"
+        val targetInterval = "1d"
         var latestDetail: CoinDetailVO? = null
         var latestCandles: List<CoinCandleVO> = emptyList()
 

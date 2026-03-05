@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
@@ -37,7 +38,8 @@ class CoinDetailStreamDataSource @Inject constructor(
 ) {
     private companion object {
         private const val TAG = "CoinDetailStream"
-        private const val TARGET_INTERVAL = "1m"
+        private const val TARGET_INTERVAL = "1d"
+        private const val KLINE_BACKFILL_PAGE_LIMIT = 1500
     }
 
     sealed interface State {
@@ -52,6 +54,45 @@ class CoinDetailStreamDataSource @Inject constructor(
         val klineStream = "${symbol.lowercase()}@kline_$TARGET_INTERVAL"
         val targetStreams = setOf(tickerStream, klineStream)
         val targetSymbol = symbol.uppercase()
+        var snapshotJob: Job? = null
+        var backfillJob: Job? = null
+
+        fun refreshRestData() {
+            snapshotJob?.cancel()
+            backfillJob?.cancel()
+
+            snapshotJob = launch {
+                runCatching {
+                    tickerSnapshotDataSource.getTicker(targetSymbol)
+                }.onSuccess { ticker ->
+                    tickerTable.upsert(ticker)
+                    trySend(State.Success(ticker))
+                }.onFailure { throwable ->
+                    Log.d(TAG, "Ticker snapshot failed: ${throwable.message}")
+                    trySend(State.Error(throwable))
+                }
+            }
+
+            backfillJob = launch {
+                runCatching {
+                    klineBackfillDataSource.getAllKlines(
+                        symbol = targetSymbol,
+                        interval = TARGET_INTERVAL,
+                        pageLimit = KLINE_BACKFILL_PAGE_LIMIT,
+                    )
+                }.onSuccess { candles ->
+                    if (candles.isNotEmpty()) {
+                        klineTable.replace(
+                            symbol = targetSymbol,
+                            interval = TARGET_INTERVAL,
+                            candles = candles,
+                        )
+                    }
+                }.onFailure { throwable ->
+                    Log.d(TAG, "Kline backfill failed: ${throwable.message}")
+                }
+            }
+        }
 
         sessionManager.acquire()
         try {
@@ -92,6 +133,7 @@ class CoinDetailStreamDataSource @Inject constructor(
                                 is WsMarketStreamEvent.Transport -> {
                                     when (val transportEvent = event.event) {
                                         is BinanceWebSocketClient.Event.Connected -> {
+                                            refreshRestData()
                                             trySend(State.Connected)
                                         }
 
@@ -135,44 +177,15 @@ class CoinDetailStreamDataSource @Inject constructor(
 
             subscriptionManager.retain(targetStreams)
 
-            launch {
-                runCatching {
-                    tickerSnapshotDataSource.getTicker(targetSymbol)
-                }.onSuccess { ticker ->
-                    tickerTable.upsert(ticker)
-                    trySend(State.Success(ticker))
-                }.onFailure { throwable ->
-                    Log.d(TAG, "Ticker snapshot failed: ${throwable.message}")
-                    trySend(State.Error(throwable))
-                }
-            }
-
-            launch {
-                runCatching {
-                    klineBackfillDataSource.getKlines(
-                        symbol = targetSymbol,
-                        interval = TARGET_INTERVAL,
-                        limit = 120,
-                    )
-                }.onSuccess { candles ->
-                    if (candles.isNotEmpty()) {
-                        klineTable.replace(
-                            symbol = targetSymbol,
-                            interval = TARGET_INTERVAL,
-                            candles = candles,
-                        )
-                    }
-                }.onFailure { throwable ->
-                    Log.d(TAG, "Kline backfill failed: ${throwable.message}")
-                }
-            }
-
             if (sessionManager.isConnected) {
+                refreshRestData()
                 trySend(State.Connected)
             }
 
             awaitCancellation()
         } finally {
+            snapshotJob?.cancel()
+            backfillJob?.cancel()
             withContext(NonCancellable) {
                 subscriptionManager.release(targetStreams)
             }

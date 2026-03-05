@@ -11,16 +11,25 @@ import javax.inject.Inject
 class CoinDetailKlineBackfillDataSource @Inject constructor(
     private val klineClient: BinanceFuturesKlineClient,
 ) {
+    private companion object {
+        private const val EARLIEST_START_TIME_MS = 0L
+        private const val MAX_PAGE_SIZE = 1500
+    }
+
     suspend fun getKlines(
         symbol: String,
         interval: String,
         limit: Int = 120,
+        startTime: Long? = null,
+        endTime: Long? = null,
     ): List<CoinKlineDto> {
         val normalizedSymbol = symbol.uppercase()
         val normalizedInterval = interval.lowercase()
         val rows = klineClient.getKlines(
             symbol = normalizedSymbol,
             interval = normalizedInterval,
+            startTime = startTime,
+            endTime = endTime,
             limit = limit,
         )
         return rows.mapNotNull { row ->
@@ -29,6 +38,48 @@ class CoinDetailKlineBackfillDataSource @Inject constructor(
                 interval = normalizedInterval,
             )
         }
+    }
+
+    suspend fun getAllKlines(
+        symbol: String,
+        interval: String,
+        pageLimit: Int = MAX_PAGE_SIZE,
+    ): List<CoinKlineDto> {
+        val normalizedSymbol = symbol.uppercase()
+        val normalizedInterval = interval.lowercase()
+        val allCandles = mutableListOf<CoinKlineDto>()
+        var nextStartTime = EARLIEST_START_TIME_MS
+
+        while (true) {
+            val rows = klineClient.getKlines(
+                symbol = normalizedSymbol,
+                interval = normalizedInterval,
+                startTime = nextStartTime,
+                endTime = null,
+                limit = pageLimit,
+            )
+            if (rows.isEmpty()) break
+
+            val candles = rows.mapNotNull { row ->
+                row.toCoinKlineDto(
+                    symbol = normalizedSymbol,
+                    interval = normalizedInterval,
+                )
+            }
+            if (candles.isEmpty()) break
+
+            allCandles += candles
+
+            if (rows.size < pageLimit) break
+
+            val candidateStartTime = candles.last().openTime + 1
+            if (candidateStartTime <= nextStartTime) break
+            nextStartTime = candidateStartTime
+        }
+
+        return allCandles
+            .sortedBy(CoinKlineDto::openTime)
+            .distinctBy(CoinKlineDto::openTime)
     }
 
     private fun List<JsonElement>.toCoinKlineDto(
