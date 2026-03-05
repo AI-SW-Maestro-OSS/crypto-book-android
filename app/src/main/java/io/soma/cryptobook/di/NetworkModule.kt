@@ -6,6 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.session.DefaultWsSessionManager
+import io.soma.cryptobook.core.network.session.WsSessionManager
+import io.soma.cryptobook.core.network.session.WsSessionPolicy
 import io.soma.cryptobook.home.data.network.BinanceApiService
 import io.soma.cryptobook.splash.data.network.CryptoBookApiService
 import kotlinx.coroutines.CoroutineScope
@@ -78,10 +81,23 @@ object NetworkModule {
     @Singleton
     fun provideBinanceWebSocketClient(
         @BinanceNetwork okHttpClient: OkHttpClient,
-        @ApplicationScope scope: CoroutineScope,
-    ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient, scope)
+    ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient)
 
-// ========================================================================
+    @Provides
+    @Singleton
+    fun provideWsSessionPolicy(): WsSessionPolicy = WsSessionPolicy()
+
+    @Provides
+    @Singleton
+    fun provideWsSessionManager(
+        webSocketClient: BinanceWebSocketClient,
+        @ApplicationScope scope: CoroutineScope,
+        policy: WsSessionPolicy,
+    ): WsSessionManager = DefaultWsSessionManager(
+        transport = webSocketClient,
+        scope = scope,
+        policy = policy,
+    )
 
     @Provides
     @Singleton
