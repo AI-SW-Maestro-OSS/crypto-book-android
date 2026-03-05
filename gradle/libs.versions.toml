@@ -34,7 +34,7 @@ navigation3 = "1.0.0"
 spotless = "6.25.0"
 materialVersion = "1.13.0"
 uiGraphics = "1.10.0"
-vico = "2.4.3"
+vico = "3.0.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
