@@ -30,6 +30,7 @@ data class CandleUiModel(
 
 sealed interface CoinDetailEvent : Event {
     data object OnBackClicked : CoinDetailEvent
+    data object OnScreenStarted : CoinDetailEvent
 }
 
 sealed interface CoinDetailSideEffect : SideEffect
