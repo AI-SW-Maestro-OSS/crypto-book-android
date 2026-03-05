@@ -4,6 +4,10 @@ import io.soma.cryptobook.core.data.model.CoinTickerDto
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
 import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.market.WsMarketMessage
+import io.soma.cryptobook.core.network.market.WsMarketMessageRouter
+import io.soma.cryptobook.core.network.market.WsMarketStreamEvent
+import io.soma.cryptobook.core.network.market.WsTickerPayload
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
@@ -12,14 +16,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class CoinDetailStreamDataSource @Inject constructor(
     private val sessionManager: WsSessionManager,
     private val subscriptionManager: WsSubscriptionManager,
     private val tickerTable: WsTickerTable,
-    private val json: Json,
+    private val marketMessageRouter: WsMarketMessageRouter,
 ) {
     sealed interface State {
         data class Success(val ticker: CoinTickerDto) : State
@@ -41,47 +44,47 @@ class CoinDetailStreamDataSource @Inject constructor(
 
         try {
             merge(
-                sessionManager.events.map<BinanceWebSocketClient.Event, StreamEvent> {
-                    StreamEvent.Transport(it)
+                marketMessageRouter.streamEvents.map<WsMarketStreamEvent, StreamEvent> {
+                    StreamEvent.Router(it)
                 },
                 subscriptionManager.failures.map<WsSubscriptionFailure, StreamEvent> {
                     StreamEvent.SubscriptionFailure(it)
                 },
             ).collect { streamEvent ->
                 when (streamEvent) {
-                    is StreamEvent.Transport -> {
+                    is StreamEvent.Router -> {
                         when (val event = streamEvent.event) {
-                            is BinanceWebSocketClient.Event.Message -> {
-                                val isTargetEvent = event.message.trim()
-                                    .startsWith("{") && event.message.contains("24hrTicker")
-                                if (isTargetEvent) {
-                                    try {
-                                        val ticker =
-                                            json.decodeFromString<CoinTickerDto>(event.message)
-                                        // target symbol만 emit
-                                        if (ticker.symbol == targetSymbol) {
-                                            tickerTable.upsert(ticker)
-                                            emit(State.Success(ticker))
-                                        }
-                                    } catch (e: Exception) { // 파싱 실패 무시
+                            is WsMarketStreamEvent.Market -> {
+                                val message = event.message
+                                if (message is WsMarketMessage.SymbolTicker) {
+                                    val ticker = message.ticker.toCoinTickerDto()
+                                    if (ticker.symbol == targetSymbol) {
+                                        tickerTable.upsert(ticker)
+                                        emit(State.Success(ticker))
                                     }
                                 }
                             }
 
-                            is BinanceWebSocketClient.Event.Connected -> {
-                                emit(State.Connected)
-                            }
+                            is WsMarketStreamEvent.Transport -> {
+                                when (val transportEvent = event.event) {
+                                    is BinanceWebSocketClient.Event.Connected -> {
+                                        emit(State.Connected)
+                                    }
 
-                            is BinanceWebSocketClient.Event.Disconnected -> {
-                                tickerTable.clear()
-                                emit(State.Disconnected)
-                            }
+                                    is BinanceWebSocketClient.Event.Disconnected -> {
+                                        tickerTable.clear()
+                                        emit(State.Disconnected)
+                                    }
 
-                            is BinanceWebSocketClient.Event.Error -> {
-                                if (event.throwable is WebSocketReconnectExhaustedException) {
-                                    tickerTable.clear()
+                                    is BinanceWebSocketClient.Event.Error -> {
+                                        if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
+                                            tickerTable.clear()
+                                        }
+                                        emit(State.Error(transportEvent.throwable))
+                                    }
+
+                                    is BinanceWebSocketClient.Event.Message -> Unit
                                 }
-                                emit(State.Error(event.throwable))
                             }
                         }
                     }
@@ -108,7 +111,18 @@ class CoinDetailStreamDataSource @Inject constructor(
     }
 
     private sealed interface StreamEvent {
-        data class Transport(val event: BinanceWebSocketClient.Event) : StreamEvent
+        data class Router(val event: WsMarketStreamEvent) : StreamEvent
         data class SubscriptionFailure(val failure: WsSubscriptionFailure) : StreamEvent
     }
+
+    private fun WsTickerPayload.toCoinTickerDto(): CoinTickerDto = CoinTickerDto(
+        symbol = symbol,
+        lastPrice = lastPrice,
+        priceChangePercent = priceChangePercent,
+        priceChange = priceChange,
+        lowPrice = lowPrice,
+        highPrice = highPrice,
+        quoteAssetVolume = quoteAssetVolume,
+        openPrice = openPrice,
+    )
 }
