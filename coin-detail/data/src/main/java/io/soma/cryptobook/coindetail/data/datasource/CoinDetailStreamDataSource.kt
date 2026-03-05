@@ -2,13 +2,14 @@ package io.soma.cryptobook.coindetail.data.datasource
 
 import io.soma.cryptobook.core.data.model.CoinTickerDto
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
+import io.soma.cryptobook.core.network.session.WsSessionManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class CoinDetailStreamDataSource @Inject constructor(
-    private val webSocketClient: BinanceWebSocketClient,
+    private val sessionManager: WsSessionManager,
     private val json: Json,
 ) {
     sealed interface State {
@@ -22,15 +23,15 @@ class CoinDetailStreamDataSource @Inject constructor(
         val targetStream = "${symbol.lowercase()}@ticker"
         val targetSymbol = symbol.uppercase()
 
-        webSocketClient.connect()
+        sessionManager.acquire()
 
-        if (webSocketClient.isConnected) {
-            webSocketClient.subscribe(listOf(targetStream))
+        if (sessionManager.isConnected) {
+            sessionManager.subscribe(listOf(targetStream))
             emit(State.Connected)
         }
 
         try {
-            webSocketClient.events.collect { event ->
+            sessionManager.events.collect { event ->
                 when (event) {
                     is BinanceWebSocketClient.Event.Message -> {
                         val isTargetEvent = event.message.trim()
@@ -49,7 +50,7 @@ class CoinDetailStreamDataSource @Inject constructor(
                     }
 
                     is BinanceWebSocketClient.Event.Connected -> {
-                        webSocketClient.subscribe(listOf(targetStream))
+                        sessionManager.subscribe(listOf(targetStream))
                         emit(State.Connected)
                     }
 
@@ -63,7 +64,8 @@ class CoinDetailStreamDataSource @Inject constructor(
                 }
             }
         } finally {
-            webSocketClient.unsubscribe(listOf(targetStream))
+            sessionManager.unsubscribe(listOf(targetStream))
+            sessionManager.release()
         }
     }
 }
