@@ -1,5 +1,6 @@
 package io.soma.cryptobook.coindetail.presentation
 
+import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -10,6 +11,8 @@ import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.presentation.MviViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = CoinDetailViewModel.Factory::class)
 class CoinDetailViewModel @AssistedInject constructor(
@@ -25,13 +28,15 @@ class CoinDetailViewModel @AssistedInject constructor(
         imageUrl = coinImageResolver.getImageUrl(coinName),
     ),
 ) {
+    private var observeJob: Job? = null
+
     @AssistedFactory
     interface Factory {
         fun create(coinName: String): CoinDetailViewModel
     }
 
     init {
-        observeCoinDetail()
+        ensureObserving()
     }
 
     override fun handleEvent(event: CoinDetailEvent) {
@@ -39,11 +44,16 @@ class CoinDetailViewModel @AssistedInject constructor(
             CoinDetailEvent.OnBackClicked -> {
                 navigationHelper.back()
             }
+
+            CoinDetailEvent.OnScreenStarted -> ensureObserving()
         }
     }
 
-    private fun observeCoinDetail() {
-        intent {
+    private fun ensureObserving() {
+        if (observeJob?.isActive == true) return
+
+        observeJob?.cancel()
+        observeJob = viewModelScope.launch {
             observeCoinDetailUseCase(symbol = coinName).collect { result ->
                 when (result) {
                     is ObserveCoinDetailUseCase.Result.Loading -> {
