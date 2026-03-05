@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import io.soma.cryptobook.coindetail.presentation.CandleUiModel
 import com.patrykandpatrick.vico.compose.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -18,7 +17,6 @@ import com.patrykandpatrick.vico.compose.cartesian.Scroll
 import com.patrykandpatrick.vico.compose.cartesian.Zoom
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.candlestickSeries
 import com.patrykandpatrick.vico.compose.cartesian.layer.CandlestickCartesianLayer
@@ -27,6 +25,8 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberCandlestickCart
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+
+private const val START_AXIS_LABEL_COUNT = 5
 
 @Composable
 fun CoinCandlestickChart(
@@ -59,6 +59,9 @@ fun CoinCandlestickChart(
         ),
         startAxis = VerticalAxis.rememberStart(
             valueFormatter = renderState.startAxisFormatter,
+            itemPlacer = remember {
+                VerticalAxis.ItemPlacer.count(count = { START_AXIS_LABEL_COUNT })
+            },
         ),
         bottomAxis = HorizontalAxis.rememberBottom(
             valueFormatter = renderState.bottomAxisFormatter,
