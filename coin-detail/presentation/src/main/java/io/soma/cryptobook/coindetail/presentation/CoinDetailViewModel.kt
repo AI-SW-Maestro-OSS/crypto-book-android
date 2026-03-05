@@ -63,7 +63,7 @@ class CoinDetailViewModel @AssistedInject constructor(
                     }
 
                     is ObserveCoinDetailUseCase.Result.Error.Disconnected -> {
-                        reduce { copy(isLoading = false, errorMsg = "연결 끊김") }
+                        reduce { copy(isLoading = true, errorMsg = null) }
                         messageHelper.showToast("실시간 연결이 끊겼습니다")
                     }
                 }

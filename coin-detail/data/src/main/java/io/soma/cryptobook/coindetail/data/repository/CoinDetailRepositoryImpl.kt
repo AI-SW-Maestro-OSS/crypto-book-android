@@ -4,44 +4,56 @@ import io.soma.cryptobook.coindetail.data.datasource.CoinDetailStreamDataSource
 import io.soma.cryptobook.coindetail.data.mapper.CoinDetailDomainModelMapper
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
+import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
 import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class CoinDetailRepositoryImpl
 @Inject
 constructor(
     private val coinDetailStreamDataSource: CoinDetailStreamDataSource,
+    private val tickerTable: WsTickerTable,
     private val coinDetailDomainModelMapper: CoinDetailDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : CoinDetailRepository {
-    private var cachedDetail: CoinDetailVO? = null
+    override fun observeCoinDetail(symbol: String): Flow<CoinDetailVO> = channelFlow {
+        val targetSymbol = symbol.uppercase()
 
-    override fun observeCoinDetail(symbol: String): Flow<CoinDetailVO> = flow {
-        coinDetailStreamDataSource.observeCoinDetail(symbol).collect { state ->
-            when (state) {
-                is CoinDetailStreamDataSource.State.Success -> {
-                    val coinDetail = coinDetailDomainModelMapper.toDomainModel(state.ticker)
-                    cachedDetail = coinDetail
-                    emit(coinDetail)
-                }
-
-                is CoinDetailStreamDataSource.State.Connected -> {
-                    cachedDetail?.let { emit(it) }
-                }
-
-                is CoinDetailStreamDataSource.State.Error -> {
-                    if (state.throwable is WebSocketReconnectExhaustedException) {
-                        throw state.throwable
+        val streamJob = launch {
+            coinDetailStreamDataSource.observeCoinDetail(targetSymbol).collect { state ->
+                when (state) {
+                    is CoinDetailStreamDataSource.State.Error -> {
+                        if (state.throwable is WebSocketReconnectExhaustedException) {
+                            close(state.throwable)
+                        }
                     }
-                }
 
-                is CoinDetailStreamDataSource.State.Disconnected -> {
+                    is CoinDetailStreamDataSource.State.Disconnected -> {
+                        Unit
+                    }
+
+                    else -> Unit
                 }
             }
+        }
+
+        val tableJob = launch {
+            tickerTable.observeSymbol(targetSymbol).collect { ticker ->
+                if (ticker != null) {
+                    send(coinDetailDomainModelMapper.toDomainModel(ticker))
+                }
+            }
+        }
+
+        awaitClose {
+            streamJob.cancel()
+            tableJob.cancel()
         }
     }.flowOn(ioDispatcher)
 }
