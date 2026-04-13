@@ -24,22 +24,12 @@ class CoinListStreamDataSource @Inject constructor(
     private val tickerTable: WsTickerTable,
     private val marketMessageRouter: WsMarketMessageRouter,
 ) {
-    sealed interface State {
-        data class Success(val tickers: List<CoinTickerDto>) : State
-        data class Error(val throwable: Throwable) : State
-        data object Connected : State
-        data object Disconnected : State
-    }
-
     private val targetStream = "!ticker@arr"
 
-    fun observeCoinList(): Flow<State> = flow {
+    // Home feature owns the lifecycle of the market overview stream for now.
+    fun maintainCoinListStream(): Flow<Throwable> = flow {
         sessionManager.acquire()
         subscriptionManager.retain(setOf(targetStream))
-
-        if (sessionManager.isConnected) {
-            emit(State.Connected)
-        }
 
         try {
             merge(
@@ -58,26 +48,19 @@ class CoinListStreamDataSource @Inject constructor(
                                 if (message is WsMarketMessage.AllTickers) {
                                     val tickers = message.tickers.map { it.toCoinTickerDto() }
                                     tickerTable.upsertAll(tickers)
-                                    emit(State.Success(tickers))
                                 }
                             }
 
                             is WsMarketStreamEvent.Transport -> {
                                 when (val transportEvent = event.event) {
-                                    is BinanceWebSocketClient.Event.Connected -> {
-                                        emit(State.Connected)
-                                    }
+                                    is BinanceWebSocketClient.Event.Connected -> Unit
 
-                                    is BinanceWebSocketClient.Event.Disconnected -> {
-                                        tickerTable.clear()
-                                        emit(State.Disconnected)
-                                    }
+                                    is BinanceWebSocketClient.Event.Disconnected -> Unit
 
                                     is BinanceWebSocketClient.Event.Error -> {
                                         if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
-                                            tickerTable.clear()
+                                            emit(transportEvent.throwable)
                                         }
-                                        emit(State.Error(transportEvent.throwable))
                                     }
 
                                     is BinanceWebSocketClient.Event.Message -> Unit
@@ -94,9 +77,8 @@ class CoinListStreamDataSource @Inject constructor(
 
                         if (isGlobalFailure || isTargetFailure) {
                             if (failure.cause is WebSocketReconnectExhaustedException) {
-                                tickerTable.clear()
+                                emit(failure.cause)
                             }
-                            emit(State.Error(failure.cause))
                         }
                     }
                 }
