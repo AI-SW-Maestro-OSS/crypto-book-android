@@ -10,11 +10,13 @@ import io.soma.cryptobook.home.data.datasource.CoinListStreamDataSource
 import io.soma.cryptobook.home.data.mapper.CoinPriceDomainModelMapper
 import io.soma.cryptobook.home.data.model.toCoinPriceVO
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -31,56 +33,35 @@ constructor(
         coinListRemoteDataSource.getAllTickerPrices().map { it.toCoinPriceVO() }
     }
 
-    override fun observeCoinPrices(): Flow<List<CoinPriceVO>> = channelFlow {
+    override fun observeCoinPrices(): Flow<List<CoinPriceVO>> = flow {
         val initialPrices = LinkedHashMap<String, CoinPriceVO>()
-        var hasInitialEmission = false
-
-        runCatching { getCoinPrices() }
-            .getOrNull()
-            ?.takeIf { it.isNotEmpty() }
-            ?.let { initial ->
-                initial.forEach { initialPrices[it.symbol] = it }
-                send(initial)
-                hasInitialEmission = true
+        val initial = runCatching { getCoinPrices() }
+            .getOrDefault(emptyList())
+            .also { prices ->
+                prices.forEach { initialPrices[it.symbol] = it }
             }
 
-        if (!hasInitialEmission) {
-            send(emptyList())
-        }
+        emit(initial)
 
-        val streamJob = launch {
-            coinListStreamDataSource.observeCoinList().collect { state ->
-                when (state) {
-                    is CoinListStreamDataSource.State.Error -> {
-                        if (state.throwable is WebSocketReconnectExhaustedException) {
-                            close(state.throwable)
-                        }
-                    }
-
-                    is CoinListStreamDataSource.State.Disconnected -> {
-                        send(emptyList())
-                    }
-
-                    else -> Unit
-                }
-            }
-        }
-
-        val tableJob = launch {
-            tickerTable.table.collect { table ->
-                if (table.isEmpty()) return@collect
+        val tableUpdates = tickerTable.table
+            .filter { it.isNotEmpty() }
+            .map { table ->
                 val merged = LinkedHashMap(initialPrices)
                 table.values.forEach { ticker ->
                     merged[ticker.symbol] = coinPriceDomainModelMapper.toDomainModel(ticker)
                 }
-                send(merged.values.toList())
+                merged.values.toList()
+            }
+
+        val fatalErrors = flow<List<CoinPriceVO>> {
+            coinListStreamDataSource.maintainCoinListStream().collect { throwable ->
+                if (throwable is WebSocketReconnectExhaustedException) {
+                    throw throwable
+                }
             }
         }
 
-        awaitClose {
-            streamJob.cancel()
-            tableJob.cancel()
-        }
+        emitAll(merge(tableUpdates, fatalErrors))
     }.flowOn(ioDispatcher)
 
     override suspend fun getCoinInfoList(): List<CoinInfoVO> {
