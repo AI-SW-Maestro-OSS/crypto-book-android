@@ -16,14 +16,14 @@ import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionMethod
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -42,14 +42,8 @@ class CoinDetailStreamDataSource @Inject constructor(
         private const val KLINE_BACKFILL_PAGE_LIMIT = 1500
     }
 
-    sealed interface State {
-        data class Success(val ticker: CoinTickerDto) : State
-        data class Error(val throwable: Throwable) : State
-        data object Connected : State
-        data object Disconnected : State
-    }
-
-    fun observeCoinDetail(symbol: String): Flow<State> = channelFlow {
+    // Coin detail owns the lifecycle of symbol-specific streams for now.
+    fun maintainCoinDetailStream(symbol: String): Flow<Throwable> = channelFlow {
         val tickerStream = "${symbol.lowercase()}@ticker"
         val klineStream = "${symbol.lowercase()}@kline_$TARGET_INTERVAL"
         val targetStreams = setOf(tickerStream, klineStream)
@@ -66,10 +60,8 @@ class CoinDetailStreamDataSource @Inject constructor(
                     tickerSnapshotDataSource.getTicker(targetSymbol)
                 }.onSuccess { ticker ->
                     tickerTable.upsert(ticker)
-                    trySend(State.Success(ticker))
                 }.onFailure { throwable ->
                     Log.d(TAG, "Ticker snapshot failed: ${throwable.message}")
-                    trySend(State.Error(throwable))
                 }
             }
 
@@ -98,12 +90,12 @@ class CoinDetailStreamDataSource @Inject constructor(
         try {
             launch {
                 merge(
-                marketMessageRouter.streamEvents.map<WsMarketStreamEvent, StreamEvent> {
-                    StreamEvent.Router(it)
-                },
-                subscriptionManager.failures.map<WsSubscriptionFailure, StreamEvent> {
-                    StreamEvent.SubscriptionFailure(it)
-                },
+                    marketMessageRouter.streamEvents.map<WsMarketStreamEvent, StreamEvent> {
+                        StreamEvent.Router(it)
+                    },
+                    subscriptionManager.failures.map<WsSubscriptionFailure, StreamEvent> {
+                        StreamEvent.SubscriptionFailure(it)
+                    },
                 ).collect { streamEvent ->
                     when (streamEvent) {
                         is StreamEvent.Router -> {
@@ -114,7 +106,6 @@ class CoinDetailStreamDataSource @Inject constructor(
                                         val ticker = message.ticker.toCoinTickerDto()
                                         if (ticker.symbol == targetSymbol) {
                                             tickerTable.upsert(ticker)
-                                            trySend(State.Success(ticker))
                                         }
                                     }
 
@@ -134,21 +125,14 @@ class CoinDetailStreamDataSource @Inject constructor(
                                     when (val transportEvent = event.event) {
                                         is BinanceWebSocketClient.Event.Connected -> {
                                             refreshRestData()
-                                            trySend(State.Connected)
                                         }
 
-                                        is BinanceWebSocketClient.Event.Disconnected -> {
-                                            tickerTable.clear()
-                                            klineTable.clear()
-                                            trySend(State.Disconnected)
-                                        }
+                                        is BinanceWebSocketClient.Event.Disconnected -> Unit
 
                                         is BinanceWebSocketClient.Event.Error -> {
                                             if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
-                                                tickerTable.clear()
-                                                klineTable.clear()
+                                                trySend(transportEvent.throwable)
                                             }
-                                            trySend(State.Error(transportEvent.throwable))
                                         }
 
                                         is BinanceWebSocketClient.Event.Message -> Unit
@@ -165,10 +149,8 @@ class CoinDetailStreamDataSource @Inject constructor(
 
                             if (isGlobalFailure || isTargetFailure) {
                                 if (failure.cause is WebSocketReconnectExhaustedException) {
-                                    tickerTable.clear()
-                                    klineTable.clear()
+                                    trySend(failure.cause)
                                 }
-                                trySend(State.Error(failure.cause))
                             }
                         }
                     }
@@ -179,7 +161,6 @@ class CoinDetailStreamDataSource @Inject constructor(
 
             if (sessionManager.isConnected) {
                 refreshRestData()
-                trySend(State.Connected)
             }
 
             awaitCancellation()

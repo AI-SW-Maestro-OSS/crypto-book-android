@@ -3,19 +3,19 @@ package io.soma.cryptobook.coindetail.data.repository
 import io.soma.cryptobook.coindetail.data.datasource.CoinDetailStreamDataSource
 import io.soma.cryptobook.coindetail.data.mapper.CoinDetailDomainModelMapper
 import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
-import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailStreamState
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
 import io.soma.cryptobook.core.data.model.CoinKlineDto
 import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
-import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import javax.inject.Inject
 
 class CoinDetailRepositoryImpl
@@ -26,67 +26,34 @@ constructor(
     private val klineTable: WsKlineTable,
     private val coinDetailDomainModelMapper: CoinDetailDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
-    ) : CoinDetailRepository {
-    override fun observeCoinDetail(symbol: String): Flow<CoinDetailStreamState> = channelFlow {
+ ) : CoinDetailRepository {
+    override fun observeCoinDetail(symbol: String): Flow<CoinDetailStreamState> = flow {
         val targetSymbol = symbol.uppercase()
         val targetInterval = "1d"
-        var latestDetail: CoinDetailVO? = null
-        var latestCandles: List<CoinCandleVO> = emptyList()
 
-        val streamJob = launch {
-            coinDetailStreamDataSource.observeCoinDetail(targetSymbol).collect { state ->
-                when (state) {
-                    is CoinDetailStreamDataSource.State.Error -> {
-                        if (state.throwable is WebSocketReconnectExhaustedException) {
-                            close(state.throwable)
-                        }
-                    }
-
-                    is CoinDetailStreamDataSource.State.Disconnected -> {
-                        Unit
-                    }
-
-                    else -> Unit
-                }
+        val detailStates = combine(
+            tickerTable.observeSymbol(targetSymbol),
+            klineTable.observe(targetSymbol, targetInterval).map { candles ->
+                candles.map { it.toCoinCandleVO() }
+            },
+        ) { ticker, candles ->
+            if (ticker == null) {
+                CoinDetailStreamState.Loading
+            } else {
+                CoinDetailStreamState.Data(
+                    value = coinDetailDomainModelMapper.toDomainModel(ticker),
+                    candles = candles,
+                )
             }
         }
 
-        val tableJob = launch {
-            tickerTable.observeSymbol(targetSymbol).collect { ticker ->
-                if (ticker == null) {
-                    latestDetail = null
-                    send(CoinDetailStreamState.Loading)
-                } else {
-                    latestDetail = coinDetailDomainModelMapper.toDomainModel(ticker)
-                    send(
-                        CoinDetailStreamState.Data(
-                            value = latestDetail!!,
-                            candles = latestCandles,
-                        ),
-                    )
-                }
+        val fatalErrors = flow<CoinDetailStreamState> {
+            coinDetailStreamDataSource.maintainCoinDetailStream(targetSymbol).collect { throwable ->
+                throw throwable
             }
         }
 
-        val klineJob = launch {
-            klineTable.observe(targetSymbol, targetInterval).collect { candles ->
-                latestCandles = candles.map { it.toCoinCandleVO() }
-                latestDetail?.let { detail ->
-                    send(
-                        CoinDetailStreamState.Data(
-                            value = detail,
-                            candles = latestCandles,
-                        ),
-                    )
-                }
-            }
-        }
-
-        awaitClose {
-            streamJob.cancel()
-            tableJob.cancel()
-            klineJob.cancel()
-        }
+        emitAll(merge(detailStates, fatalErrors))
     }.flowOn(ioDispatcher)
 
     private fun CoinKlineDto.toCoinCandleVO(): CoinCandleVO = CoinCandleVO(
