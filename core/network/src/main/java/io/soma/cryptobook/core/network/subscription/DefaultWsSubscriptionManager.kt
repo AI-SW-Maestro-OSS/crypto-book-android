@@ -335,7 +335,9 @@ class DefaultWsSubscriptionManager @Inject constructor(
 
             is ControlMessage.Result -> {
                 if (pending.method == WsSubscriptionMethod.ListSubscriptions) {
-                    pending.deferred.complete(RequestAck.ListSuccess(parseStreamsFromResult(control.result)))
+                    pending.deferred.complete(
+                        RequestAck.ListSuccess(parseStreamsFromResult(control.result)),
+                    )
                 } else {
                     pending.deferred.complete(RequestAck.Success)
                 }
@@ -429,8 +431,10 @@ class DefaultWsSubscriptionManager @Inject constructor(
 
         Log.d(
             TAG,
-            "[WS_SUB] action=$action method=${method.wireValue} streams=${streams.sorted()}$attemptPart$causePart " +
-                "desired=${desired.size}:$desired confirmed=${confirmed.size}:$confirmed pending=${pending.size}:$pending",
+            "[WS_SUB] action=$action method=${method.wireValue} " +
+                "streams=${streams.sorted()}$attemptPart$causePart " +
+                "desired=${desired.size}:$desired confirmed=${confirmed.size}:$confirmed " +
+                "pending=${pending.size}:$pending",
         )
     }
 
@@ -473,5 +477,4 @@ class DefaultWsSubscriptionManager @Inject constructor(
         code: Int?,
         msg: String?,
     ) : Exception("ACK error for ${method.wireValue} (id=$id, code=$code, msg=$msg)")
-
 }

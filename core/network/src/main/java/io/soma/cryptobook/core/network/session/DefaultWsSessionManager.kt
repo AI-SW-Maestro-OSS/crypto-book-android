@@ -93,7 +93,6 @@ class DefaultWsSessionManager @Inject constructor(
             }
 
             is BinanceWebSocketClient.Event.Message -> {
-
             }
 
             is BinanceWebSocketClient.Event.Disconnected -> {
@@ -151,7 +150,9 @@ class DefaultWsSessionManager @Inject constructor(
         val attempt = reconnectAttempt.incrementAndGet()
         if (attempt > policy.maxReconnectCount) {
             _state.value = WsSessionState.Exhausted(attempt = attempt, cause = cause)
-            _events.tryEmit(BinanceWebSocketClient.Event.Error(WebSocketReconnectExhaustedException()))
+            _events.tryEmit(
+                BinanceWebSocketClient.Event.Error(WebSocketReconnectExhaustedException()),
+            )
             return
         }
 

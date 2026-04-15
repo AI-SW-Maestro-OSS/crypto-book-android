@@ -3,8 +3,8 @@ package io.soma.cryptobook.coindetail.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,8 +22,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContainer
 import io.soma.cryptobook.coindetail.presentation.component.CoinCandlestickChart
+import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContainer
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground

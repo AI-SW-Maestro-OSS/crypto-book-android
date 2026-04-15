@@ -6,22 +6,23 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 class DefaultWsSessionManagerTest {
 
     @Test
     fun `acquire called concurrently connects only once`() = runTest {
-        val transportEvents = MutableSharedFlow<BinanceWebSocketClient.Event>(extraBufferCapacity = 16)
+        val transportEvents =
+            MutableSharedFlow<BinanceWebSocketClient.Event>(extraBufferCapacity = 16)
         val connectCalls = AtomicInteger(0)
         val transport = mockTransport(
             events = transportEvents,
@@ -42,30 +43,32 @@ class DefaultWsSessionManagerTest {
     }
 
     @Test
-    fun `release called concurrently disconnects only once when consumers drain to zero`() = runTest {
-        val transportEvents = MutableSharedFlow<BinanceWebSocketClient.Event>(extraBufferCapacity = 16)
-        val disconnectCalls = AtomicInteger(0)
-        val transport = mockTransport(
-            events = transportEvents,
-            onDisconnect = { disconnectCalls.incrementAndGet() },
-        )
-        val manager = createManager(
-            transport = transport,
-            scope = backgroundScope,
-        )
+    fun `release called concurrently disconnects only once when consumers drain to zero`() =
+        runTest {
+            val transportEvents =
+                MutableSharedFlow<BinanceWebSocketClient.Event>(extraBufferCapacity = 16)
+            val disconnectCalls = AtomicInteger(0)
+            val transport = mockTransport(
+                events = transportEvents,
+                onDisconnect = { disconnectCalls.incrementAndGet() },
+            )
+            val manager = createManager(
+                transport = transport,
+                scope = backgroundScope,
+            )
 
-        repeat(8) {
-            manager.acquire()
+            repeat(8) {
+                manager.acquire()
+            }
+
+            runConcurrently(times = 8) {
+                manager.release()
+            }
+
+            assertEquals(1, disconnectCalls.get())
+            assertEquals(WsSessionState.Stopped, manager.state.value)
+            verify(exactly = 1) { transport.disconnect() }
         }
-
-        runConcurrently(times = 8) {
-            manager.release()
-        }
-
-        assertEquals(1, disconnectCalls.get())
-        assertEquals(WsSessionState.Stopped, manager.state.value)
-        verify(exactly = 1) { transport.disconnect() }
-    }
 
     private fun createManager(
         transport: BinanceWebSocketClient,
@@ -103,10 +106,7 @@ class DefaultWsSessionManagerTest {
         return transport
     }
 
-    private fun runConcurrently(
-        times: Int,
-        action: () -> Unit,
-    ) {
+    private fun runConcurrently(times: Int, action: () -> Unit) {
         val executor = Executors.newFixedThreadPool(times)
         val ready = CountDownLatch(times)
         val start = CountDownLatch(1)

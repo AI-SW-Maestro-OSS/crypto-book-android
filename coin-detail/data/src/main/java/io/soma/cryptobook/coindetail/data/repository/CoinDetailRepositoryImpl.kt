@@ -26,7 +26,7 @@ constructor(
     private val klineTable: WsKlineTable,
     private val coinDetailDomainModelMapper: CoinDetailDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
- ) : CoinDetailRepository {
+) : CoinDetailRepository {
     override fun observeCoinDetail(symbol: String): Flow<CoinDetailStreamState> = flow {
         val targetSymbol = symbol.uppercase()
         val targetInterval = "1d"
