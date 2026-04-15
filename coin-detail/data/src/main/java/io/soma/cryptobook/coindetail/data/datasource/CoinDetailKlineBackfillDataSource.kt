@@ -82,10 +82,7 @@ class CoinDetailKlineBackfillDataSource @Inject constructor(
             .distinctBy(CoinKlineDto::openTime)
     }
 
-    private fun List<JsonElement>.toCoinKlineDto(
-        symbol: String,
-        interval: String,
-    ): CoinKlineDto? {
+    private fun List<JsonElement>.toCoinKlineDto(symbol: String, interval: String): CoinKlineDto? {
         if (size < 7) return null
         val openTime = this[0].jsonPrimitive.longOrNull ?: return null
         val closeTime = this[6].jsonPrimitive.longOrNull ?: return null

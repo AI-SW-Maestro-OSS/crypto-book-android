@@ -9,8 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import io.soma.cryptobook.coindetail.presentation.CandleUiModel
 import com.patrykandpatrick.vico.compose.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.Scroll
@@ -25,14 +23,12 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberCandlestickCart
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import io.soma.cryptobook.coindetail.presentation.CandleUiModel
 
 private const val START_AXIS_LABEL_COUNT = 5
 
 @Composable
-fun CoinCandlestickChart(
-    candles: List<CandleUiModel>,
-    modifier: Modifier = Modifier,
-) {
+fun CoinCandlestickChart(candles: List<CandleUiModel>, modifier: Modifier = Modifier) {
     val modelProducer = remember { CartesianChartModelProducer() }
     val scrollState = rememberVicoScrollState(
         initialScroll = Scroll.Absolute.End,

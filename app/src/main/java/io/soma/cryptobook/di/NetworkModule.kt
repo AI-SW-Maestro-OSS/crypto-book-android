@@ -87,15 +87,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideBinanceSpotApiService(
-        @BinanceNetwork retrofit: Retrofit,
-    ): BinanceSpotApiService = retrofit.create(BinanceSpotApiService::class.java)
+    fun provideBinanceSpotApiService(@BinanceNetwork retrofit: Retrofit): BinanceSpotApiService =
+        retrofit.create(BinanceSpotApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideBinanceSpotKlineClient(
-        apiService: BinanceSpotApiService,
-    ): BinanceSpotKlineClient = DefaultBinanceSpotKlineClient(apiService)
+    fun provideBinanceSpotKlineClient(apiService: BinanceSpotApiService): BinanceSpotKlineClient =
+        DefaultBinanceSpotKlineClient(apiService)
 
     @Provides
     @Singleton
@@ -145,7 +143,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideWsMarketMessageParser(json: Json): WsMarketMessageParser = WsMarketMessageParser(json)
+    fun provideWsMarketMessageParser(json: Json): WsMarketMessageParser =
+        WsMarketMessageParser(json)
 
     @Provides
     @Singleton

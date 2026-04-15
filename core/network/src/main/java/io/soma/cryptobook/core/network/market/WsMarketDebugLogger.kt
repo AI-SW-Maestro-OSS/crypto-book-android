@@ -44,7 +44,9 @@ internal class WsMarketDebugLogger(
 
         Log.d(
             TAG,
-            "[WS_PARSED] seq=$seq type=$type stream=${streamOf(message)} summary=${summaryOf(message)}",
+            "[WS_PARSED] seq=$seq type=$type stream=${streamOf(
+                message,
+            )} summary=${summaryOf(message)}",
         )
     }
 
@@ -60,7 +62,7 @@ internal class WsMarketDebugLogger(
         is WsMarketMessage.SymbolKline -> {
             val symbol = message.klineEvent.symbol.lowercase()
             val interval = message.klineEvent.kline.interval.lowercase()
-            "${symbol}@kline_$interval"
+            "$symbol@kline_$interval"
         }
 
         is WsMarketMessage.Ignored -> "-"
@@ -77,13 +79,16 @@ internal class WsMarketDebugLogger(
 
         is WsMarketMessage.SymbolTicker -> {
             val ticker = message.ticker
-            "symbol=${ticker.symbol} lastPrice=${ticker.lastPrice} changePercent=${ticker.priceChangePercent}"
+            "symbol=${ticker.symbol} lastPrice=${ticker.lastPrice} " +
+                "changePercent=${ticker.priceChangePercent}"
         }
 
         is WsMarketMessage.SymbolKline -> {
             val event = message.klineEvent
             val kline = event.kline
-            "symbol=${event.symbol} interval=${kline.interval} openTime=${kline.openTime} closeTime=${kline.closeTime} isClosed=${kline.isClosed}"
+            "symbol=${event.symbol} interval=${kline.interval} " +
+                "openTime=${kline.openTime} closeTime=${kline.closeTime} " +
+                "isClosed=${kline.isClosed}"
         }
 
         is WsMarketMessage.Ignored -> "ignored"

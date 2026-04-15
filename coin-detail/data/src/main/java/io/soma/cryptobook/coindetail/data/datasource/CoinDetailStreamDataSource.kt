@@ -111,7 +111,10 @@ class CoinDetailStreamDataSource @Inject constructor(
 
                                     if (message is WsMarketMessage.SymbolKline) {
                                         val candle = message.klineEvent.toCoinKlineDto()
-                                        if (candle.symbol == targetSymbol && candle.interval == TARGET_INTERVAL) {
+                                        if (
+                                            candle.symbol == targetSymbol &&
+                                            candle.interval == TARGET_INTERVAL
+                                        ) {
                                             klineTable.upsert(
                                                 symbol = targetSymbol,
                                                 interval = TARGET_INTERVAL,
@@ -130,7 +133,10 @@ class CoinDetailStreamDataSource @Inject constructor(
                                         is BinanceWebSocketClient.Event.Disconnected -> Unit
 
                                         is BinanceWebSocketClient.Event.Error -> {
-                                            if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
+                                            val reconnectExhausted =
+                                                transportEvent.throwable is
+                                                    WebSocketReconnectExhaustedException
+                                            if (reconnectExhausted) {
                                                 trySend(transportEvent.throwable)
                                             }
                                         }

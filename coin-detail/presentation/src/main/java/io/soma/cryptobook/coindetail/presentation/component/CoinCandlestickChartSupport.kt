@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.cartesian.VicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.VicoZoomState
-import com.patrykandpatrick.vico.compose.cartesian.axis.Axis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
@@ -173,7 +172,7 @@ private fun List<CandleUiModel>.visibleSlice(
     val fullRangeLength = lastIndex.toDouble() + edgePaddingInX * 2.0
     val visibleRangeLength = (
         fullRangeLength - maxScrollPx.toDouble() / scaledXSpacingPx
-    ).coerceIn(edgePaddingInX.toDouble(), fullRangeLength)
+        ).coerceIn(edgePaddingInX.toDouble(), fullRangeLength)
     val visibleRangeStart = fullRangeStart + scrollPx.toDouble() / scaledXSpacingPx
     val visibleRangeEnd = visibleRangeStart + visibleRangeLength
 

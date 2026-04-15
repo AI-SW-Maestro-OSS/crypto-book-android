@@ -21,9 +21,7 @@ interface BinanceSpotApiService {
     ): Response<List<List<JsonElement>>>
 
     @GET("api/v3/ticker/24hr")
-    suspend fun getTicker(
-        @Query("symbol") symbol: String,
-    ): Response<BinanceSpotTickerDto>
+    suspend fun getTicker(@Query("symbol") symbol: String): Response<BinanceSpotTickerDto>
 }
 
 class DefaultBinanceSpotKlineClient @Inject constructor(

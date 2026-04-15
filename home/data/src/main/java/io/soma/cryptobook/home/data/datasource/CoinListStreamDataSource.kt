@@ -12,12 +12,12 @@ import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionMethod
-import java.math.BigDecimal
-import java.math.RoundingMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import java.math.BigDecimal
+import java.math.RoundingMode
 import javax.inject.Inject
 
 class CoinListStreamDataSource @Inject constructor(
@@ -60,7 +60,10 @@ class CoinListStreamDataSource @Inject constructor(
                                     is BinanceWebSocketClient.Event.Disconnected -> Unit
 
                                     is BinanceWebSocketClient.Event.Error -> {
-                                        if (transportEvent.throwable is WebSocketReconnectExhaustedException) {
+                                        val reconnectExhausted =
+                                            transportEvent.throwable is
+                                                WebSocketReconnectExhaustedException
+                                        if (reconnectExhausted) {
                                             emit(transportEvent.throwable)
                                         }
                                     }
@@ -128,4 +131,3 @@ class CoinListStreamDataSource @Inject constructor(
         )
     }
 }
-

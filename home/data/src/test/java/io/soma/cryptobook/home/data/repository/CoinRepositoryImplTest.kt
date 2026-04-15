@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -40,7 +40,9 @@ class CoinRepositoryImplTest {
     }
 
     @Test
-    fun `observeCoinPrices propagates ticker table updates after initial rest snapshot`() = runTest(testDispatcher) {
+    fun `observeCoinPrices propagates ticker table updates after initial rest snapshot`() = runTest(
+        testDispatcher,
+    ) {
         val remoteDataSource = mockk<CoinListRemoteDataSource>()
         val streamDataSource = mockk<CoinListStreamDataSource>()
         val tickerTable = InMemoryWsTickerTable()
@@ -91,8 +93,17 @@ class CoinRepositoryImplTest {
         advanceUntilIdle()
 
         assertEquals(2, emissions.size)
-        assertEquals("100.0", emissions.first().first { it.symbol == "BTCUSDT" }.price.toPlainString())
-        assertEquals("101.5", emissions.last().first { it.symbol == "BTCUSDT" }.price.toPlainString())
-        assertEquals("200.0", emissions.last().first { it.symbol == "ETHUSDT" }.price.toPlainString())
+        assertEquals(
+            "100.0",
+            emissions.first().first { it.symbol == "BTCUSDT" }.price.toPlainString(),
+        )
+        assertEquals(
+            "101.5",
+            emissions.last().first { it.symbol == "BTCUSDT" }.price.toPlainString(),
+        )
+        assertEquals(
+            "200.0",
+            emissions.last().first { it.symbol == "ETHUSDT" }.price.toPlainString(),
+        )
     }
 }
