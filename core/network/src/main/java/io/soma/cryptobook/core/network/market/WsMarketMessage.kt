@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 sealed interface WsMarketMessage {
-    data class AllTickers(val tickers: List<WsTickerPayload>) : WsMarketMessage
+    data class AllMiniTickers(val tickers: List<WsMiniTickerPayload>) : WsMarketMessage
     data class SymbolTicker(val ticker: WsTickerPayload) : WsMarketMessage
     data class SymbolKline(val klineEvent: WsKlineEventPayload) : WsMarketMessage
     data object Ignored : WsMarketMessage
@@ -21,6 +21,18 @@ data class WsTickerPayload(
     @SerialName("h") val highPrice: String,
     @SerialName("q") val quoteAssetVolume: String,
     @SerialName("o") val openPrice: String,
+)
+
+@Serializable
+data class WsMiniTickerPayload(
+    @SerialName("e") val eventType: String? = null,
+    @SerialName("s") val symbol: String,
+    @SerialName("c") val lastPrice: String,
+    @SerialName("o") val openPrice: String,
+    @SerialName("h") val highPrice: String,
+    @SerialName("l") val lowPrice: String,
+    @SerialName("v") val volume: String,
+    @SerialName("q") val quoteAssetVolume: String,
 )
 
 @Serializable

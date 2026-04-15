@@ -10,7 +10,7 @@ internal class WsMarketDebugLogger(
 ) {
     companion object {
         private const val TAG = "WsMarketDebug"
-        private const val ALL_TICKERS_STREAM = "!ticker@arr"
+        private const val ALL_MINI_TICKERS_STREAM = "!miniTicker@arr"
     }
 
     private val sequence = AtomicLong(0L)
@@ -36,7 +36,7 @@ internal class WsMarketDebugLogger(
         if (!shouldLog(seq)) return
 
         val type = when (message) {
-            is WsMarketMessage.AllTickers -> "AllTickers"
+            is WsMarketMessage.AllMiniTickers -> "AllMiniTickers"
             is WsMarketMessage.SymbolTicker -> "SymbolTicker"
             is WsMarketMessage.SymbolKline -> "SymbolKline"
             is WsMarketMessage.Ignored -> "Ignored"
@@ -55,7 +55,7 @@ internal class WsMarketDebugLogger(
     }
 
     private fun streamOf(message: WsMarketMessage): String = when (message) {
-        is WsMarketMessage.AllTickers -> ALL_TICKERS_STREAM
+        is WsMarketMessage.AllMiniTickers -> ALL_MINI_TICKERS_STREAM
         is WsMarketMessage.SymbolTicker -> "${message.ticker.symbol.lowercase()}@ticker"
         is WsMarketMessage.SymbolKline -> {
             val symbol = message.klineEvent.symbol.lowercase()
@@ -67,7 +67,7 @@ internal class WsMarketDebugLogger(
     }
 
     private fun summaryOf(message: WsMarketMessage): String = when (message) {
-        is WsMarketMessage.AllTickers -> {
+        is WsMarketMessage.AllMiniTickers -> {
             val topSymbols = message.tickers
                 .take(3)
                 .joinToString(separator = ",") { it.symbol }

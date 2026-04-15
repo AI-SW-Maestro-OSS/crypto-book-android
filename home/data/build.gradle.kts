@@ -7,6 +7,10 @@ plugins {
 
 android {
     namespace = "io.soma.cryptobook.home.data"
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -17,6 +21,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp.logging)

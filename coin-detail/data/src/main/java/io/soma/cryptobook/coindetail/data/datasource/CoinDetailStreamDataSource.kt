@@ -39,7 +39,7 @@ class CoinDetailStreamDataSource @Inject constructor(
     private companion object {
         private const val TAG = "CoinDetailStream"
         private const val TARGET_INTERVAL = "1d"
-        private const val KLINE_BACKFILL_PAGE_LIMIT = 1500
+        private const val KLINE_BACKFILL_PAGE_LIMIT = 1000
     }
 
     // Coin detail owns the lifecycle of symbol-specific streams for now.
