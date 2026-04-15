@@ -95,11 +95,9 @@ class DefaultWsSessionManagerTest {
         every { transport.isConnected } returns false
         every { transport.connect() } answers {
             onConnect()
-            Unit
         }
         every { transport.disconnect() } answers {
             onDisconnect()
-            Unit
         }
         every { transport.subscribe(any()) } just runs
         every { transport.unsubscribe(any()) } just runs
