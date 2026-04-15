@@ -1,6 +1,6 @@
 package io.soma.cryptobook.coindetail.data.datasource
 
-import io.soma.cryptobook.coindetail.data.network.BinanceFuturesKlineClient
+import io.soma.cryptobook.coindetail.data.network.BinanceSpotKlineClient
 import io.soma.cryptobook.core.data.model.CoinKlineDto
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.contentOrNull
@@ -9,11 +9,11 @@ import kotlinx.serialization.json.longOrNull
 import javax.inject.Inject
 
 class CoinDetailKlineBackfillDataSource @Inject constructor(
-    private val klineClient: BinanceFuturesKlineClient,
+    private val klineClient: BinanceSpotKlineClient,
 ) {
     private companion object {
         private const val EARLIEST_START_TIME_MS = 0L
-        private const val MAX_PAGE_SIZE = 1500
+        private const val MAX_PAGE_SIZE = 1000
     }
 
     suspend fun getKlines(

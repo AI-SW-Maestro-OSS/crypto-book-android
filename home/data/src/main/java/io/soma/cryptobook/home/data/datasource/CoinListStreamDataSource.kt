@@ -7,11 +7,13 @@ import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.market.WsMarketMessage
 import io.soma.cryptobook.core.network.market.WsMarketMessageRouter
 import io.soma.cryptobook.core.network.market.WsMarketStreamEvent
-import io.soma.cryptobook.core.network.market.WsTickerPayload
+import io.soma.cryptobook.core.network.market.WsMiniTickerPayload
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionMethod
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -24,7 +26,7 @@ class CoinListStreamDataSource @Inject constructor(
     private val tickerTable: WsTickerTable,
     private val marketMessageRouter: WsMarketMessageRouter,
 ) {
-    private val targetStream = "!ticker@arr"
+    private val targetStream = "!miniTicker@arr"
 
     // Home feature owns the lifecycle of the market overview stream for now.
     fun maintainCoinListStream(): Flow<Throwable> = flow {
@@ -45,7 +47,7 @@ class CoinListStreamDataSource @Inject constructor(
                         when (val event = streamEvent.event) {
                             is WsMarketStreamEvent.Market -> {
                                 val message = event.message
-                                if (message is WsMarketMessage.AllTickers) {
+                                if (message is WsMarketMessage.AllMiniTickers) {
                                     val tickers = message.tickers.map { it.toCoinTickerDto() }
                                     tickerTable.upsertAll(tickers)
                                 }
@@ -94,14 +96,36 @@ class CoinListStreamDataSource @Inject constructor(
         data class SubscriptionFailure(val failure: WsSubscriptionFailure) : StreamEvent
     }
 
-    private fun WsTickerPayload.toCoinTickerDto(): CoinTickerDto = CoinTickerDto(
-        symbol = symbol,
-        lastPrice = lastPrice,
-        priceChangePercent = priceChangePercent,
-        priceChange = priceChange,
-        lowPrice = lowPrice,
-        highPrice = highPrice,
-        quoteAssetVolume = quoteAssetVolume,
-        openPrice = openPrice,
-    )
+    private fun WsMiniTickerPayload.toCoinTickerDto(): CoinTickerDto {
+        val openPriceDecimal = openPrice.toBigDecimalOrNull()
+        val lastPriceDecimal = lastPrice.toBigDecimalOrNull()
+        val priceChange = if (openPriceDecimal != null && lastPriceDecimal != null) {
+            lastPriceDecimal.subtract(openPriceDecimal)
+        } else {
+            BigDecimal.ZERO
+        }
+        val priceChangePercent = if (
+            openPriceDecimal == null ||
+            lastPriceDecimal == null ||
+            openPriceDecimal.compareTo(BigDecimal.ZERO) == 0
+        ) {
+            BigDecimal.ZERO
+        } else {
+            priceChange
+                .multiply(BigDecimal("100"))
+                .divide(openPriceDecimal, 8, RoundingMode.HALF_UP)
+        }
+
+        return CoinTickerDto(
+            symbol = symbol,
+            lastPrice = lastPrice,
+            priceChangePercent = priceChangePercent.stripTrailingZeros().toPlainString(),
+            priceChange = priceChange.stripTrailingZeros().toPlainString(),
+            lowPrice = lowPrice,
+            highPrice = highPrice,
+            quoteAssetVolume = quoteAssetVolume,
+            openPrice = openPrice,
+        )
+    }
 }
+

@@ -393,13 +393,13 @@ class DefaultWsSubscriptionManager @Inject constructor(
         val array = result as? JsonArray ?: return emptySet()
         return array.mapNotNull { element ->
             val primitive = element as? JsonPrimitive ?: return@mapNotNull null
-            primitive.contentOrNull?.trim()?.lowercase()?.takeIf { it.isNotEmpty() }
+            primitive.contentOrNull?.trim()?.takeIf { it.isNotEmpty() }
         }.toSet()
     }
 
     private fun normalizeStreams(streams: Set<String>): Set<String> = streams
         .asSequence()
-        .map { it.trim().lowercase() }
+        .map { it.trim() }
         .filter { it.isNotEmpty() }
         .toSet()
 

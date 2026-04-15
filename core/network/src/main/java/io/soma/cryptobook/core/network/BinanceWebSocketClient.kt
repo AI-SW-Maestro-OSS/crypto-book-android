@@ -39,7 +39,7 @@ class BinanceWebSocketClient @Inject constructor(
 
     companion object {
         private const val TAG = "BinanceWS"
-        private const val BASE_URL = "wss://fstream.binance.com/ws"
+        private const val BASE_URL = "wss://stream.binance.com:9443/ws"
     }
 
     private var webSocket: WebSocket? = null

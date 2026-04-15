@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BinanceFuturesTickerDto(
+data class BinanceSpotTickerDto(
     @SerialName("symbol")
     val symbol: String,
     @SerialName("lastPrice")
@@ -24,7 +24,7 @@ data class BinanceFuturesTickerDto(
     val openPrice: String,
 )
 
-fun BinanceFuturesTickerDto.toCoinTickerDto(): CoinTickerDto = CoinTickerDto(
+fun BinanceSpotTickerDto.toCoinTickerDto(): CoinTickerDto = CoinTickerDto(
     symbol = symbol.uppercase(),
     lastPrice = lastPrice,
     priceChangePercent = priceChangePercent,

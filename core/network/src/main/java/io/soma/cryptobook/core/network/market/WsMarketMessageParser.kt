@@ -1,6 +1,7 @@
 package io.soma.cryptobook.core.network.market
 
 import android.util.Log
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.Json
@@ -14,6 +15,7 @@ class WsMarketMessageParser @Inject constructor(
     companion object {
         private const val TAG = "WsMarketMessageParser"
         private const val EVENT_24HR_TICKER = "24hrTicker"
+        private const val EVENT_24HR_MINI_TICKER = "24hrMiniTicker"
         private const val EVENT_KLINE = "kline"
     }
 
@@ -23,7 +25,7 @@ class WsMarketMessageParser @Inject constructor(
         if (isControlAckMessage(message)) return WsMarketMessage.Ignored
 
         return when {
-            message.startsWith("[") -> parseAllTickers(message)
+            message.startsWith("[") -> parseArrayMessage(message)
             message.startsWith("{") -> parseSymbolMessage(message)
             else -> WsMarketMessage.Ignored
         }
@@ -41,13 +43,24 @@ class WsMarketMessageParser @Inject constructor(
             jsonObject.containsKey("msg")
     }
 
-    private fun parseAllTickers(message: String): WsMarketMessage = runCatching {
-        val tickers = json.decodeFromString<List<WsTickerPayload>>(message)
-        val payload = tickers.filter { it.eventType == EVENT_24HR_TICKER }
-        if (payload.isEmpty()) {
-            WsMarketMessage.Ignored
-        } else {
-            WsMarketMessage.AllTickers(payload)
+    private fun parseArrayMessage(message: String): WsMarketMessage = runCatching {
+        val element = json.parseToJsonElement(message)
+        val payload = element.jsonArray
+        val eventType = payload.firstOrNull()
+            ?.jsonObject
+            ?.get("e")
+            ?.jsonPrimitive
+            ?.contentOrNull
+
+        when (eventType) {
+            EVENT_24HR_MINI_TICKER -> {
+                val tickers = json.decodeFromJsonElement<List<WsMiniTickerPayload>>(element)
+                WsMarketMessage.AllMiniTickers(tickers)
+            }
+
+            else -> {
+                WsMarketMessage.Ignored
+            }
         }
     }.getOrElse { throwable ->
         Log.d(TAG, "[WS_PARSE] action=ignored kind=array reason=${throwable.message}")

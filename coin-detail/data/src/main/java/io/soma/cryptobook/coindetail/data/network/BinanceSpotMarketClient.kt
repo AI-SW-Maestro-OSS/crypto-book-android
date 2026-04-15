@@ -1,9 +1,9 @@
 package io.soma.cryptobook.coindetail.data.network
 
-import io.soma.cryptobook.coindetail.data.model.BinanceFuturesTickerDto
+import io.soma.cryptobook.coindetail.data.model.BinanceSpotTickerDto
 import kotlinx.serialization.json.JsonElement
 
-interface BinanceFuturesKlineClient {
+interface BinanceSpotKlineClient {
     suspend fun getKlines(
         symbol: String,
         interval: String,
@@ -13,6 +13,6 @@ interface BinanceFuturesKlineClient {
     ): List<List<JsonElement>>
 }
 
-interface BinanceFuturesTickerClient {
-    suspend fun getTicker(symbol: String): BinanceFuturesTickerDto
+interface BinanceSpotTickerClient {
+    suspend fun getTicker(symbol: String): BinanceSpotTickerDto
 }

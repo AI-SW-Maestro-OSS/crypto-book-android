@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.soma.cryptobook.coindetail.data.network.BinanceFuturesKlineClient
-import io.soma.cryptobook.coindetail.data.network.BinanceFuturesTickerClient
+import io.soma.cryptobook.coindetail.data.network.BinanceSpotKlineClient
+import io.soma.cryptobook.coindetail.data.network.BinanceSpotTickerClient
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.market.DefaultWsMarketMessageRouter
@@ -35,10 +35,6 @@ annotation class BinanceNetwork
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class BinanceFuturesNetwork
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
 annotation class CryptoBookNetwork
 
 @Qualifier
@@ -49,7 +45,6 @@ annotation class KoreaEximNetwork
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     private const val BINANCE_BASE_URL = "https://api.binance.com/"
-    private const val BINANCE_FUTURES_BASE_URL = "https://fapi.binance.com/"
     private const val CRYPTOBOOK_BASE_URL = "https://cryptobook.soma.io/"
     private const val KOREA_EXIM_BASE_URL = "https://oapi.koreaexim.go.kr/"
 
@@ -87,41 +82,26 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideBinanceApiService(@BinanceFuturesNetwork retrofit: Retrofit): BinanceApiService =
+    fun provideBinanceApiService(@BinanceNetwork retrofit: Retrofit): BinanceApiService =
         retrofit.create(BinanceApiService::class.java)
 
     @Provides
     @Singleton
-    @BinanceFuturesNetwork
-    fun provideBinanceFuturesRetrofit(
-        @BinanceNetwork okHttpClient: OkHttpClient,
-        json: Json,
-    ): Retrofit {
-        val contentType = "application/json".toMediaType()
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(BINANCE_FUTURES_BASE_URL)
-            .addConverterFactory(json.asConverterFactory(contentType))
-            .build()
-    }
+    fun provideBinanceSpotApiService(
+        @BinanceNetwork retrofit: Retrofit,
+    ): BinanceSpotApiService = retrofit.create(BinanceSpotApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideBinanceFuturesApiService(
-        @BinanceFuturesNetwork retrofit: Retrofit,
-    ): BinanceFuturesApiService = retrofit.create(BinanceFuturesApiService::class.java)
+    fun provideBinanceSpotKlineClient(
+        apiService: BinanceSpotApiService,
+    ): BinanceSpotKlineClient = DefaultBinanceSpotKlineClient(apiService)
 
     @Provides
     @Singleton
-    fun provideBinanceFuturesKlineClient(
-        apiService: BinanceFuturesApiService,
-    ): BinanceFuturesKlineClient = DefaultBinanceFuturesKlineClient(apiService)
-
-    @Provides
-    @Singleton
-    fun provideBinanceFuturesTickerClient(
-        apiService: BinanceFuturesApiService,
-    ): BinanceFuturesTickerClient = DefaultBinanceFuturesTickerClient(apiService)
+    fun provideBinanceSpotTickerClient(
+        apiService: BinanceSpotApiService,
+    ): BinanceSpotTickerClient = DefaultBinanceSpotTickerClient(apiService)
 
     @Provides
     @Singleton
