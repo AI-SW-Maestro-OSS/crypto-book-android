@@ -7,6 +7,11 @@ import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotKlineClient
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotTickerClient
 import io.soma.cryptobook.core.data.network.ExchangeApiService
+import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
+import io.soma.cryptobook.core.data.realtime.market.DefaultMarketRealtimeCoordinator
+import io.soma.cryptobook.core.data.realtime.market.MarketRealtimeCoordinator
+import io.soma.cryptobook.core.data.realtime.market.MarketRealtimePayloadMapper
+import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.market.DefaultWsMarketMessageRouter
 import io.soma.cryptobook.core.network.market.WsMarketMessageParser
@@ -155,6 +160,26 @@ object NetworkModule {
     ): WsMarketMessageRouter = DefaultWsMarketMessageRouter(
         sessionManager = sessionManager,
         parser = parser,
+        scope = scope,
+    )
+
+    @Provides
+    @Singleton
+    fun provideMarketRealtimeCoordinator(
+        sessionManager: WsSessionManager,
+        subscriptionManager: WsSubscriptionManager,
+        marketMessageRouter: WsMarketMessageRouter,
+        tickerTable: WsTickerTable,
+        klineTable: WsKlineTable,
+        payloadMapper: MarketRealtimePayloadMapper,
+        @ApplicationScope scope: CoroutineScope,
+    ): MarketRealtimeCoordinator = DefaultMarketRealtimeCoordinator(
+        sessionManager = sessionManager,
+        subscriptionManager = subscriptionManager,
+        marketMessageRouter = marketMessageRouter,
+        tickerTable = tickerTable,
+        klineTable = klineTable,
+        payloadMapper = payloadMapper,
         scope = scope,
     )
 
