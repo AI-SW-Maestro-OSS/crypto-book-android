@@ -63,6 +63,7 @@ dependencies {
 
     implementation(libs.androidx.dataStore)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.process)
 
     // Coil (Image Loading)
     implementation(libs.coil.compose)
