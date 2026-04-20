@@ -11,8 +11,10 @@ import io.soma.cryptobook.core.network.session.WsSessionState
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionMethod
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,8 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class DefaultMarketRealtimeCoordinator @Inject constructor(
@@ -31,15 +31,16 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
     private val tickerTable: WsTickerTable,
     private val klineTable: WsKlineTable,
     private val payloadMapper: MarketRealtimePayloadMapper,
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
 ) : MarketRealtimeCoordinator {
 
-    private val mutex = Mutex()
     private val overviewStream = "!miniTicker@arr"
+    private val commands = Channel<Command>(capacity = Channel.UNLIMITED)
     private val symbolDemandCounts = LinkedHashMap<String, Int>()
-    private var overviewDemandCount = 0
     private var started = false
     private var sessionLeaseHeld = false
+    private var overviewRetained = false
+    private val activeDemands = MutableStateFlow(ActiveDemands())
 
     private val _runtimeState = MutableStateFlow(
         MarketRealtimeRuntimeState.initial(nowMillis = currentTimeMillis()),
@@ -53,6 +54,16 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
         _demandFatalSignals.asSharedFlow()
 
     init {
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            for (command in commands) {
+                when (command) {
+                    Command.Start -> handleStart()
+                    Command.Stop -> handleStop()
+                    is Command.RetainSymbol -> handleRetainSymbol(command.symbol, command.ack)
+                    is Command.ReleaseSymbol -> handleReleaseSymbol(command.symbol, command.ack)
+                }
+            }
+        }
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             sessionManager.state.collect { state ->
                 applySessionState(state)
@@ -84,104 +95,42 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
         }
     }
 
-    @Synchronized
     override fun start() {
-        if (started) return
-        started = true
-        if (!sessionLeaseHeld) {
-            sessionManager.acquire()
-            sessionLeaseHeld = true
-        }
-        updateRuntimeState(isStarted = true)
+        commands.trySend(Command.Start)
     }
 
-    @Synchronized
     override fun stop() {
-        if (!started && !sessionLeaseHeld) return
-        started = false
-        if (sessionLeaseHeld) {
-            sessionManager.release()
-            sessionLeaseHeld = false
-        }
-        updateRuntimeState(
-            isStarted = false,
-            isConnected = false,
-            isRecovering = false,
-        )
-    }
-
-    override suspend fun retainOverview() {
-        val shouldRetain = mutex.withLock {
-            overviewDemandCount += 1
-            overviewDemandCount == 1
-        }
-        if (shouldRetain) {
-            subscriptionManager.retain(setOf(overviewStream))
-        }
-    }
-
-    override suspend fun releaseOverview() {
-        val shouldRelease = mutex.withLock {
-            if (overviewDemandCount == 0) {
-                false
-            } else {
-                overviewDemandCount -= 1
-                overviewDemandCount == 0
-            }
-        }
-        if (shouldRelease) {
-            subscriptionManager.release(setOf(overviewStream))
-        }
+        commands.trySend(Command.Stop)
     }
 
     override suspend fun retainSymbol(symbol: String) {
-        val normalizedSymbol = normalizeSymbol(symbol)
-        val shouldRetain = mutex.withLock {
-            val previous = symbolDemandCounts[normalizedSymbol] ?: 0
-            symbolDemandCounts[normalizedSymbol] = previous + 1
-            previous == 0
-        }
-        if (shouldRetain) {
-            subscriptionManager.retain(streamsForSymbol(normalizedSymbol))
-        }
+        val ack = CompletableDeferred<Unit>()
+        commands.send(Command.RetainSymbol(symbol = normalizeSymbol(symbol), ack = ack))
+        ack.await()
     }
 
     override suspend fun releaseSymbol(symbol: String) {
-        val normalizedSymbol = normalizeSymbol(symbol)
-        val shouldRelease = mutex.withLock {
-            when (val previous = symbolDemandCounts[normalizedSymbol] ?: 0) {
-                0 -> false
-                1 -> {
-                    symbolDemandCounts.remove(normalizedSymbol)
-                    true
-                }
-                else -> {
-                    symbolDemandCounts[normalizedSymbol] = previous - 1
-                    false
-                }
-            }
-        }
-        if (shouldRelease) {
-            subscriptionManager.release(streamsForSymbol(normalizedSymbol))
-        }
+        val ack = CompletableDeferred<Unit>()
+        commands.send(Command.ReleaseSymbol(symbol = normalizeSymbol(symbol), ack = ack))
+        ack.await()
     }
 
     private suspend fun handleMarketMessage(message: WsMarketMessage) {
         when (message) {
             is WsMarketMessage.AllMiniTickers -> {
-                if (!hasOverviewDemand()) return
+                if (!activeDemands.value.hasOverview) return
                 tickerTable.upsertAll(message.tickers.map(payloadMapper::toTickerDto))
             }
 
             is WsMarketMessage.SymbolTicker -> {
                 val ticker = payloadMapper.toTickerDto(message.ticker)
-                if (!hasSymbolDemand(ticker.symbol)) return
+                if (!activeDemands.value.hasSymbolDemand(ticker.symbol)) return
                 tickerTable.upsert(ticker)
             }
 
             is WsMarketMessage.SymbolKline -> {
                 val candle = payloadMapper.toKlineDto(message.klineEvent)
-                if (!hasSymbolDemand(candle.symbol)) return
+                if (!activeDemands.value.hasSymbolDemand(candle.symbol)) return
                 klineTable.upsert(
                     symbol = candle.symbol,
                     interval = candle.interval,
@@ -194,12 +143,7 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
     }
 
     private suspend fun handleSubscriptionFailure(failure: WsSubscriptionFailure) {
-        val activeDemands = mutex.withLock {
-            ActiveDemands(
-                hasOverview = overviewDemandCount > 0,
-                symbols = symbolDemandCounts.keys.toSet(),
-            )
-        }
+        val activeDemands = activeDemands.value
         val signals = LinkedHashSet<MarketRealtimeDemandFatalSignal>()
 
         if (failure.method == WsSubscriptionMethod.ListSubscriptions) {
@@ -251,10 +195,80 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
         }
     }
 
-    private suspend fun hasOverviewDemand(): Boolean = mutex.withLock { overviewDemandCount > 0 }
+    private suspend fun handleStart() {
+        if (started) return
+        started = true
+        if (!sessionLeaseHeld) {
+            sessionManager.acquire()
+            sessionLeaseHeld = true
+        }
+        if (!overviewRetained) {
+            subscribeOverviewBaseline()
+        }
+        updateRuntimeState(isStarted = true)
+    }
 
-    private suspend fun hasSymbolDemand(symbol: String): Boolean = mutex.withLock {
-        (symbolDemandCounts[normalizeSymbol(symbol)] ?: 0) > 0
+    private suspend fun handleStop() {
+        if (!started && !sessionLeaseHeld) return
+        started = false
+        if (overviewRetained) {
+            unsubscribeOverviewBaseline()
+        }
+        if (sessionLeaseHeld) {
+            sessionManager.release()
+            sessionLeaseHeld = false
+        }
+        updateRuntimeState(
+            isStarted = false,
+            isConnected = false,
+            isRecovering = false,
+        )
+    }
+
+    private suspend fun handleRetainSymbol(
+        symbol: String,
+        ack: CompletableDeferred<Unit>,
+    ) {
+        runCommand(ack) {
+            val previous = symbolDemandCounts[symbol] ?: 0
+            symbolDemandCounts[symbol] = previous + 1
+            publishActiveDemands()
+            if (previous == 0) {
+                subscriptionManager.retain(streamsForSymbol(symbol))
+            }
+        }
+    }
+
+    private suspend fun handleReleaseSymbol(
+        symbol: String,
+        ack: CompletableDeferred<Unit>,
+    ) {
+        runCommand(ack) {
+            when (val previous = symbolDemandCounts[symbol] ?: 0) {
+                0 -> Unit
+                1 -> {
+                    symbolDemandCounts.remove(symbol)
+                    publishActiveDemands()
+                    subscriptionManager.release(streamsForSymbol(symbol))
+                }
+                else -> {
+                    symbolDemandCounts[symbol] = previous - 1
+                    publishActiveDemands()
+                }
+            }
+        }
+    }
+
+    private suspend fun subscribeOverviewBaseline() {
+        overviewRetained = true
+        publishActiveDemands()
+        subscriptionManager.retain(setOf(overviewStream))
+    }
+
+    private suspend fun unsubscribeOverviewBaseline() {
+        overviewRetained = false
+        publishActiveDemands()
+        subscriptionManager.release(setOf(overviewStream))
     }
 
     private fun normalizeSymbol(symbol: String): String = symbol.uppercase()
@@ -291,7 +305,45 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
     private fun currentTimeMillis(): Long = System.currentTimeMillis()
 
     private data class ActiveDemands(
-        val hasOverview: Boolean,
+        val hasOverview: Boolean = false,
         val symbols: Set<String>,
-    )
+    ) {
+        constructor() : this(symbols = emptySet())
+
+        fun hasSymbolDemand(symbol: String): Boolean = normalize(symbol) in symbols
+
+        private fun normalize(symbol: String): String = symbol.uppercase()
+    }
+
+    private fun publishActiveDemands() {
+        activeDemands.value = ActiveDemands(
+            hasOverview = overviewRetained,
+            symbols = symbolDemandCounts.keys.toSet(),
+        )
+    }
+
+    private suspend fun runCommand(
+        ack: CompletableDeferred<Unit>,
+        block: suspend () -> Unit,
+    ) {
+        try {
+            block()
+            ack.complete(Unit)
+        } catch (throwable: Throwable) {
+            ack.completeExceptionally(throwable)
+        }
+    }
+
+    private sealed interface Command {
+        data object Start : Command
+        data object Stop : Command
+        data class RetainSymbol(
+            val symbol: String,
+            val ack: CompletableDeferred<Unit>,
+        ) : Command
+        data class ReleaseSymbol(
+            val symbol: String,
+            val ack: CompletableDeferred<Unit>,
+        ) : Command
+    }
 }

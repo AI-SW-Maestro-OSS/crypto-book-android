@@ -10,9 +10,6 @@ interface MarketRealtimeCoordinator {
     fun start()
     fun stop()
 
-    suspend fun retainOverview()
-    suspend fun releaseOverview()
-
     suspend fun retainSymbol(symbol: String)
     suspend fun releaseSymbol(symbol: String)
 }

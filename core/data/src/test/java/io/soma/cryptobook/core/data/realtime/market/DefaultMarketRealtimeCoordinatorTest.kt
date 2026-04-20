@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -32,36 +33,46 @@ class DefaultMarketRealtimeCoordinatorTest {
     @Test
     fun `start and stop hold app session lease once`() = runTest(dispatcher) {
         val sessionManager = FakeWsSessionManager()
+        val subscriptionManager = FakeWsSubscriptionManager()
         val coordinator = createCoordinator(
             scope = backgroundScope,
             sessionManager = sessionManager,
+            subscriptionManager = subscriptionManager,
         )
 
         coordinator.start()
         coordinator.start()
+        runCurrent()
         coordinator.stop()
         coordinator.stop()
+        runCurrent()
 
         assertEquals(1, sessionManager.acquireCalls)
         assertEquals(1, sessionManager.releaseCalls)
+        assertEquals(listOf(setOf("!miniTicker@arr")), subscriptionManager.retainCalls)
+        assertEquals(listOf(setOf("!miniTicker@arr")), subscriptionManager.releaseCalls)
         assertFalse(coordinator.runtimeState.value.isStarted)
     }
 
     @Test
-    fun `overview demand ref count only retains and releases once`() = runTest(dispatcher) {
+    fun `start then stop keeps overview baseline retain release ordered`() = runTest(dispatcher) {
         val subscriptionManager = FakeWsSubscriptionManager()
         val coordinator = createCoordinator(
             scope = backgroundScope,
             subscriptionManager = subscriptionManager,
         )
 
-        coordinator.retainOverview()
-        coordinator.retainOverview()
-        coordinator.releaseOverview()
-        coordinator.releaseOverview()
+        coordinator.start()
+        coordinator.stop()
+        runCurrent()
 
-        assertEquals(listOf(setOf("!miniTicker@arr")), subscriptionManager.retainCalls)
-        assertEquals(listOf(setOf("!miniTicker@arr")), subscriptionManager.releaseCalls)
+        assertEquals(
+            listOf(
+                "retain:[!miniTicker@arr]",
+                "release:[!miniTicker@arr]",
+            ),
+            subscriptionManager.operations,
+        )
     }
 
     @Test
@@ -143,13 +154,16 @@ class DefaultMarketRealtimeCoordinatorTest {
 
         val retainCalls = mutableListOf<Set<String>>()
         val releaseCalls = mutableListOf<Set<String>>()
+        val operations = mutableListOf<String>()
 
         override suspend fun retain(streams: Set<String>) {
             retainCalls += streams
+            operations += "retain:$streams"
         }
 
         override suspend fun release(streams: Set<String>) {
             releaseCalls += streams
+            operations += "release:$streams"
         }
 
         override fun snapshot(): WsSubscriptionSnapshot = WsSubscriptionSnapshot(
