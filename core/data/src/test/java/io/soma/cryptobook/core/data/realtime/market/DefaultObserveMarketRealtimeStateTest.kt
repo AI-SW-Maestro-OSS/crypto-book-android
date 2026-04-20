@@ -1,6 +1,5 @@
 package io.soma.cryptobook.core.data.realtime.market
 
-import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow

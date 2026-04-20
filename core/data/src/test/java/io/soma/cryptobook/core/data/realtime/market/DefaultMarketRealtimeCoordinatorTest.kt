@@ -11,7 +11,6 @@ import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionState
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionFailure
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
-import io.soma.cryptobook.core.network.subscription.WsSubscriptionMethod
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionSnapshot
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionState
 import kotlinx.coroutines.CoroutineScope
@@ -20,8 +19,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -119,7 +118,9 @@ class DefaultMarketRealtimeCoordinatorTest {
         )
         runCurrent()
 
-        assertTrue(coordinator.runtimeState.value.lastFatalError is WebSocketReconnectExhaustedException)
+        assertTrue(
+            coordinator.runtimeState.value.lastFatalError is WebSocketReconnectExhaustedException,
+        )
 
         sessionManager.state.value = WsSessionState.Reconnecting(
             attempt = 1,
@@ -174,7 +175,6 @@ class DefaultMarketRealtimeCoordinatorTest {
         override fun subscribe(streams: List<String>) = Unit
 
         override fun unsubscribe(streams: List<String>) = Unit
-
     }
 
     private class FakeWsSubscriptionManager : WsSubscriptionManager {

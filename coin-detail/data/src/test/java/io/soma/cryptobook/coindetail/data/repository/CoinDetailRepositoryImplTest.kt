@@ -175,7 +175,9 @@ class CoinDetailRepositoryImplTest {
         assertEquals(1, tickerSnapshotCalls)
         assertEquals(1, klineBackfillCalls)
 
-        coordinator.runtimeStateFlow.value = coordinator.runtimeStateFlow.value.copy(isConnected = true)
+        coordinator.runtimeStateFlow.value = coordinator.runtimeStateFlow.value.copy(
+            isConnected = true,
+        )
         advanceUntilIdle()
 
         assertEquals(2, tickerSnapshotCalls)

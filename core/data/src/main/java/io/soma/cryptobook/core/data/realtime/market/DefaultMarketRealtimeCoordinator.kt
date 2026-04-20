@@ -243,10 +243,7 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
         )
     }
 
-    private suspend fun handleRetainSymbol(
-        symbol: String,
-        ack: CompletableDeferred<Unit>,
-    ) {
+    private suspend fun handleRetainSymbol(symbol: String, ack: CompletableDeferred<Unit>) {
         runCommand(ack) {
             val previous = symbolDemandCounts[symbol] ?: 0
             symbolDemandCounts[symbol] = previous + 1
@@ -257,10 +254,7 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
         }
     }
 
-    private suspend fun handleReleaseSymbol(
-        symbol: String,
-        ack: CompletableDeferred<Unit>,
-    ) {
+    private suspend fun handleReleaseSymbol(symbol: String, ack: CompletableDeferred<Unit>) {
         runCommand(ack) {
             when (val previous = symbolDemandCounts[symbol] ?: 0) {
                 0 -> Unit
@@ -294,8 +288,8 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
     private fun streamsForSymbol(symbol: String): Set<String> {
         val normalized = normalizeSymbol(symbol).lowercase()
         return linkedSetOf(
-            "${normalized}@ticker",
-            "${normalized}@kline_1d",
+            "$normalized@ticker",
+            "$normalized@kline_1d",
         )
     }
 
@@ -340,10 +334,7 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
         )
     }
 
-    private suspend fun runCommand(
-        ack: CompletableDeferred<Unit>,
-        block: suspend () -> Unit,
-    ) {
+    private suspend fun runCommand(ack: CompletableDeferred<Unit>, block: suspend () -> Unit) {
         try {
             block()
             ack.complete(Unit)
