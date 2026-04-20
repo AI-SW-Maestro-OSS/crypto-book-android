@@ -2,6 +2,7 @@ package io.soma.cryptobook.core.data.realtime.market
 
 import io.soma.cryptobook.core.data.realtime.kline.InMemoryWsKlineTable
 import io.soma.cryptobook.core.data.realtime.ticker.InMemoryWsTickerTable
+import io.soma.cryptobook.core.domain.error.WebSocketReconnectExhaustedException
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.market.WsMarketMessage
 import io.soma.cryptobook.core.network.market.WsMarketMessageRouter
@@ -24,6 +25,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -96,6 +99,37 @@ class DefaultMarketRealtimeCoordinatorTest {
             listOf(setOf("btcusdt@ticker", "btcusdt@kline_1d")),
             subscriptionManager.releaseCalls,
         )
+    }
+
+    @Test
+    fun `fatal runtime error clears when session transitions back to healthy state`() = runTest(
+        dispatcher,
+    ) {
+        val sessionManager = FakeWsSessionManager()
+        val coordinator = createCoordinator(
+            scope = backgroundScope,
+            sessionManager = sessionManager,
+        )
+
+        coordinator.start()
+        runCurrent()
+        sessionManager.state.value = WsSessionState.Exhausted(
+            attempt = 1,
+            cause = WebSocketReconnectExhaustedException(),
+        )
+        runCurrent()
+
+        assertTrue(coordinator.runtimeState.value.lastFatalError is WebSocketReconnectExhaustedException)
+
+        sessionManager.state.value = WsSessionState.Reconnecting(
+            attempt = 1,
+            delayMs = 1000L,
+            cause = null,
+        )
+        runCurrent()
+
+        assertNull(coordinator.runtimeState.value.lastFatalError)
+        assertTrue(coordinator.runtimeState.value.isRecovering)
     }
 
     private fun createCoordinator(

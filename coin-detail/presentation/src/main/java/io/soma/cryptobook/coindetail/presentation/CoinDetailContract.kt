@@ -17,6 +17,7 @@ data class CoinDetailUiState(
     val openPrice: String = "",
     val isLoading: Boolean = true,
     val errorMsg: String? = null,
+    val realtimeStatusMessage: String? = null,
 ) : UiState
 
 data class CandleUiModel(

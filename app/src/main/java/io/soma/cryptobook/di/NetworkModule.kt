@@ -9,9 +9,11 @@ import io.soma.cryptobook.coindetail.data.network.BinanceSpotTickerClient
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.market.DefaultMarketRealtimeCoordinator
+import io.soma.cryptobook.core.data.realtime.market.DefaultObserveMarketRealtimeState
 import io.soma.cryptobook.core.data.realtime.market.MarketRealtimeCoordinator
 import io.soma.cryptobook.core.data.realtime.market.MarketRealtimePayloadMapper
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
+import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.market.DefaultWsMarketMessageRouter
 import io.soma.cryptobook.core.network.market.WsMarketMessageParser
@@ -181,6 +183,14 @@ object NetworkModule {
         klineTable = klineTable,
         payloadMapper = payloadMapper,
         scope = scope,
+    )
+
+    @Provides
+    @Singleton
+    fun provideObserveMarketRealtimeState(
+        coordinator: MarketRealtimeCoordinator,
+    ): ObserveMarketRealtimeState = DefaultObserveMarketRealtimeState(
+        coordinator = coordinator,
     )
 
     @Provides
