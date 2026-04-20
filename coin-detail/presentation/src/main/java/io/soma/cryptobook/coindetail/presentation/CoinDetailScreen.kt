@@ -75,6 +75,17 @@ internal fun CoinDetailScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
+        state.realtimeStatusMessage?.let { message ->
+            Text(
+                text = message,
+                color = Color(0xFF8A6D3B),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFF3CD))
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+        }
+
         when {
             state.isLoading -> {
                 CircularProgressIndicator()
@@ -168,6 +179,19 @@ private fun CoinDetailScreenErrorPreview() {
         state = CoinDetailUiState(
             isLoading = false,
             errorMsg = "Network error occurred",
+        ),
+        onEvent = {},
+        modifier = Modifier.background(ScreenBackground),
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Composable
+private fun CoinDetailScreenRealtimeWarningPreview() {
+    CoinDetailScreen(
+        state = CoinDetailUiState(
+            isLoading = false,
+            realtimeStatusMessage = "실시간 연결을 복구하는 중입니다",
         ),
         onEvent = {},
         modifier = Modifier.background(ScreenBackground),

@@ -178,14 +178,31 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
         when (state) {
             WsSessionState.Idle,
             WsSessionState.Stopped,
-            -> updateRuntimeState(isConnected = false, isRecovering = false)
+            -> updateRuntimeState(
+                isConnected = false,
+                isRecovering = false,
+                lastFatalError = null,
+            )
 
-            is WsSessionState.Connecting,
             is WsSessionState.Reconnecting,
             is WsSessionState.Rotating,
-            -> updateRuntimeState(isConnected = false, isRecovering = true)
+            -> updateRuntimeState(
+                isConnected = false,
+                isRecovering = true,
+                lastFatalError = null,
+            )
 
-            is WsSessionState.Connected -> updateRuntimeState(isConnected = true, isRecovering = false)
+            is WsSessionState.Connecting -> updateRuntimeState(
+                isConnected = false,
+                isRecovering = false,
+                lastFatalError = null,
+            )
+
+            is WsSessionState.Connected -> updateRuntimeState(
+                isConnected = true,
+                isRecovering = false,
+                lastFatalError = null,
+            )
 
             is WsSessionState.Exhausted -> updateRuntimeState(
                 isConnected = false,
@@ -222,6 +239,7 @@ class DefaultMarketRealtimeCoordinator @Inject constructor(
             isStarted = false,
             isConnected = false,
             isRecovering = false,
+            lastFatalError = null,
         )
     }
 

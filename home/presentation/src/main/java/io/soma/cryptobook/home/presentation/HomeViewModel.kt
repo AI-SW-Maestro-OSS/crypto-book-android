@@ -6,6 +6,8 @@ import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
+import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
+import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.presentation.MviViewModel
 import io.soma.cryptobook.home.domain.usecase.ObserveCoinListUseCase
 import kotlinx.coroutines.Job
@@ -18,11 +20,13 @@ class HomeViewModel @Inject constructor(
     private val coinImageResolver: CoinImageResolver,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
+    private val observeMarketRealtimeState: ObserveMarketRealtimeState,
 ) : MviViewModel<HomeEvent, HomeUiState, HomeSideEffect>(HomeUiState()) {
     private var observeJob: Job? = null
 
     init {
         observeCoins()
+        observeRealtimeState()
     }
 
     override fun handleEvent(event: HomeEvent) {
@@ -62,5 +66,25 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun observeRealtimeState() {
+        viewModelScope.launch {
+            observeMarketRealtimeState().collect { runtimeState ->
+                reduce {
+                    copy(realtimeStatusMessage = runtimeState.toRealtimeStatusMessage())
+                }
+            }
+        }
+    }
+
+    private fun MarketRealtimeState.toRealtimeStatusMessage(): String? = when (this) {
+        MarketRealtimeState.Connected,
+        MarketRealtimeState.Connecting,
+        MarketRealtimeState.Inactive,
+        -> null
+
+        MarketRealtimeState.Recovering -> "실시간 연결을 복구하는 중입니다"
+        is MarketRealtimeState.Failed -> "실시간 데이터 연결이 중단되었습니다"
     }
 }

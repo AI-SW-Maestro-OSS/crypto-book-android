@@ -10,6 +10,7 @@ data class HomeUiState(
     val coins: List<CoinItem> = emptyList(),
     val isLoading: Boolean = false,
     val errorMsg: String? = null,
+    val realtimeStatusMessage: String? = null,
 ) : UiState
 
 data class CoinItem(

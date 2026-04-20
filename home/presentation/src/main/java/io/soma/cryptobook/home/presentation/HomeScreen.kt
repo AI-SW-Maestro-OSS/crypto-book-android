@@ -51,6 +51,18 @@ fun HomeRoute(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltView
 @Composable
 internal fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifier: Modifier) {
     Column(modifier = modifier.fillMaxSize()) {
+        state.realtimeStatusMessage?.let { msg ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFF3CD))
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(text = msg, color = Color(0xFF8A6D3B))
+            }
+        }
+
         // Error message
         state.errorMsg?.let { msg ->
             Row(
@@ -135,6 +147,16 @@ private fun HomeScreenLoadingPreview() {
 private fun HomeScreenErrorPreview() {
     HomeScreen(
         state = HomeUiState(errorMsg = "Network error occurred"),
+        onEvent = {},
+        modifier = Modifier.background(ScreenBackground),
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Composable
+private fun HomeScreenRealtimeWarningPreview() {
+    HomeScreen(
+        state = HomeUiState(realtimeStatusMessage = "실시간 연결을 복구하는 중입니다"),
         onEvent = {},
         modifier = Modifier.background(ScreenBackground),
     )
