@@ -103,52 +103,53 @@ class CoinRepositoryImplTest {
     }
 
     @Test
-    fun `observeCoinPrices uses current table snapshot for first emission when available`() = runTest(
-        testDispatcher,
-    ) {
-        val remoteDataSource = mockk<CoinListRemoteDataSource>()
-        val tickerTable = InMemoryWsTickerTable().apply {
-            upsertAll(
-                listOf(
-                    CoinTickerDto(
-                        symbol = "BTCUSDT",
-                        lastPrice = "101.5",
-                        priceChangePercent = "1.5",
-                        priceChange = "1.5",
-                        lowPrice = "99.0",
-                        highPrice = "102.0",
-                        quoteAssetVolume = "1000.0",
-                        openPrice = "100.0",
+    fun `observeCoinPrices uses current table snapshot for first emission when available`() =
+        runTest(
+            testDispatcher,
+        ) {
+            val remoteDataSource = mockk<CoinListRemoteDataSource>()
+            val tickerTable = InMemoryWsTickerTable().apply {
+                upsertAll(
+                    listOf(
+                        CoinTickerDto(
+                            symbol = "BTCUSDT",
+                            lastPrice = "101.5",
+                            priceChangePercent = "1.5",
+                            priceChange = "1.5",
+                            lowPrice = "99.0",
+                            highPrice = "102.0",
+                            quoteAssetVolume = "1000.0",
+                            openPrice = "100.0",
+                        ),
                     ),
+                )
+            }
+            val repository = CoinRepositoryImpl(
+                coinListRemoteDataSource = remoteDataSource,
+                tickerTable = tickerTable,
+                coinPriceDomainModelMapper = CoinPriceDomainModelMapper(),
+                ioDispatcher = testDispatcher,
+            )
+
+            coEvery { remoteDataSource.getAllTickerPrices() } returns listOf(
+                BinanceTickerDto(
+                    symbol = "BTCUSDT",
+                    lastPrice = "100.0",
+                    priceChangePercent = "1.0",
                 ),
             )
+
+            val emissions = mutableListOf<List<io.soma.cryptobook.core.domain.model.CoinPriceVO>>()
+            backgroundScope.launch(testDispatcher) {
+                repository.observeCoinPrices()
+                    .take(1)
+                    .toList(emissions)
+            }
+
+            advanceUntilIdle()
+
+            assertEquals(1, emissions.size)
+            assertEquals("101.5", emissions.first().first().price.toPlainString())
+            assertTrue(emissions.first().any { it.symbol == "BTCUSDT" })
         }
-        val repository = CoinRepositoryImpl(
-            coinListRemoteDataSource = remoteDataSource,
-            tickerTable = tickerTable,
-            coinPriceDomainModelMapper = CoinPriceDomainModelMapper(),
-            ioDispatcher = testDispatcher,
-        )
-
-        coEvery { remoteDataSource.getAllTickerPrices() } returns listOf(
-            BinanceTickerDto(
-                symbol = "BTCUSDT",
-                lastPrice = "100.0",
-                priceChangePercent = "1.0",
-            ),
-        )
-
-        val emissions = mutableListOf<List<io.soma.cryptobook.core.domain.model.CoinPriceVO>>()
-        backgroundScope.launch(testDispatcher) {
-            repository.observeCoinPrices()
-                .take(1)
-                .toList(emissions)
-        }
-
-        advanceUntilIdle()
-
-        assertEquals(1, emissions.size)
-        assertEquals("101.5", emissions.first().first().price.toPlainString())
-        assertTrue(emissions.first().any { it.symbol == "BTCUSDT" })
-    }
 }

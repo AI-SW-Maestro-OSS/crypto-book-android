@@ -1,8 +1,8 @@
 package io.soma.cryptobook.coindetail.domain.usecase
 
 import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
-import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailStreamState
+import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

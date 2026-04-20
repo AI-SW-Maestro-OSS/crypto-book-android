@@ -1,7 +1,7 @@
 package io.soma.cryptobook.core.data.realtime.market
 
-import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
+import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -14,9 +14,7 @@ class DefaultObserveMarketRealtimeState @Inject constructor(
         .map(::toResult)
         .distinctUntilChanged()
 
-    private fun toResult(
-        state: MarketRealtimeRuntimeState,
-    ): MarketRealtimeState = when {
+    private fun toResult(state: MarketRealtimeRuntimeState): MarketRealtimeState = when {
         !state.isStarted -> MarketRealtimeState.Inactive
         state.lastFatalError != null -> MarketRealtimeState.Failed(
             cause = state.lastFatalError,

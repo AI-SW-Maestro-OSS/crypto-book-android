@@ -1,12 +1,12 @@
 package io.soma.cryptobook
 
 import android.app.Application
-import coil3.ImageLoader
-import coil3.PlatformContext
-import coil3.SingletonImageLoader
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
 import dagger.hilt.android.HiltAndroidApp
 import io.soma.cryptobook.core.data.realtime.market.MarketRealtimeCoordinator
 import javax.inject.Inject
