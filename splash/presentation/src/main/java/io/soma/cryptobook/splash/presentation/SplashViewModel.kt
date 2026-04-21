@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.soma.cryptobook.core.domain.repository.CoinRepository
 import io.soma.cryptobook.core.domain.usecase.RefreshExchangeRateUseCase
+import io.soma.cryptobook.core.domain.usecase.RefreshTickSizesIfRequiredUseCase
 import io.soma.cryptobook.splash.domain.usecase.CheckUpdateRequirementUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -21,6 +22,7 @@ class SplashViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val checkUpdateRequirementUseCase: CheckUpdateRequirementUseCase,
     private val refreshExchangeRateUseCase: RefreshExchangeRateUseCase,
+    private val refreshTickSizesIfRequiredUseCase: RefreshTickSizesIfRequiredUseCase,
     private val coinRepository: CoinRepository,
 ) : ViewModel() {
 
@@ -52,11 +54,22 @@ class SplashViewModel @Inject constructor(
                     }
             }
 
+            val tickSizeJob = async {
+                runCatching { refreshTickSizesIfRequiredUseCase() }
+                    .onFailure { e ->
+                        android.util.Log.e("SplashViewModel", "tickSize 갱신 실패: ${e.message}", e)
+                    }
+                    .onSuccess {
+                        android.util.Log.d("SplashViewModel", "tickSize 갱신 성공")
+                    }
+            }
+
             val delayJob = async { delay(2000) }
 
             val isUpdateRequired = versionCheckJob.await()
             prefetchJob.await()
             exchangeRateJob.await()
+            tickSizeJob.await()
             delayJob.await()
 
             _uiState.value = SplashUiState.Success(isUpdateRequired = isUpdateRequired)

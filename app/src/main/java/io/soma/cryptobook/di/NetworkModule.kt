@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotKlineClient
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotTickerClient
+import io.soma.cryptobook.core.data.datasource.ticksize.BinanceExchangeInfoApiService
 import io.soma.cryptobook.core.data.network.ExchangeApiService
 import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.market.DefaultMarketRealtimeCoordinator
@@ -91,6 +92,12 @@ object NetworkModule {
     @Singleton
     fun provideBinanceApiService(@BinanceNetwork retrofit: Retrofit): BinanceApiService =
         retrofit.create(BinanceApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideBinanceExchangeInfoApiService(
+        @BinanceNetwork retrofit: Retrofit,
+    ): BinanceExchangeInfoApiService = retrofit.create(BinanceExchangeInfoApiService::class.java)
 
     @Provides
     @Singleton

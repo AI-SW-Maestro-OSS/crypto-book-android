@@ -10,4 +10,5 @@ message UserPreferences {
     LanguageProto language = 1;
     CurrencyUnitProto currency_unit = 2;
     int64 usd_krw_exchange_rate = 3;
+    int64 last_tick_size_checked_at_millis = 4;
 }
