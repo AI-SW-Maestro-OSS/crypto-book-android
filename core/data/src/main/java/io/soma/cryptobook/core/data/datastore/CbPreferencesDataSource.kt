@@ -15,6 +15,9 @@ import javax.inject.Inject
 class CbPreferencesDataSource @Inject constructor(
     private val userPreferences: DataStore<UserPreferences>,
 ) {
+    val lastTickSizeCheckedAtMillis = userPreferences.data
+        .map { it.lastTickSizeCheckedAtMillis }
+
     val userData = userPreferences.data
         .map {
             UserData(
@@ -67,6 +70,12 @@ class CbPreferencesDataSource @Inject constructor(
     suspend fun setUsdKrwExchangeRate(usdKrwExchangeRate: Long) {
         userPreferences.updateData {
             it.copy { this.usdKrwExchangeRate = usdKrwExchangeRate }
+        }
+    }
+
+    suspend fun setLastTickSizeCheckedAtMillis(checkedAtMillis: Long) {
+        userPreferences.updateData {
+            it.copy { this.lastTickSizeCheckedAtMillis = checkedAtMillis }
         }
     }
 }

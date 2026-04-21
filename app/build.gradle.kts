@@ -62,6 +62,7 @@ dependencies {
     implementation(projects.settings.data)
 
     implementation(libs.androidx.dataStore)
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.process)
 

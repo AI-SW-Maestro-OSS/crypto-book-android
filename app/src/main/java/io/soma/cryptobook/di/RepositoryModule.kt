@@ -11,8 +11,10 @@ import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.ticker.InMemoryWsTickerTable
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
 import io.soma.cryptobook.core.data.repository.ExchangeRateRepositoryImpl
+import io.soma.cryptobook.core.data.repository.TickSizeRepositoryImpl
 import io.soma.cryptobook.core.domain.repository.CoinRepository
 import io.soma.cryptobook.core.domain.repository.ExchangeRateRepository
+import io.soma.cryptobook.core.domain.repository.TickSizeRepository
 import io.soma.cryptobook.home.data.repository.CoinRepositoryImpl
 import javax.inject.Singleton
 
@@ -28,6 +30,10 @@ abstract class RepositoryModule {
     abstract fun bindExchangeRateRepository(
         impl: ExchangeRateRepositoryImpl,
     ): ExchangeRateRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTickSizeRepository(impl: TickSizeRepositoryImpl): TickSizeRepository
 
     @Binds
     @Singleton
