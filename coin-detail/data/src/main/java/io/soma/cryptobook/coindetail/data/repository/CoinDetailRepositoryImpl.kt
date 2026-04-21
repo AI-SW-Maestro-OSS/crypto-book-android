@@ -6,6 +6,7 @@ import io.soma.cryptobook.coindetail.data.mapper.CoinDetailDomainModelMapper
 import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailStreamState
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
+import io.soma.cryptobook.core.data.database.ticksize.SymbolTickSizeDao
 import io.soma.cryptobook.core.data.model.CoinKlineDto
 import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.market.MarketRealtimeCoordinator
@@ -36,6 +37,7 @@ constructor(
     private val klineBackfillDataSource: CoinDetailKlineBackfillDataSource,
     private val tickerTable: WsTickerTable,
     private val klineTable: WsKlineTable,
+    private val tickSizeDao: SymbolTickSizeDao,
     private val coinDetailDomainModelMapper: CoinDetailDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : CoinDetailRepository {
@@ -55,12 +57,16 @@ constructor(
                     klineTable.observe(targetSymbol, TARGET_INTERVAL).map { candles ->
                         candles.map { it.toCoinCandleVO() }
                     },
-                ) { ticker, candles ->
+                    tickSizeDao.observeTickSize(targetSymbol).map { it?.toBigDecimalOrNull() },
+                ) { ticker, candles, tickSize ->
                     if (ticker == null) {
                         CoinDetailStreamState.Loading
                     } else {
                         CoinDetailStreamState.Data(
-                            value = coinDetailDomainModelMapper.toDomainModel(ticker),
+                            value = coinDetailDomainModelMapper.toDomainModel(
+                                coinTickerDto = ticker,
+                                tickSize = tickSize,
+                            ),
                             candles = candles,
                         )
                     }

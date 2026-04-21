@@ -4,9 +4,9 @@ import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.presentation.CandleUiModel
 import io.soma.cryptobook.coindetail.presentation.CoinDetailUiState
+import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.DecimalFormat
 import javax.inject.Inject
 
 /**
@@ -33,14 +33,15 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
         return CoinDetailUiState(
             symbol = vo.symbol,
             imageUrl = imageUrl,
-            currentPrice = formatPrice(vo.currentPrice),
-            priceChangeText = formatPriceChange(vo.priceChange, vo.priceChangePercent),
+            currentPrice = formatPrice(vo.currentPrice, vo.tickSize),
+            priceChangeText = formatPriceChange(vo.priceChange, vo.priceChangePercent, vo.tickSize),
             priceChangePercent = vo.priceChangePercent,
             candles = candles.map { it.toUiModel() },
-            high24h = formatPrice(vo.high24h),
-            low24h = formatPrice(vo.low24h),
+            high24h = formatPrice(vo.high24h, vo.tickSize),
+            low24h = formatPrice(vo.low24h, vo.tickSize),
             volume24h = formatVolume(vo.volume24h),
-            openPrice = formatPrice(vo.openPrice),
+            openPrice = formatPrice(vo.openPrice, vo.tickSize),
+            tickSize = vo.tickSize,
             isLoading = isLoading,
             errorMsg = errorMsg,
         )
@@ -49,11 +50,8 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
     /**
      * Formats price as "$70,123.45"
      */
-    private fun formatPrice(value: BigDecimal): String {
-        val formatter = DecimalFormat("#,##0.00")
-        val rounded = value.setScale(2, RoundingMode.HALF_UP)
-        return "$${formatter.format(rounded)}"
-    }
+    private fun formatPrice(value: BigDecimal, tickSize: BigDecimal?): String =
+        TickSizePriceFormatter.formatUsd(value, tickSize)
 
     /**
      * Formats volume with appropriate unit
@@ -80,22 +78,24 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
                 val result = value.divide(thousand, 1, RoundingMode.HALF_UP)
                 "$${result}K"
             }
-            else -> formatPrice(value)
+            else -> TickSizePriceFormatter.formatUsd(value, tickSize = null)
         }
     }
 
     /**
      * Formats price change as "+1,840.55 (+2.58%)" or "-1,840.55 (-2.58%)"
      */
-    private fun formatPriceChange(priceChange: BigDecimal, priceChangePercent: Double): String {
-        val formatter = DecimalFormat("#,##0.00")
-        val rounded = priceChange.setScale(2, RoundingMode.HALF_UP)
-        val sign = if (priceChangePercent >= 0) "+" else ""
-
-        val priceChangeFormatted = formatter.format(rounded.abs())
+    private fun formatPriceChange(
+        priceChange: BigDecimal,
+        priceChangePercent: Double,
+        tickSize: BigDecimal?,
+    ): String {
+        val priceSign = if (priceChangePercent >= 0) "+" else "-"
+        val percentSign = if (priceChangePercent >= 0) "+" else ""
+        val priceChangeFormatted = TickSizePriceFormatter.format(priceChange.abs(), tickSize)
         val percentFormatted = String.format("%.2f", priceChangePercent)
 
-        return "$sign$$priceChangeFormatted ($sign$percentFormatted%)"
+        return "$priceSign$$priceChangeFormatted ($percentSign$percentFormatted%)"
     }
 
     private fun CoinCandleVO.toUiModel(): CandleUiModel = CandleUiModel(
