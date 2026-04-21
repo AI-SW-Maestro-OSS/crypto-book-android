@@ -18,6 +18,7 @@ data class CoinItem(
     val imageUrl: String,
     val price: BigDecimal,
     val priceChangePercentage24h: Double,
+    val tickSize: BigDecimal? = null,
 )
 
 sealed interface HomeEvent : Event {
@@ -33,4 +34,5 @@ fun CoinPriceVO.toCoinItem(imageUrl: String) = CoinItem(
     imageUrl = imageUrl,
     price = price,
     priceChangePercentage24h = priceChangePercentage24h,
+    tickSize = tickSize,
 )

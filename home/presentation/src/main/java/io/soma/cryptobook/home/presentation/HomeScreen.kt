@@ -21,12 +21,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.component.CbSearchTopAppBar
+import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListItemData
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListTable
 import io.soma.cryptobook.home.presentation.component.sortheader.SortDirection
 import io.soma.cryptobook.home.presentation.component.sortheader.SortHeader
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 @Composable
 fun HomeRoute(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()) {
@@ -110,7 +110,7 @@ private fun CoinItem.toCoinListItemData() = CoinListItemData(
     symbol = symbol,
     name = symbol.removeSuffix("USDT"),
     imageUrl = imageUrl,
-    price = "$${price.setScale(2, RoundingMode.HALF_UP)}",
+    price = TickSizePriceFormatter.formatUsd(price, tickSize),
     changePercent = priceChangePercentage24h,
 )
 

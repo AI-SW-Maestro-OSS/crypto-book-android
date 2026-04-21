@@ -24,11 +24,16 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import io.soma.cryptobook.coindetail.presentation.CandleUiModel
+import java.math.BigDecimal
 
 private const val START_AXIS_LABEL_COUNT = 5
 
 @Composable
-fun CoinCandlestickChart(candles: List<CandleUiModel>, modifier: Modifier = Modifier) {
+fun CoinCandlestickChart(
+    candles: List<CandleUiModel>,
+    tickSize: BigDecimal?,
+    modifier: Modifier = Modifier,
+) {
     val modelProducer = remember { CartesianChartModelProducer() }
     val scrollState = rememberVicoScrollState(
         initialScroll = Scroll.Absolute.End,
@@ -42,6 +47,7 @@ fun CoinCandlestickChart(candles: List<CandleUiModel>, modifier: Modifier = Modi
     )
     val renderState = rememberCoinCandlestickChartRenderState(
         candles = candles,
+        tickSize = tickSize,
         scrollState = scrollState,
         zoomState = zoomState,
     )

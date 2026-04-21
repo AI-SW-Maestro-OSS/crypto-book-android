@@ -25,4 +25,5 @@ data class CoinDetailVO(
     val low24h: BigDecimal,
     val volume24h: BigDecimal,
     val openPrice: BigDecimal,
+    val tickSize: BigDecimal? = null,
 )

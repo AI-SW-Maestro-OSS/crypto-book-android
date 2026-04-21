@@ -3,6 +3,7 @@ package io.soma.cryptobook.coindetail.presentation
 import io.soma.cryptobook.core.presentation.Event
 import io.soma.cryptobook.core.presentation.SideEffect
 import io.soma.cryptobook.core.presentation.UiState
+import java.math.BigDecimal
 
 data class CoinDetailUiState(
     val symbol: String = "",
@@ -15,6 +16,7 @@ data class CoinDetailUiState(
     val low24h: String = "",
     val volume24h: String = "",
     val openPrice: String = "",
+    val tickSize: BigDecimal? = null,
     val isLoading: Boolean = true,
     val errorMsg: String? = null,
     val realtimeStatusMessage: String? = null,

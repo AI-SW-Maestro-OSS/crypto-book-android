@@ -126,6 +126,7 @@ private fun CoinDetailContent(state: CoinDetailUiState, modifier: Modifier = Mod
 
         CoinCandlestickChart(
             candles = state.candles,
+            tickSize = state.tickSize,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(220.dp)

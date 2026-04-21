@@ -13,7 +13,8 @@ import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvi
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import io.soma.cryptobook.coindetail.presentation.CandleUiModel
-import java.text.DecimalFormat
+import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -50,12 +51,12 @@ internal data class CoinCandlestickChartRenderState(
 @Composable
 internal fun rememberCoinCandlestickChartRenderState(
     candles: List<CandleUiModel>,
+    tickSize: BigDecimal?,
     scrollState: VicoScrollState,
     zoomState: VicoZoomState,
 ): CoinCandlestickChartRenderState {
     val density = LocalDensity.current
     val timeFormatter = remember { SimpleDateFormat("yy.MM.dd", Locale.getDefault()) }
-    val priceFormatter = remember { DecimalFormat("#,##0.########") }
     val candleBodyWidthPx = remember(density) {
         with(density) { DEFAULT_CANDLE_BODY_WIDTH.toPx() }
     }
@@ -102,9 +103,9 @@ internal fun rememberCoinCandlestickChartRenderState(
                 ?: " "
         }
     }
-    val startAxisFormatter = remember(priceFormatter) {
+    val startAxisFormatter = remember(tickSize) {
         CartesianValueFormatter { _, value, _ ->
-            priceFormatter.format(value)
+            TickSizePriceFormatter.format(value, tickSize)
         }
     }
 
