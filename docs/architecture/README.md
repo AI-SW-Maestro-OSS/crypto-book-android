@@ -8,7 +8,6 @@ The application follows a modular architecture with clear separation between dif
 - **🔀 Separation of Concerns**: Each module focuses on a specific aspect of the application
 - **⬇️ Dependency Inversion**: Higher-level modules do not depend on lower-level modules directly
 - **🎯 Single Responsibility**: Each component has a single responsibility
-- **🔄 API/Internal Separation**: Clear separation between public APIs and internal implementation details is a future consideration for larger module boundaries
 - **🧹 Clean Architecture**: Separation of UI, domain, and data layers
 - **🔄 Unidirectional Data Flow**: UI state flows in a predictable direction through the MVI pattern
 - **🧪 Testability**: The architecture facilitates comprehensive testing at all levels
@@ -35,17 +34,6 @@ For more details on the module organization and structure, see the `module-organ
 ## 🧩 Architectural Patterns
 
 The architecture follows several key patterns to ensure maintainability, testability, and separation of concerns:
-
-### 🔄 API/Internal Separation
-
-Splitting modules into **API** and **internal** parts is not currently enforced in CryptoBook Android, but it remains a
-useful architectural direction to consider as module boundaries grow:
-
-- **📝 API**: Public interfaces, models, and contracts
-- **⚙️ Internal**: Concrete implementations of the interfaces, private to the module
-
-This separation can provide clear boundaries, improve testability, and enable flexibility. It should be discussed with
-the team before being introduced as a project-wide rule.
 
 ### Clean Architecture
 
