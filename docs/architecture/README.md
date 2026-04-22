@@ -1,6 +1,8 @@
 # 🏗️ Architecture
 
-The application follows a modular architecture with clear separation between different layers and components. The architecture is designed to support CryptoBook Android while maximizing code reuse, maintainability, and testability.
+The application follows a modular architecture with clear separation between different layers and
+components. The architecture is designed to support CryptoBook Android while maximizing code reuse,
+maintainability, and testability.
 
 ## 🔑 Key Architectural Principles
 
@@ -9,35 +11,35 @@ The application follows a modular architecture with clear separation between dif
 - **⬇️ Dependency Inversion**: Higher-level modules do not depend on lower-level modules directly
 - **🎯 Single Responsibility**: Each component has a single responsibility
 - **🧹 Clean Architecture**: Separation of UI, domain, and data layers
-- **🔄 Unidirectional Data Flow**: UI state flows in a predictable direction through the MVI pattern
 - **🧪 Testability**: The architecture facilitates comprehensive testing at all levels
 
 ## 📝 Architecture Decision Records
 
-The Architecture Decision Records document the architectural decisions made during the development of the project,
-providing context and rationale for key technical choices. (`docs/architecture/adr/` 작성 예정)
+The Architecture Decision Records document the architectural decisions made during the development
+of the project,
+providing context and rationale for key technical choices. (planned under `docs/architecture/adr/`)
 
 ## 📦 Module Structure
 
 The application is organized into several module types:
 
 - **📱 App Module**: `app` - Application entry point
-- **✨ Feature Modules**: `home:*`, `coin-detail:*`, `settings:*`, `main:*`, and `splash:*` - Independent feature modules
+- **✨ Feature Modules**: `home:*`, `coin-detail:*`, `settings:*`, `main:*`, and `splash:*` -
+  Independent feature modules
 - **🧰 Core Modules**: `core:*` - Foundational components and utilities used across multiple features
-- **🛠️ Build Logic**: `build-logic` - Gradle convention plugins used by application and library modules
-
-Feature modules are typically divided into `data`, `domain`, and `presentation` modules.
 
 For more details on the module organization and structure, see the `module-organization.md` and
-`module-structure.md` documents. (작성 예정)
+`module-structure.md` documents. (planned)
 
 ## 🧩 Architectural Patterns
 
-The architecture follows several key patterns to ensure maintainability, testability, and separation of concerns:
+The architecture follows several key patterns to ensure maintainability, testability, and separation
+of concerns:
 
 ### Clean Architecture
 
-CryptoBook Android uses **Clean Architecture** with three main layers (UI, domain, and data) to break down complex
+CryptoBook Android uses **Clean Architecture** with three main layers (UI, domain, and data) to
+break down complex
 feature implementation into manageable components. Each layer has a specific responsibility:
 
 ```mermaid
@@ -55,7 +57,7 @@ graph TD
     subgraph DATA[Data Layer]
         DATA_SOURCE[Data Sources]
         API[API Clients]
-        LOCAL[Local Storage]
+        DB[Local Database]
     end
 
     UI_COMPONENTS --> VIEW_MODEL
@@ -63,7 +65,7 @@ graph TD
     USE_CASE --> REPO
     REPO --> DATA_SOURCE
     DATA_SOURCE --> API
-    DATA_SOURCE --> LOCAL
+    DATA_SOURCE --> DB
 
     classDef ui_layer fill:#d9e9ff,stroke:#000000,color:#000000
     classDef ui_class fill:#4d94ff,stroke:#000000,color:#000000
@@ -71,7 +73,7 @@ graph TD
     classDef domain_class fill:#33cc33,stroke:#000000,color:#000000
     classDef data_layer fill:#ffe6cc,stroke:#000000,color:#000000
     classDef data_class fill:#ffaa33,stroke:#000000,color:#000000
-
+    
     linkStyle default stroke:#999,stroke-width:2px
 
     class UI ui_layer
@@ -79,7 +81,7 @@ graph TD
     class DOMAIN domain_layer
     class USE_CASE,REPO domain_class
     class DATA data_layer
-    class DATA_SOURCE,API,LOCAL data_class
+    class DATA_SOURCE,API,DB data_class
 ```
 
 #### 🖼️ UI Layer (Presentation)
@@ -87,11 +89,14 @@ graph TD
 The UI layer is responsible for displaying data to the user and handling user interactions.
 
 **Key Components:**
+
 - **🎨 [Compose UI](ui-architecture.md#-screens)**: Screen components built with Jetpack Compose
 - **🧠 [ViewModels](ui-architecture.md#-viewmodel)**: Manage UI state and handle UI events
 - **📊 [UI State](ui-architecture.md#-state)**: Immutable data classes representing the UI state
-- **🎮 [Events](ui-architecture.md#-events)**: User interactions or system events that trigger state changes
-- **🔔 [Effects](ui-architecture.md#effects)**: One-time side effects like navigation or showing messages
+- **🎮 [Events](ui-architecture.md#-events)**: User interactions or system events that trigger state
+  changes
+- **🔔 [Effects](ui-architecture.md#effects)**: One-time side effects like navigation or showing
+  messages
 
 **Pattern: Model-View-Intent (MVI)**
 
@@ -102,10 +107,12 @@ The UI layer is responsible for displaying data to the user and handling user in
 
 #### 🧠 Domain Layer (Business Logic)
 
-The domain layer contains the business logic and rules of the application. It is independent of the UI and data layers,
+The domain layer contains the business logic and rules of the application. It is independent of the
+UI and data layers,
 allowing for easy testing and reuse.
 
 **Key Components:**
+
 - **⚙️ Use Cases**: Encapsulate business logic operations
 - **📋 Domain Models**: Represent business entities
 - **📝 Repository Interfaces**: Define data access contracts
@@ -143,14 +150,16 @@ graph TB
 
 #### 💾 Data Layer
 
-The data layer is responsible for data retrieval, storage, and realtime coordination.
+The data layer is responsible for data retrieval, storage, and synchronization.
 
 **Key Components:**
-- **📦 Repository implementations**: Implement repository interfaces from the domain layer
+
+- **📦 Repository implementations**: Implementations of repository interfaces from the domain layer
 - **🔌 Data Sources**: Provide data from specific sources (API, WebSocket, database, preferences)
 - **📄 Data Transfer Objects**: Represent data at the data layer
 
 **Pattern: Data Source Pattern**
+
 - 🔍 Abstracts data sources behind a clean API
 - Maps data between domain models and data transfer objects
 
@@ -191,159 +200,63 @@ graph TD
 
 ### 🔄 Immutability
 
-Immutability means that once an object is created, it cannot be changed. Instead of modifying existing objects, new objects are created with the desired changes. In the context of UI state, this means that each state object represents a complete snapshot of the UI at a specific point in time.
+Immutability means that once an object is created, it cannot be changed. Instead of modifying
+existing objects, new objects are created with the desired changes. In the context of UI state, this
+means that each state object represents a complete snapshot of the UI at a specific point in time.
 
 **Why is Immutability Important?**
 
 Immutability provides several benefits:
-- **Predictability**: With immutable state, the UI can only change when a new state object is provided, making the flow of data more predictable and easier to reason about.
-- **Debugging**: Each state change creates a new state object, making it easier to track changes and debug issues by comparing state objects.
+
+- **Predictability**: With immutable state, the UI can only change when a new state object is
+  provided, making the flow of data more predictable and easier to reason about.
+- **Debugging**: Each state change creates a new state object, making it easier to track changes and
+  debug issues by comparing state objects.
 - **Concurrency**: Immutable objects are thread-safe by nature, eliminating many concurrency issues.
-- **Performance**: While creating new objects might seem inefficient, modern frameworks optimize this process, and the benefits of immutability often outweigh the costs.
-- **Time-travel debugging**: Immutability enables storing previous states, allowing developers to "time travel" back to previous application states during debugging.
+- **Performance**: While creating new objects might seem inefficient, modern frameworks optimize
+  this process, and the benefits of immutability often outweigh the costs.
+- **Time-travel debugging**: Immutability enables storing previous states, allowing developers to "
+  time travel" back to previous application states during debugging.
 
 ## 🎨 UI Architecture
 
-The UI is built using Jetpack Compose with a component-based architecture following our modified Model-View-Intent (MVI) pattern. This architecture provides a unidirectional data flow, clear separation of concerns, and improved testability.
+The UI is built using Jetpack Compose with a component-based architecture following our modified
+Model-View-Intent (MVI) pattern. This architecture provides a unidirectional data flow, clear
+separation of concerns, and improved testability.
 
-For detailed information about the UI architecture and theming, see the [UI Architecture](ui-architecture.md) and
-`theme-system.md` documents. (`theme-system.md` 작성 예정)
-
-## 🌐 Network and Realtime Data
-
-The application uses Retrofit and OkHttp for request/response API communication, and OkHttp WebSocket for realtime
-cryptocurrency market data.
-
-#### Implementation Approach
-
-```mermaid
-graph LR
-    subgraph UI[UI Layer]
-        VIEW_MODEL[ViewModel]
-    end
-
-    subgraph DOMAIN[Domain Layer]
-        USE_CASE[Use Cases]
-        REPO_API[Repository Interfaces]
-    end
-
-    subgraph DATA[Data Layer]
-        REPO[Repository]
-        COORDINATOR[Realtime Coordinator]
-        TICKER_TABLE[In-memory Ticker Table]
-        KLINE_TABLE[In-memory Kline Table]
-    end
-
-    subgraph NETWORK[Network Layer]
-        REST[Retrofit APIs]
-        WS_CLIENT[WebSocket Client]
-        SESSION[Session Manager]
-        SUBSCRIPTION[Subscription Manager]
-        ROUTER[Message Router]
-    end
-
-    VIEW_MODEL --> USE_CASE
-    USE_CASE --> REPO_API
-    REPO --> |implements| REPO_API
-    REPO --> REST
-    REPO --> COORDINATOR
-    COORDINATOR --> SESSION
-    COORDINATOR --> SUBSCRIPTION
-    COORDINATOR --> TICKER_TABLE
-    COORDINATOR --> KLINE_TABLE
-    SESSION --> WS_CLIENT
-    WS_CLIENT --> ROUTER
-    ROUTER --> COORDINATOR
-
-    classDef ui_layer fill:#d9e9ff,stroke:#000000,color:#000000
-    classDef ui_class fill:#4d94ff,stroke:#000000,color:#000000
-    classDef domain_layer fill:#d9ffd9,stroke:#000000,color:#000000
-    classDef domain_class fill:#33cc33,stroke:#000000,color:#000000
-    classDef data_layer fill:#ffe6cc,stroke:#000000,color:#000000
-    classDef data_class fill:#ffaa33,stroke:#000000,color:#000000
-    classDef network_layer fill:#e6cce6,stroke:#000000,color:#000000
-    classDef network_class fill:#cc99cc,stroke:#000000,color:#000000
-
-    linkStyle default stroke:#999,stroke-width:2px
-
-    class UI ui_layer
-    class VIEW_MODEL ui_class
-    class DOMAIN domain_layer
-    class USE_CASE,REPO_API domain_class
-    class DATA data_layer
-    class REPO,COORDINATOR,TICKER_TABLE,KLINE_TABLE data_class
-    class NETWORK network_layer
-    class REST,WS_CLIENT,SESSION,SUBSCRIPTION,ROUTER network_class
-```
-
-Realtime market data is handled across multiple layers:
-
-1. **🌐 Network Layer**:
-    - Retrofit API clients handle request/response calls
-    - OkHttp WebSocket clients receive realtime market events
-    - Session and subscription managers manage WebSocket lifecycle and stream demand
-    - Message routers parse raw stream messages into typed events
-2. **💾 Data Layer**:
-    - Repositories implement domain contracts and coordinate API, WebSocket, and local sources
-    - Realtime coordinators track active demands and runtime state
-    - In-memory tables hold the latest ticker and kline stream data
-3. **🧠 Domain Layer**:
-    - Use cases expose market data as results or streams
-    - Domain models hide network DTO details from presentation
-4. **🖼️ UI Layer**:
-    - ViewModels collect domain streams and map them to UI state
-    - UI components render loading, data, and error states from the ViewModel
+For detailed information about the UI architecture, see the [UI Architecture](ui-architecture.md).
 
 ## 💉 Dependency Injection
 
-The application uses Hilt for dependency injection, with bindings organized by app, feature, and core responsibilities:
+The application
+uses [Hilt](https://developer.android.com/training/dependency-injection/hilt-android) for dependency
+injection, with modules organized by feature:
 
-- **📱 App Module**: Configure application-wide dependencies
+- **📱 App Modules**: Configure application-wide dependencies
 - **✨ Feature Modules**: Configure feature-specific dependencies
 - **🧰 Core Modules**: Configure core dependencies
 
-```kotlin
-@Module
-@InstallIn(SingletonComponent::class)
-object FeatureModule {
-
-    @Provides
-    fun provideFeatureRepository(
-        remoteDataSource: FeatureRemoteDataSource,
-    ): FeatureRepository = FeatureRepositoryImpl(remoteDataSource)
-}
-```
-
-## 🔄 Cross-Cutting Concerns
-
-Cross-cutting concerns are aspects of the application that affect multiple features and cannot be cleanly handled
-individually for every feature. These concerns require consistent implementation throughout the codebase to ensure
-maintainability and reliability.
-
-In CryptoBook Android, cross-cutting concerns should be implemented as dedicated core modules or shared conventions when
-they need to be reused across the application:
-
-- **⚠️ Error Handling**: Comprehensive error handling transforms exceptions into domain-specific errors and provides user-friendly feedback.
-- **🌐 Networking and Realtime Data**: `core:network` and `core:data` coordinate API, WebSocket, session, subscription, and stream state behavior.
-- **💾 Persistence**: DataStore, Room, or in-memory tables should be used through data-layer abstractions.
-- **📋 Logging**: Logging should be minimal and must not expose secrets, API keys, tokens, or sensitive data.
-
 ### ⚠️ Error Handling
 
-The application implements a comprehensive error handling strategy across all layers. We favor using the Outcome pattern
-over exceptions for expected error conditions, while exceptions are reserved for truly exceptional situations that
+The application implements a comprehensive error handling strategy across all layers. We favor using
+the Outcome pattern
+over exceptions for expected error conditions, while exceptions are reserved for truly exceptional
+situations that
 indicate programming errors or unrecoverable system failures.
 
-- 🧠 **Domain Errors**: Encapsulate business logic errors as sealed classes, ensuring clear representation of specific
+- 🧠 **Domain Errors**: Encapsulate business logic errors as sealed classes, ensuring clear
+  representation of specific
   error cases.
-- 💾 **Data Errors**: Transform network or database exceptions into domain-specific errors using result patterns in repository implementations.
+- 💾 **Data Errors**: Transform network or database exceptions into domain-specific errors using
+  result patterns in repository implementations.
 - 🖼️ **UI Error Handling**: Provide user-friendly error feedback by:
     - Mapping domain errors to UI state in ViewModels.
     - Displaying actionable error states in Compose UI components.
     - Offering retry options for network connectivity issues.
 
-> [!NOTE]
-> Exceptions should be used sparingly. Favor the Outcome pattern and sealed classes for predictable error conditions to
+> [!NOTE]  
+> Exceptions should be used sparingly. Favor the Outcome pattern and sealed classes for predictable
+> error conditions to
 > enhance maintainability and clarity.
 
 #### 🛠️ How to Implement Error Handling
@@ -425,11 +338,11 @@ When implementing error handling in your code:
            }
            is Outcome.Failure -> {
                val errorMessage = when (val error = outcome.error) {
-                   is AccountError.AuthenticationFailed ->
+                   is AccountError.AuthenticationFailed -> 
                        stringProvider.getString(R.string.error_authentication_failed, error.reason)
-                   is AccountError.NetworkError ->
+                   is AccountError.NetworkError -> 
                        stringProvider.getString(R.string.error_network, error.exception.message)
-                   is AccountError.ValidationError ->
+                   is AccountError.ValidationError -> 
                        stringProvider.getString(R.string.error_validation, error.field, error.message)
                }
                _uiState.update { it.copy(error = errorMessage) }
@@ -479,15 +392,7 @@ When implementing error handling in your code:
    }
    ```
 
-### 📝 Logging
-
-The project does not currently define a dedicated structured logging system. Until one is introduced:
-
-- Do not log secrets, credentials, API keys, or tokens
-- Avoid logging large raw network payloads outside short-lived debugging
-- Keep debug logs scoped to troubleshooting
-- Prefer domain-specific errors over logs as a control-flow mechanism
-
 ## 🔄 User Flows
 
-The `user-flows.md` document provides visual representations of typical user flows through the application, helping to understand how different components interact. (작성 예정)
+The `user-flows.md` document provides visual representations of typical user flows through the
+application, helping to understand how different components interact. (planned)
