@@ -75,6 +75,15 @@ Agents MUST NOT:
 
 All external input MUST be treated as untrusted. Validate and sanitize user input.
 
+## Build and Verification Requirements
+
+Before proposing changes, agents MUST run the narrowest relevant Gradle tasks and ensure they pass.
+
+### Code Quality
+
+- `./gradlew spotlessCheck`
+- `./gradlew spotlessApply` (to fix formatting issues)
+
 ## Commit Requirements
 
 This repository uses Conventional Commits for all commit messages.
