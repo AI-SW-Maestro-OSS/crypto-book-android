@@ -39,15 +39,25 @@ constructor(
     override suspend fun getCoinPrices(): Outcome<List<CoinPriceVO>, CoinPriceError> = withContext(
         ioDispatcher,
     ) {
-        coinListRemoteDataSource.getAllTickerPrices()
-            .map(
-                transformSuccess = { tickers ->
-                    tickers.map { it.toCoinPriceVO() }
-                },
-                transformFailure = { error, _ ->
-                    error.toCoinPriceError()
-                },
-            )
+        when (val outcome = coinListRemoteDataSource.getAllTickerPrices()) {
+            is Outcome.Success -> {
+                try {
+                    Outcome.success(outcome.data.map { it.toCoinPriceVO() })
+                } catch (e: NumberFormatException) {
+                    Outcome.Failure(
+                        error = CoinPriceError.UnexpectedResponse,
+                        cause = e,
+                    )
+                }
+            }
+
+            is Outcome.Failure -> {
+                Outcome.Failure(
+                    error = outcome.error.toCoinPriceError(),
+                    cause = outcome.cause,
+                )
+            }
+        }
     }
 
     override fun observeCoinPrices(): Flow<Outcome<List<CoinPriceVO>, CoinPriceError>> {
