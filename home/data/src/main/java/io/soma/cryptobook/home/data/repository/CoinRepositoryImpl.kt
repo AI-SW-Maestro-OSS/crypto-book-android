@@ -7,7 +7,6 @@ import io.soma.cryptobook.core.domain.error.HttpResponseStatus
 import io.soma.cryptobook.core.domain.model.CoinInfoVO
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import io.soma.cryptobook.core.domain.outcome.Outcome
-import io.soma.cryptobook.core.domain.outcome.map
 import io.soma.cryptobook.core.domain.outcome.mapSuccess
 import io.soma.cryptobook.core.domain.repository.CoinRepository
 import io.soma.cryptobook.core.network.error.ApiError
