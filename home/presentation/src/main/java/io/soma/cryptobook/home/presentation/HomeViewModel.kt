@@ -1,14 +1,12 @@
 package io.soma.cryptobook.home.presentation
 
 import androidx.lifecycle.viewModelScope
-import coil3.util.CoilUtils.result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.soma.cryptobook.core.domain.error.CoinPriceError
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
-import io.soma.cryptobook.core.domain.outcome.Outcome
 import io.soma.cryptobook.core.domain.outcome.handle
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
@@ -71,7 +69,7 @@ class HomeViewModel @Inject constructor(
                             )
                         }
                         messageHelper.showToast(message)
-                    }
+                    },
                 )
             }
         }

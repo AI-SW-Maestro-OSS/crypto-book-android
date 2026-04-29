@@ -2,18 +2,18 @@ package io.soma.cryptobook.home.data.repository
 
 import io.soma.cryptobook.core.data.database.ticksize.SymbolTickSizeDao
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
+import io.soma.cryptobook.core.domain.error.CoinPriceError
+import io.soma.cryptobook.core.domain.error.HttpResponseStatus
 import io.soma.cryptobook.core.domain.model.CoinInfoVO
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import io.soma.cryptobook.core.domain.outcome.Outcome
 import io.soma.cryptobook.core.domain.outcome.map
+import io.soma.cryptobook.core.domain.outcome.mapSuccess
 import io.soma.cryptobook.core.domain.repository.CoinRepository
+import io.soma.cryptobook.core.network.error.ApiError
 import io.soma.cryptobook.home.data.datasource.CoinListRemoteDataSource
 import io.soma.cryptobook.home.data.mapper.CoinPriceDomainModelMapper
 import io.soma.cryptobook.home.data.model.toCoinPriceVO
-import io.soma.cryptobook.core.domain.error.CoinPriceError
-import io.soma.cryptobook.core.domain.error.HttpResponseStatus
-import io.soma.cryptobook.core.domain.outcome.mapSuccess
-import io.soma.cryptobook.core.network.error.ApiError
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -36,9 +36,11 @@ constructor(
     private val coinPriceDomainModelMapper: CoinPriceDomainModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : CoinRepository {
-    override suspend fun getCoinPrices(): Outcome<List<CoinPriceVO>, CoinPriceError> = withContext(ioDispatcher) {
+    override suspend fun getCoinPrices(): Outcome<List<CoinPriceVO>, CoinPriceError> = withContext(
+        ioDispatcher,
+    ) {
         coinListRemoteDataSource.getAllTickerPrices()
-            .map (
+            .map(
                 transformSuccess = { tickers ->
                     tickers.map { it.toCoinPriceVO() }
                 },
@@ -85,8 +87,8 @@ constructor(
                     Outcome.success(
                         mergePrices(
                             initialPrices = initialPrices,
-                            table = table
-                        )
+                            table = table,
+                        ),
                     )
                 }
 
@@ -140,13 +142,11 @@ constructor(
                 status == HttpResponseStatus.ClientTimeout -> CoinPriceError.Network
 
                 else -> CoinPriceError.Unknown(message)
-
             }
 
             is ApiError.UnexpectedBody -> CoinPriceError.UnexpectedResponse
 
             is ApiError.Unknown -> CoinPriceError.Unknown(message)
         }
-
     }
 }
