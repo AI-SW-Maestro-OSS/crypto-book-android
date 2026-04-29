@@ -53,7 +53,6 @@ class SplashViewModel @Inject constructor(
                     )
             }
 
-
             val exchangeRateJob = async {
                 runCatching { refreshExchangeRateUseCase() }
                     .onFailure { e ->
