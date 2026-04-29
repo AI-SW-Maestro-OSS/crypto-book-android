@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.soma.cryptobook.core.domain.outcome.handle
 import io.soma.cryptobook.core.domain.repository.CoinRepository
 import io.soma.cryptobook.core.domain.usecase.RefreshExchangeRateUseCase
 import io.soma.cryptobook.core.domain.usecase.RefreshTickSizesIfRequiredUseCase
@@ -41,8 +42,17 @@ class SplashViewModel @Inject constructor(
                 }.getOrDefault(false)
             }
             val prefetchJob = async {
-                runCatching { coinRepository.getCoinPrices() }
+                coinRepository.getCoinPrices()
+                    .handle(
+                        onSuccess = {
+                            android.util.Log.d("SplashViewModel", "코인 가격 프리패치 성공")
+                        },
+                        onFailure = { error ->
+                            android.util.Log.e("SplashViewModel", "코인 가격 프리패치 실패: $error")
+                        },
+                    )
             }
+
 
             val exchangeRateJob = async {
                 runCatching { refreshExchangeRateUseCase() }
