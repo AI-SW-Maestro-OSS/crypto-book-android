@@ -1,4 +1,4 @@
-# Thunderbird Core Outcome Module
+# Outcome Module
 
 이 모듈은 `Outcome`을 제공합니다. `Outcome`은 아키텍처 경계를 넘어 exception을 던지는 대신, 예상 가능한
 성공과 실패를 값으로 표현하기 위한 작은 result 타입입니다.
