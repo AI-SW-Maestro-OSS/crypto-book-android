@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.home.domain)
+    implementation(projects.core.domain)
 
     implementation(libs.okhttp.logging)
     implementation(libs.retrofit.core)
