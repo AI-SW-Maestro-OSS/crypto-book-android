@@ -39,6 +39,5 @@ public abstract class BaseViewModel<STATE, EVENT, EFFECT>(
             handledOneTimeEvents.add(event)
             block()
         }
-
     }
 }

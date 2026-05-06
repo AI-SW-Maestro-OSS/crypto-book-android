@@ -1,0 +1,82 @@
+package io.soma.cryptobook.settings.presentation
+
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.soma.cryptobook.core.domain.message.MessageHelper
+import io.soma.cryptobook.core.domain.model.CurrencyUnit
+import io.soma.cryptobook.core.domain.model.Language
+import io.soma.cryptobook.core.domain.navigation.AppPage
+import io.soma.cryptobook.core.domain.navigation.NavigationHelper
+import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
+import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
+import io.soma.cryptobook.settings.domain.usecase.SetLanguageUseCase
+import io.soma.cryptobook.settings.domain.usecase.SetPriceCurrencyUseCase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class NewSettingsViewModel @Inject constructor(
+    private val navigationHelper: NavigationHelper,
+    private val messageHelper: MessageHelper,
+    private val getUserDataUseCase: GetUserDataUseCase,
+    private val setLanguageUseCase: SetLanguageUseCase,
+    private val setPriceCurrencyUseCase: SetPriceCurrencyUseCase,
+) : BaseViewModel<NewSettingsContract.State, NewSettingsContract.Event, NewSettingsContract.Effect>(
+    NewSettingsContract.State(),
+),
+    NewSettingsContract.ViewModel {
+    override fun event(event: NewSettingsContract.Event) {
+        when (event) {
+            is NewSettingsContract.Event.SetLanguage -> onLanguageChanged(event.language)
+            is NewSettingsContract.Event.SetCurrencyUnit -> onPriceCurrencyChanged(
+                event.currencyUnit,
+            )
+            is NewSettingsContract.Event.NavigateToHome -> navigateToHome()
+            is NewSettingsContract.Event.ShowLoadingMessage -> showLoadingMessage()
+            is NewSettingsContract.Event.ShowSnackbarMessage -> showSnackbarMessage()
+        }
+    }
+
+    init {
+        observeUserData()
+    }
+
+    private fun observeUserData() {
+        getUserDataUseCase()
+            .onEach { userData ->
+                updateState { state ->
+                    state.copy(userData = userData, isLoading = false)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun onLanguageChanged(language: Language) = viewModelScope.launch {
+        setLanguageUseCase(language)
+    }
+
+    private fun onPriceCurrencyChanged(currencyUnit: CurrencyUnit) = viewModelScope.launch {
+        setPriceCurrencyUseCase(currencyUnit)
+    }
+
+    private fun navigateToHome() = viewModelScope.launch {
+        navigationHelper.navigate(AppPage.Home)
+    }
+
+    private fun showLoadingMessage() = viewModelScope.launch {
+        messageHelper.showLoading()
+        delay(3000L)
+        messageHelper.hideLoading()
+    }
+
+    private fun showSnackbarMessage() {
+        messageHelper.showSnackbar(
+            message = "스낵바 테스트 메시지입니다",
+            actionLabel = "확인",
+            onAction = { },
+        )
+    }
+}

@@ -42,12 +42,13 @@ public data class StateDispatch<STATE, EVENT>(
     val dispatch: (EVENT) -> Unit,
 )
 
+@Suppress("MaxLineLength")
 @Composable
-public inline fun <reified STATE, reified EVENT, reified EFFECT> UnidirectionalViewModel<STATE, EVENT, EFFECT>.observe(
+public inline fun <reified STATE, EVENT, EFFECT> UnidirectionalViewModel<STATE, EVENT, EFFECT>.observe(
     crossinline handleEffect: (EFFECT) -> Unit,
 ): StateDispatch<STATE, EVENT> {
     val state = state.collectAsStateWithLifecycle()
-    val dispatch: (EVENT) -> Unit = {event(it)}
+    val dispatch: (EVENT) -> Unit = { event(it) }
 
     LaunchedEffect(key1 = effect) {
         effect.collect { effect ->
