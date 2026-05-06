@@ -23,10 +23,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
-fun SettingsRoute(
-    modifier: Modifier = Modifier,
-    viewModel: NewSettingsViewModel = hiltViewModel(),
-) {
+fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
     val (state, dispatch) = viewModel.observeWithoutEffect()
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -41,8 +38,8 @@ fun SettingsRoute(
 
 @Composable
 internal fun SettingsScreen(
-    state: NewSettingsContract.State,
-    onEvent: (NewSettingsContract.Event) -> Unit,
+    state: SettingsContract.State,
+    onEvent: (SettingsContract.Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val currentLanguage = state.userData?.language ?: Language.ENGLISH
@@ -70,7 +67,7 @@ internal fun SettingsScreen(
                     0 -> CurrencyUnit.DOLLAR
                     else -> CurrencyUnit.WON
                 }
-                onEvent(NewSettingsContract.Event.SetCurrencyUnit(currency))
+                onEvent(SettingsContract.Event.SetCurrencyUnit(currency))
             },
         )
 
@@ -88,7 +85,7 @@ internal fun SettingsScreen(
                     0 -> Language.ENGLISH
                     else -> Language.KOREAN
                 }
-                onEvent(NewSettingsContract.Event.SetLanguage(language))
+                onEvent(SettingsContract.Event.SetLanguage(language))
             },
         )
 
@@ -114,7 +111,7 @@ private fun formatExchangeRate(rate: BigDecimal?): String {
 @Composable
 private fun SettingsScreenPreview() {
     SettingsScreen(
-        state = NewSettingsContract.State(
+        state = SettingsContract.State(
             userData = UserData(
                 language = Language.KOREAN,
                 currencyUnit = CurrencyUnit.DOLLAR,
