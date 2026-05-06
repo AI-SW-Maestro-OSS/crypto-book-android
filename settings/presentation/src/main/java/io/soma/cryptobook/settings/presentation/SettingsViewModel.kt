@@ -1,5 +1,6 @@
 package io.soma.cryptobook.settings.presentation
 
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
@@ -7,10 +8,13 @@ import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
-import io.soma.cryptobook.core.presentation.MviViewModel
+import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
 import io.soma.cryptobook.settings.domain.usecase.SetLanguageUseCase
 import io.soma.cryptobook.settings.domain.usecase.SetPriceCurrencyUseCase
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,42 +24,49 @@ class SettingsViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val setLanguageUseCase: SetLanguageUseCase,
     private val setPriceCurrencyUseCase: SetPriceCurrencyUseCase,
-) : MviViewModel<SettingsEvent, SettingsUiState, SettingsSideEffect>(SettingsUiState()) {
-    init {
-        intent {
-            observeUserData()
-        }
-    }
-
-    private suspend fun observeUserData() {
-        getUserDataUseCase().collect { userData ->
-            reduce { copy(userData = userData, isLoading = false) }
-        }
-    }
-
-    override fun handleEvent(event: SettingsEvent) {
+) : BaseViewModel<SettingsContract.State, SettingsContract.Event, SettingsContract.Effect>(
+    SettingsContract.State(),
+),
+    SettingsContract.ViewModel {
+    override fun event(event: SettingsContract.Event) {
         when (event) {
-            is SettingsEvent.SetLanguage -> onLanguageChanged(event.language)
-            is SettingsEvent.SetCurrencyUnit -> onPriceCurrencyChanged(event.currencyUnit)
-            is SettingsEvent.NavigateToHome -> navigateToHome()
-            is SettingsEvent.ShowLoadingMessage -> showLoadingMessage()
-            is SettingsEvent.ShowSnackbarMessage -> showSnackbarMessage()
+            is SettingsContract.Event.SetLanguage -> onLanguageChanged(event.language)
+            is SettingsContract.Event.SetCurrencyUnit -> onPriceCurrencyChanged(
+                event.currencyUnit,
+            )
+            is SettingsContract.Event.NavigateToHome -> navigateToHome()
+            is SettingsContract.Event.ShowLoadingMessage -> showLoadingMessage()
+            is SettingsContract.Event.ShowSnackbarMessage -> showSnackbarMessage()
         }
     }
 
-    private fun onLanguageChanged(language: Language) = intent {
+    init {
+        observeUserData()
+    }
+
+    private fun observeUserData() {
+        getUserDataUseCase()
+            .onEach { userData ->
+                updateState { state ->
+                    state.copy(userData = userData, isLoading = false)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun onLanguageChanged(language: Language) = viewModelScope.launch {
         setLanguageUseCase(language)
     }
 
-    private fun onPriceCurrencyChanged(currencyUnit: CurrencyUnit) = intent {
+    private fun onPriceCurrencyChanged(currencyUnit: CurrencyUnit) = viewModelScope.launch {
         setPriceCurrencyUseCase(currencyUnit)
     }
 
-    private fun navigateToHome() = intent {
+    private fun navigateToHome() = viewModelScope.launch {
         navigationHelper.navigate(AppPage.Home)
     }
 
-    private fun showLoadingMessage() = intent {
+    private fun showLoadingMessage() = viewModelScope.launch {
         messageHelper.showLoading()
         delay(3000L)
         messageHelper.hideLoading()
