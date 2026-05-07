@@ -13,7 +13,6 @@ import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.mapper.CoinDetailPresentationModelMapper
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
-import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
@@ -26,7 +25,6 @@ class CoinDetailViewModel @AssistedInject constructor(
     private val observeCoinDetailUseCase: ObserveCoinDetailUseCase,
     private val mapper: CoinDetailPresentationModelMapper,
     private val coinImageResolver: CoinImageResolver,
-    private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
     private val observeMarketRealtimeState: ObserveMarketRealtimeState,
 ) : BaseViewModel<State, Event, Effect>(
@@ -50,7 +48,7 @@ class CoinDetailViewModel @AssistedInject constructor(
 
     override fun event(event: Event) {
         when (event) {
-            Event.OnBackClicked -> navigationHelper.back()
+            Event.OnBackClicked -> emitEffect(Effect.NavigateBack)
             Event.OnScreenStarted -> ensureObserving()
         }
     }

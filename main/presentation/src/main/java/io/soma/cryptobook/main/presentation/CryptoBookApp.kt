@@ -163,7 +163,7 @@ fun CryptoBookApp(
                 entryProvider = entryProvider {
                     settingsEntry()
                     homeEntry()
-                    coinDetailEntry()
+                    coinDetailEntry(navigator::goBack)
                 },
             )
         }
