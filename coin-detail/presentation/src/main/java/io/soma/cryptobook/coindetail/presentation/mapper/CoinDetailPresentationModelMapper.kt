@@ -3,7 +3,7 @@ package io.soma.cryptobook.coindetail.presentation.mapper
 import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.presentation.CandleUiModel
-import io.soma.cryptobook.coindetail.presentation.CoinDetailUiState
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -29,8 +29,8 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
         imageUrl: String,
         isLoading: Boolean = false,
         errorMsg: String? = null,
-    ): CoinDetailUiState {
-        return CoinDetailUiState(
+    ): CoinDetailContract.State {
+        return CoinDetailContract.State(
             symbol = vo.symbol,
             imageUrl = imageUrl,
             currentPrice = formatPrice(vo.currentPrice, vo.tickSize),
@@ -70,14 +70,17 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
                 val result = value.divide(billion, 1, RoundingMode.HALF_UP)
                 "$${result}B"
             }
+
             value >= million -> {
                 val result = value.divide(million, 1, RoundingMode.HALF_UP)
                 "$${result}M"
             }
+
             value >= thousand -> {
                 val result = value.divide(thousand, 1, RoundingMode.HALF_UP)
                 "$${result}K"
             }
+
             else -> TickSizePriceFormatter.formatUsd(value, tickSize = null)
         }
     }

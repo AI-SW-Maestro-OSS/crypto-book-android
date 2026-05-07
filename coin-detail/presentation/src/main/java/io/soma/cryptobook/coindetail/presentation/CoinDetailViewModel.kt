@@ -6,13 +6,17 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveCoinDetailUseCase
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Effect
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.mapper.CoinDetailPresentationModelMapper
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
-import io.soma.cryptobook.core.presentation.MviViewModel
+import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -25,12 +29,13 @@ class CoinDetailViewModel @AssistedInject constructor(
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
     private val observeMarketRealtimeState: ObserveMarketRealtimeState,
-) : MviViewModel<CoinDetailEvent, CoinDetailUiState, CoinDetailSideEffect>(
-    CoinDetailUiState(
+) : BaseViewModel<State, Event, Effect>(
+    State(
         symbol = coinName,
         imageUrl = coinImageResolver.getImageUrl(coinName),
     ),
-) {
+),
+    ViewModel {
     private var observeJob: Job? = null
 
     @AssistedFactory
@@ -43,13 +48,10 @@ class CoinDetailViewModel @AssistedInject constructor(
         observeRealtimeState()
     }
 
-    override fun handleEvent(event: CoinDetailEvent) {
+    override fun event(event: Event) {
         when (event) {
-            CoinDetailEvent.OnBackClicked -> {
-                navigationHelper.back()
-            }
-
-            CoinDetailEvent.OnScreenStarted -> ensureObserving()
+            Event.OnBackClicked -> navigationHelper.back()
+            Event.OnScreenStarted -> ensureObserving()
         }
     }
 
@@ -61,15 +63,17 @@ class CoinDetailViewModel @AssistedInject constructor(
             observeCoinDetailUseCase(symbol = coinName).collect { result ->
                 when (result) {
                     is ObserveCoinDetailUseCase.Result.Loading -> {
-                        reduce { copy(isLoading = true, errorMsg = null) }
+                        updateState { state ->
+                            state.copy(isLoading = true, errorMsg = null)
+                        }
                     }
 
                     is ObserveCoinDetailUseCase.Result.Success -> {
-                        reduce {
+                        updateState { state ->
                             mapper.toUiState(
                                 vo = result.coinDetail,
                                 candles = result.candles,
-                                imageUrl = imageUrl,
+                                imageUrl = state.imageUrl,
                                 isLoading = false,
                                 errorMsg = null,
                             )
@@ -77,7 +81,9 @@ class CoinDetailViewModel @AssistedInject constructor(
                     }
 
                     is ObserveCoinDetailUseCase.Result.Error.Connection -> {
-                        reduce { copy(isLoading = false, errorMsg = "연결 오류") }
+                        updateState { state ->
+                            state.copy(isLoading = false, errorMsg = "연결 오류")
+                        }
                         messageHelper.showToast("연결 오류가 발생했습니다")
                     }
                 }
@@ -88,8 +94,8 @@ class CoinDetailViewModel @AssistedInject constructor(
     private fun observeRealtimeState() {
         viewModelScope.launch {
             observeMarketRealtimeState().collect { runtimeState ->
-                reduce {
-                    copy(realtimeStatusMessage = runtimeState.toRealtimeStatusMessage())
+                updateState { state ->
+                    state.copy(realtimeStatusMessage = runtimeState.toRealtimeStatusMessage())
                 }
             }
         }
