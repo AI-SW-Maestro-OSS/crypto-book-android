@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Effect
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
@@ -35,16 +35,22 @@ import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAp
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIcon
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
+import io.soma.cryptobook.core.presentation.mvi.observe
 
 @Composable
-fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: ViewModel) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+fun CoinDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: ViewModel) {
+    val (state, dispatch) = viewModel.observe { effect ->
+        when (effect) {
+            Effect.NavigateBack -> onBack()
+        }
+    }
+
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
-                viewModel.event(Event.OnScreenStarted)
+                dispatch(Event.OnScreenStarted)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -59,8 +65,8 @@ fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: ViewModel) {
             .background(ScreenBackground),
     ) {
         CoinDetailScreen(
-            state = uiState,
-            onEvent = viewModel::event,
+            state = state.value,
+            onEvent = dispatch,
             modifier = modifier,
         )
     }

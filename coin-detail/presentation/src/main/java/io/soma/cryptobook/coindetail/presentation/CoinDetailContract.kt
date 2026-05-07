@@ -30,7 +30,9 @@ interface CoinDetailContract {
         data object OnScreenStarted : Event
     }
 
-    sealed interface Effect
+    sealed interface Effect {
+        data object NavigateBack : Effect
+    }
 }
 
 data class CandleUiModel(
