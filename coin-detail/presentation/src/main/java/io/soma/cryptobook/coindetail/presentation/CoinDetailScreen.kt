@@ -23,6 +23,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
+import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.component.CoinCandlestickChart
 import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContainer
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
@@ -34,14 +37,14 @@ import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIco
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 
 @Composable
-fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: CoinDetailViewModel) {
+fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: ViewModel) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
-                viewModel.handleEvent(CoinDetailEvent.OnScreenStarted)
+                viewModel.event(Event.OnScreenStarted)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -57,7 +60,7 @@ fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: CoinDetailViewMode
     ) {
         CoinDetailScreen(
             state = uiState,
-            onEvent = viewModel::handleEvent,
+            onEvent = viewModel::event,
             modifier = modifier,
         )
     }
@@ -65,8 +68,8 @@ fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: CoinDetailViewMode
 
 @Composable
 internal fun CoinDetailScreen(
-    state: CoinDetailUiState,
-    onEvent: (CoinDetailEvent) -> Unit,
+    state: State,
+    onEvent: (Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -77,7 +80,7 @@ internal fun CoinDetailScreen(
             navigationIcon = NavigationIcon(
                 navigationIcon = painterResource(id = CbDrawable.ic_arrow_back),
                 navigationIconContentDescription = "Back",
-                onNavigationIconClick = { },
+                onNavigationIconClick = { onEvent(Event.OnBackClicked) },
             ),
             actions = {
                 CbStandardIconButton(
@@ -120,7 +123,7 @@ internal fun CoinDetailScreen(
 }
 
 @Composable
-private fun CoinDetailContent(state: CoinDetailUiState, modifier: Modifier = Modifier) {
+private fun CoinDetailContent(state: State, modifier: Modifier = Modifier) {
     val priceChangeType = when {
         state.priceChangePercent > 0 -> PriceChangeType.Up
         state.priceChangePercent < 0 -> PriceChangeType.Down
@@ -160,7 +163,7 @@ private fun CoinDetailContent(state: CoinDetailUiState, modifier: Modifier = Mod
 @Composable
 private fun CoinDetailScreenPreview() {
     CoinDetailScreen(
-        state = CoinDetailUiState(
+        state = State(
             symbol = "BTCUSDT",
             imageUrl = "",
             currentPrice = "$73,500.89",
@@ -181,7 +184,7 @@ private fun CoinDetailScreenPreview() {
 @Composable
 private fun CoinDetailScreenLoadingPreview() {
     CoinDetailScreen(
-        state = CoinDetailUiState(isLoading = true),
+        state = State(isLoading = true),
         onEvent = {},
         modifier = Modifier.background(ScreenBackground),
     )
@@ -191,7 +194,7 @@ private fun CoinDetailScreenLoadingPreview() {
 @Composable
 private fun CoinDetailScreenErrorPreview() {
     CoinDetailScreen(
-        state = CoinDetailUiState(
+        state = State(
             isLoading = false,
             errorMsg = "Network error occurred",
         ),
@@ -204,7 +207,7 @@ private fun CoinDetailScreenErrorPreview() {
 @Composable
 private fun CoinDetailScreenRealtimeWarningPreview() {
     CoinDetailScreen(
-        state = CoinDetailUiState(
+        state = State(
             isLoading = false,
             realtimeStatusMessage = "실시간 연결을 복구하는 중입니다",
         ),
