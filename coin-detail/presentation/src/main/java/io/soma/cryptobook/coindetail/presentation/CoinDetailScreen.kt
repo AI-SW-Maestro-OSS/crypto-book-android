@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -27,7 +28,10 @@ import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContai
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
-import io.soma.cryptobook.core.designsystem.theme.component.CbDetailTopAppBar
+import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIcon
+import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
+import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 
 @Composable
 fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: CoinDetailViewModel) {
@@ -51,13 +55,6 @@ fun CoinDetailRoute(modifier: Modifier = Modifier, viewModel: CoinDetailViewMode
             .fillMaxSize()
             .background(ScreenBackground),
     ) {
-        CbDetailTopAppBar(
-            onSearchClick = { },
-            title = uiState.symbol,
-            onBackClick = { },
-            onFavoriteClick = { },
-            modifier = modifier,
-        )
         CoinDetailScreen(
             state = uiState,
             onEvent = viewModel::handleEvent,
@@ -75,6 +72,23 @@ internal fun CoinDetailScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
+        CbMediumTopAppBar(
+            title = state.symbol,
+            navigationIcon = NavigationIcon(
+                navigationIcon = painterResource(id = CbDrawable.ic_arrow_back),
+                navigationIconContentDescription = "Back",
+                onNavigationIconClick = { },
+            ),
+            actions = {
+                CbStandardIconButton(
+                    vectorIconRes = CbDrawable.ic_favorite,
+                    contentDescription = "favorite",
+                    onClick = { },
+                    modifier = Modifier,
+                )
+            },
+        )
+
         state.realtimeStatusMessage?.let { message ->
             Text(
                 text = message,
