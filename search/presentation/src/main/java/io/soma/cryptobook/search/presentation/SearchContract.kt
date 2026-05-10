@@ -7,13 +7,16 @@ interface SearchContract {
 
     data class State(
         val searchTerm: String = "",
-        val viewState: ViewState = ViewState.Empty,
+        val viewState: ViewState = ViewState.Empty(message = null),
     ) {
         sealed interface ViewState {
-            data object Empty : ViewState
+            data object Loading : ViewState
+            data class Empty(val message: String?) : ViewState
             data class Content(
                 val items: List<DisplayItem>,
             ) : ViewState
+
+            data class Error(val message: String) : ViewState
         }
     }
 

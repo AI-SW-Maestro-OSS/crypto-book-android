@@ -13,16 +13,16 @@ fun SearchContent(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier = modifier,
     ) {
         items(
             items = items,
-            key = { it.symbol }
+            key = { it.symbol },
         ) { item ->
             SearchListItem(
                 symbol = item.symbol,
                 imageUrl = item.imageUrl,
-                onClick = { onItemClick(item.symbol) }
+                onClick = { onItemClick(item.symbol) },
             )
         }
     }
