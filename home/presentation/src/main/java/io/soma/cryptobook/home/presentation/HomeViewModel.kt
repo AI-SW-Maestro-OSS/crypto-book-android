@@ -41,6 +41,10 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.OnCoinClicked -> navigationHelper.navigate(
                 AppPage.CoinDetail(event.symbol),
             )
+
+            HomeEvent.SearchIconClick -> navigationHelper.navigate(
+                AppPage.Search
+            )
         }
     }
 
@@ -89,7 +93,7 @@ class HomeViewModel @Inject constructor(
         MarketRealtimeState.Connected,
         MarketRealtimeState.Connecting,
         MarketRealtimeState.Inactive,
-        -> null
+            -> null
 
         MarketRealtimeState.Recovering -> "실시간 연결을 복구하는 중입니다"
         is MarketRealtimeState.Failed -> "실시간 데이터 연결이 중단되었습니다"

@@ -37,6 +37,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import io.soma.cryptobook.coindetail.presentation.navigation.CoinDetailNavKey
 import io.soma.cryptobook.coindetail.presentation.navigation.coinDetailEntry
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.cbNavigationItemColors
@@ -50,6 +51,7 @@ import io.soma.cryptobook.main.presentation.navigation.NavCommand
 import io.soma.cryptobook.main.presentation.navigation.NavCommandSource
 import io.soma.cryptobook.main.presentation.navigation.TOP_LEVEL_NAV_ITEMS
 import io.soma.cryptobook.navigation.rememberNavigationState
+import io.soma.cryptobook.search.presentation.navigation.searchEntry
 import io.soma.cryptobook.settings.presentation.navigation.settingsEntry
 
 @Composable
@@ -164,6 +166,12 @@ fun CryptoBookApp(
                     settingsEntry()
                     homeEntry()
                     coinDetailEntry(navigator::goBack)
+                    searchEntry(
+                        onBack = navigator::goBack,
+                        onCoinClick = { coinName ->
+                            navigator.navigateTo(CoinDetailNavKey(coinName))
+                        }
+                    )
                 },
             )
         }

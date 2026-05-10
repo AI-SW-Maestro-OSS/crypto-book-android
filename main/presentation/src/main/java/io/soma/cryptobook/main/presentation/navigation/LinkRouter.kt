@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import io.soma.cryptobook.coindetail.presentation.navigation.CoinDetailNavKey
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
+import io.soma.cryptobook.search.presentation.navigation.SearchNavKey
 import io.soma.cryptobook.settings.presentation.navigation.SettingsNavKey
 import javax.inject.Inject
 
@@ -32,5 +33,6 @@ class LinkRouter @Inject constructor() {
         is AppPage.Home -> HomeNavKey
         is AppPage.CoinDetail -> CoinDetailNavKey(page.coinName)
         is AppPage.Settings -> SettingsNavKey
+        is AppPage.Search -> SearchNavKey
     }
 }

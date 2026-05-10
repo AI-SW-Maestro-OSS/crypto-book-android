@@ -14,6 +14,7 @@ dependencies {
     implementation(projects.coinDetail.presentation)
     implementation(projects.home.presentation)
     implementation(projects.settings.presentation)
+    implementation(projects.search.presentation)
 
     // Navigation 3
     implementation(libs.androidx.navigation3.runtime)
