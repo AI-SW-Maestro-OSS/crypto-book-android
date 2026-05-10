@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(projects.core.presentation)
     implementation(projects.core.designsystem)
+    implementation(projects.search.domain)
     implementation(libs.coil.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)

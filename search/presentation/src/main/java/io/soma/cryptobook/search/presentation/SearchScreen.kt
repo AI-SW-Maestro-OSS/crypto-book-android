@@ -1,6 +1,7 @@
 package io.soma.cryptobook.search.presentation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -38,16 +39,12 @@ fun SearchRoute(
     SearchScreen(
         state = state.value,
         onEvent = dispatch,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
 @Composable
-fun SearchScreen(
-    state: State,
-    onEvent: (Event) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun SearchScreen(state: State, onEvent: (Event) -> Unit, modifier: Modifier = Modifier) {
     CbScaffold(
         topBar = {
             CbSearchTopAppBar(
@@ -63,19 +60,28 @@ fun SearchScreen(
                 ),
                 clearIconContentDescription = "clear",
             )
-        }
+        },
     ) {
         when (val viewState = state.viewState) {
-            State.ViewState.Empty -> {
-                Text("Empty")
+            State.ViewState.Loading -> {
+                Text("Loading..")
+            }
+
+            is State.ViewState.Empty -> SearchEmptyContent(
+                viewState = viewState,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            is State.ViewState.Error -> {
+                Text(viewState.message)
             }
 
             is State.ViewState.Content -> {
                 SearchContent(
                     items = viewState.items,
-                    onItemClick = { coinName ->
-                        onEvent(Event.OnListItemClick(coinName))
-                    }
+                    onItemClick = { symbol ->
+                        onEvent(Event.OnListItemClick(symbol))
+                    },
                 )
             }
         }
