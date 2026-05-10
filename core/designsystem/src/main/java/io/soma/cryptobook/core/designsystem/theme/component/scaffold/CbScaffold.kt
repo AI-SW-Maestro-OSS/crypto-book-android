@@ -120,6 +120,8 @@ fun CbScaffold(
                                     enabled = pullToRefreshState.isEnabled
                                 )
                         ) {
+                            content()
+
                             PullToRefreshDefaults.Indicator(
                                 modifier = Modifier.align(Alignment.TopCenter),
                                 isRefreshing = pullToRefreshState.isRefreshing,
