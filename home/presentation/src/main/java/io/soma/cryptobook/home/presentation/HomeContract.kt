@@ -25,6 +25,7 @@ sealed interface HomeEvent : Event {
     data object OnRefresh : HomeEvent
     data object OnBackClicked : HomeEvent
     data class OnCoinClicked(val symbol: String) : HomeEvent
+    data object SearchIconClick : HomeEvent
 }
 
 sealed interface HomeSideEffect : SideEffect

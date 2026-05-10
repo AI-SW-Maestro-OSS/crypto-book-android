@@ -20,7 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
-import io.soma.cryptobook.core.designsystem.theme.component.CbSearchTopAppBar
+import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
+import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListItemData
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListTable
@@ -32,25 +34,35 @@ import java.math.BigDecimal
 fun HomeRoute(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ScreenBackground),
-    ) {
-        CbSearchTopAppBar(
-            onSearchClick = { },
-        )
-        HomeScreen(
-            state = uiState,
-            onEvent = viewModel::handleEvent,
-            modifier = modifier,
-        )
-    }
+    HomeScreen(
+        state = uiState,
+        onEvent = viewModel::handleEvent,
+        modifier = modifier,
+    )
 }
 
 @Composable
-internal fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifier: Modifier) {
-    Column(modifier = modifier.fillMaxSize()) {
+internal fun HomeScreen(
+    state: HomeUiState,
+    onEvent: (HomeEvent) -> Unit,
+    modifier: Modifier,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ScreenBackground)
+    ) {
+        CbMediumTopAppBar(
+            title = "Crypto-Book-Android",
+            actions = {
+                CbStandardIconButton(
+                    vectorIconRes = CbDrawable.ic_search,
+                    contentDescription = "search",
+                    onClick = { onEvent(HomeEvent.SearchIconClick) },
+                    modifier = Modifier,
+                )
+            },
+        )
         state.realtimeStatusMessage?.let { msg ->
             Row(
                 modifier = Modifier
@@ -114,7 +126,7 @@ private fun CoinItem.toCoinListItemData() = CoinListItemData(
     changePercent = priceChangePercentage24h,
 )
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
     val sampleCoins = listOf(
@@ -132,7 +144,7 @@ private fun HomeScreenPreview() {
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun HomeScreenLoadingPreview() {
     HomeScreen(
@@ -142,7 +154,7 @@ private fun HomeScreenLoadingPreview() {
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun HomeScreenErrorPreview() {
     HomeScreen(
@@ -152,7 +164,7 @@ private fun HomeScreenErrorPreview() {
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun HomeScreenRealtimeWarningPreview() {
     HomeScreen(
