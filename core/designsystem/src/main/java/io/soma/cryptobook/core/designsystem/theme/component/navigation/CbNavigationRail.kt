@@ -26,7 +26,7 @@ import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-fun CbnavigationRail(
+fun CbNavigationRail(
     navigationItems: ImmutableList<NavigationItem>,
     selectedItem: NavigationItem?,
     onClick: (NavigationItem) -> Unit,
@@ -54,7 +54,14 @@ fun CbnavigationRail(
             )
         ) {
             navigationItems.forEach { navigationItem ->
-
+                CbNavigationRailItem(
+                    labelRes = navigationItem.labelRes,
+                    selectedIconRes = navigationItem.iconResSelected,
+                    unselectedIconRes = navigationItem.iconRes,
+                    isSelected = navigationItem == selectedItem,
+                    onClick = { onClick(navigationItem) },
+                    modifier = Modifier,
+                )
             }
         }
     }
