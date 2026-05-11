@@ -21,7 +21,6 @@ fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onCoinClick: (String) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val (state, dispatch) = viewModel.observe { effect ->
         when (effect) {
@@ -39,7 +38,6 @@ fun SearchRoute(
     SearchScreen(
         state = state.value,
         onEvent = dispatch,
-        modifier = modifier,
     )
 }
 

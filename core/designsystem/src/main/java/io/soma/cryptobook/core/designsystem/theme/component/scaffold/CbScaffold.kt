@@ -33,7 +33,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import io.soma.cryptobook.core.designsystem.theme.component.navigation.CbBottomAppBar
-import io.soma.cryptobook.core.designsystem.theme.component.navigation.CbnavigationRail
+import io.soma.cryptobook.core.designsystem.theme.component.navigation.CbNavigationRail
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.model.CbPullToRefreshState
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.model.ScaffoldNavigationData
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.model.rememberCbPullToRefreshState
@@ -63,7 +63,7 @@ fun CbScaffold(
     val isNavigationBarVisible = windowSize == WindowSize.Compact && hasNavigationItems
     Scaffold(
         modifier = Modifier
-            .then(other = Modifier),
+            .then(other = modifier),
         topBar = {
             Box(
                 modifier = Modifier
@@ -167,7 +167,7 @@ private fun ScaffoldNavigationRail(
             .zIndex(zIndex = 1f),
     ) {
         var appBarWidthPx by remember { mutableIntStateOf(0) }
-        CbnavigationRail(
+        CbNavigationRail(
             navigationItems = navigationData.navigationItems,
             selectedItem = navigationData.selectedNavigationItem,
             onClick = navigationData.onNavigationClick,
