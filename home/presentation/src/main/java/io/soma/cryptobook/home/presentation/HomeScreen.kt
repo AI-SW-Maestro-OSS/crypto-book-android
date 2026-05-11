@@ -48,7 +48,7 @@ internal fun HomeScreen(
     modifier: Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(ScreenBackground)
     ) {
