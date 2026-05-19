@@ -41,7 +41,11 @@ constructor(
         when (val outcome = coinListRemoteDataSource.getAllTickerPrices()) {
             is Outcome.Success -> {
                 try {
-                    Outcome.success(outcome.data.map { it.toCoinPriceVO() })
+                    Outcome.success(
+                        outcome.data
+                            .filter { it.symbol.isUsdtPair() }
+                            .map { it.toCoinPriceVO() },
+                    )
                 } catch (e: NumberFormatException) {
                     Outcome.Failure(
                         error = CoinPriceError.UnexpectedResponse,
@@ -124,9 +128,11 @@ constructor(
         table: Map<String, io.soma.cryptobook.core.data.model.CoinTickerDto>,
     ): List<CoinPriceVO> {
         val merged = LinkedHashMap(initialPrices)
-        table.values.forEach { ticker ->
-            merged[ticker.symbol] = coinPriceDomainModelMapper.toDomainModel(ticker)
-        }
+        table.values
+            .filter { it.symbol.isUsdtPair() }
+            .forEach { ticker ->
+                merged[ticker.symbol] = coinPriceDomainModelMapper.toDomainModel(ticker)
+            }
         return merged.values.toList()
     }
 
@@ -157,5 +163,11 @@ constructor(
 
             is ApiError.Unknown -> CoinPriceError.Unknown(message)
         }
+    }
+
+    private fun String.isUsdtPair(): Boolean = endsWith(QUOTE_USDT) && this != QUOTE_USDT
+
+    private companion object {
+        const val QUOTE_USDT = "USDT"
     }
 }
