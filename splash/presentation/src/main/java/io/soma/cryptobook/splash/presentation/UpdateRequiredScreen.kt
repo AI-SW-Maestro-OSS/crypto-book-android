@@ -14,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 
 @Composable
 fun UpdateRequiredScreen(modifier: Modifier = Modifier) {
@@ -31,7 +33,7 @@ fun UpdateRequiredScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "업데이트가 필요합니다",
+            text = stringResource(CryptoString.cb_update_required_title),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
         )
@@ -39,7 +41,7 @@ fun UpdateRequiredScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "새로운 버전이 출시되었습니다.\n앱을 업데이트해주세요.",
+            text = stringResource(CryptoString.cb_update_required_message),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -52,7 +54,7 @@ fun UpdateRequiredScreen(modifier: Modifier = Modifier) {
                 uriHandler.openUri("https://github.com/SW-Maestro-OSS/crypto-book-android")
             },
         ) {
-            Text(text = "업데이트")
+            Text(text = stringResource(CryptoString.cb_update_required_button))
         }
     }
 }

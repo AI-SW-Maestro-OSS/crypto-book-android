@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.patrykandpatrick.vico.compose.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.Scroll
@@ -24,6 +25,7 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import io.soma.cryptobook.coindetail.presentation.CandleUiModel
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import java.math.BigDecimal
 
 private const val START_AXIS_LABEL_COUNT = 5
@@ -109,7 +111,7 @@ fun CoinCandlestickChart(
                     .padding(horizontal = CHART_CANDLE_SPACING),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("차트 로딩 중...")
+                Text(stringResource(CryptoString.cb_coin_detail_chart_loading))
             }
         },
     )

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.cryptobook.android.library)
     alias(libs.plugins.cryptobook.android.library.compose)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {

@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
 import io.soma.cryptobook.core.designsystem.theme.surfaceControlDefault
 import io.soma.cryptobook.core.designsystem.theme.surfaceControlSelected
@@ -83,7 +85,10 @@ fun SegmentedControl(
 @Composable
 private fun SegmentedControlPreview() {
     SegmentedControl(
-        options = listOf("Dollar", "Won"),
+        options = listOf(
+            stringResource(CryptoString.cb_settings_currency_dollar),
+            stringResource(CryptoString.cb_settings_currency_won),
+        ),
         selectedIndex = 0,
         onOptionSelected = {},
     )
@@ -93,7 +98,10 @@ private fun SegmentedControlPreview() {
 @Composable
 private fun SegmentedControlLanguagePreview() {
     SegmentedControl(
-        options = listOf("English", "Korean"),
+        options = listOf(
+            stringResource(CryptoString.cb_settings_language_english),
+            stringResource(CryptoString.cb_settings_language_korean),
+        ),
         selectedIndex = 1,
         onOptionSelected = {},
     )

@@ -9,11 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.IconPrimary
 import io.soma.cryptobook.core.designsystem.theme.Selectedicon
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
@@ -86,7 +88,10 @@ fun SortHeaderItem(
         )
         Icon(
             painter = painterResource(id = iconRes),
-            contentDescription = "Sort $label",
+            contentDescription = stringResource(
+                CryptoString.cb_home_sort_icon_cd_format,
+                label,
+            ),
             tint = textColor,
             modifier = Modifier.size(20.dp),
         )
@@ -97,7 +102,7 @@ fun SortHeaderItem(
 @Composable
 private fun SortHeaderItemAscPreview() {
     SortHeaderItem(
-        label = "Symbol",
+        label = stringResource(CryptoString.cb_home_sort_symbol),
         sortDirection = SortDirection.Asc,
         onClick = {},
     )
@@ -107,7 +112,7 @@ private fun SortHeaderItemAscPreview() {
 @Composable
 private fun SortHeaderItemDescPreview() {
     SortHeaderItem(
-        label = "Symbol",
+        label = stringResource(CryptoString.cb_home_sort_symbol),
         sortDirection = SortDirection.Desc,
         onClick = {},
     )
@@ -117,7 +122,7 @@ private fun SortHeaderItemDescPreview() {
 @Composable
 private fun SortHeaderItemNonePreview() {
     SortHeaderItem(
-        label = "Symbol",
+        label = stringResource(CryptoString.cb_home_sort_symbol),
         sortDirection = SortDirection.None,
         onClick = {},
     )

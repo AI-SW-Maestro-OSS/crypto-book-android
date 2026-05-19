@@ -11,10 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
 import io.soma.cryptobook.core.designsystem.theme.surfaceCardDefault
 import io.soma.cryptobook.core.designsystem.theme.textPrimary
@@ -91,9 +93,12 @@ fun SettingsOptionCard(
 @Composable
 private fun SettingsOptionCardCurrencyPreview() {
     SettingsOptionCard(
-        title = "Price Currency Unit",
-        description = "Choose the currency unit for all prices.",
-        options = listOf("Dollar", "Won"),
+        title = stringResource(CryptoString.cb_settings_currency_unit_title),
+        description = stringResource(CryptoString.cb_settings_currency_unit_description),
+        options = listOf(
+            stringResource(CryptoString.cb_settings_currency_dollar),
+            stringResource(CryptoString.cb_settings_currency_won),
+        ),
         selectedIndex = 0,
         onOptionSelected = {},
     )
@@ -103,9 +108,12 @@ private fun SettingsOptionCardCurrencyPreview() {
 @Composable
 private fun SettingsOptionCardLanguagePreview() {
     SettingsOptionCard(
-        title = "Language",
-        description = "Change the display language of the app.",
-        options = listOf("English", "Korean"),
+        title = stringResource(CryptoString.cb_settings_language_title),
+        description = stringResource(CryptoString.cb_settings_language_description),
+        options = listOf(
+            stringResource(CryptoString.cb_settings_language_english),
+            stringResource(CryptoString.cb_settings_language_korean),
+        ),
         selectedIndex = 1,
         onOptionSelected = {},
     )

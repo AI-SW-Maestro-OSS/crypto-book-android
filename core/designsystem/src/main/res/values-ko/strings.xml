@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Top-level navigation -->
+    <string name="cb_top_level_home">홈</string>
+    <string name="cb_top_level_settings">설정</string>
+
+    <!-- Settings screen -->
+    <string name="cb_settings_title">설정</string>
+    <string name="cb_settings_currency_unit_title">가격 통화 단위</string>
+    <string name="cb_settings_currency_unit_description">모든 가격에 사용할 통화 단위를 선택하세요.</string>
+    <string name="cb_settings_currency_dollar">달러</string>
+    <string name="cb_settings_currency_won">원</string>
+    <string name="cb_settings_language_title">언어</string>
+    <string name="cb_settings_language_description">앱의 표시 언어를 변경하세요.</string>
+    <string name="cb_settings_language_english">영어</string>
+    <string name="cb_settings_language_korean">한국어</string>
+    <string name="cb_settings_exchange_rate_title">환율</string>
+    <string name="cb_settings_exchange_rate_updated_now">방금 업데이트되었습니다</string>
+    <string name="cb_settings_exchange_rate_loading">불러오는 중…</string>
+    <string name="cb_settings_exchange_rate_format">1 USD = %1$s 원</string>
+    <string name="cb_settings_exchange_rate_refresh_cd">환율 새로고침</string>
+    <string name="cb_settings_test_snackbar_message">스낵바 테스트 메시지입니다</string>
+    <string name="cb_settings_test_snackbar_action">확인</string>
+
+    <!-- Realtime status (shared by Home & Coin detail) -->
+    <string name="cb_realtime_recovering">실시간 연결을 복구하는 중입니다</string>
+    <string name="cb_realtime_disconnected">실시간 데이터 연결이 중단되었습니다</string>
+
+    <!-- Coin price errors (shared) -->
+    <string name="cb_error_network">네트워크 연결을 확인해주세요</string>
+    <string name="cb_error_rate_limited">요청이 너무 많습니다. 잠시 후 다시 시도해주세요</string>
+    <string name="cb_error_server">가격 정보를 불러오지 못했습니다</string>
+    <string name="cb_error_unexpected_response">가격 정보 응답이 올바르지 않습니다</string>
+    <string name="cb_error_unknown">알 수 없는 오류가 발생했습니다</string>
+
+    <!-- Home screen -->
+    <string name="cb_home_search_hint">검색</string>
+    <string name="cb_home_search_icon_cd">검색</string>
+    <string name="cb_home_sort_symbol">심볼</string>
+    <string name="cb_home_sort_price">가격 ($)</string>
+    <string name="cb_home_sort_change_24h">24시간 변동률 %</string>
+    <string name="cb_home_sort_icon_cd_format">%1$s 정렬</string>
+    <string name="cb_home_coin_icon_cd_format">%1$s 코인 아이콘</string>
+
+    <!-- Coin detail screen -->
+    <string name="cb_coin_detail_back_cd">뒤로</string>
+    <string name="cb_coin_detail_favorite_cd">즐겨찾기</string>
+    <string name="cb_coin_detail_search_cd">검색</string>
+    <string name="cb_coin_detail_coin_icon_cd">코인 아이콘</string>
+    <string name="cb_coin_detail_chart_loading">차트를 불러오는 중…</string>
+    <string name="cb_coin_detail_connection_error_state">연결 오류</string>
+    <string name="cb_coin_detail_connection_error_toast">연결 오류가 발생했습니다</string>
+    <string name="cb_coin_detail_metric_high_24h">24시간 최고가</string>
+    <string name="cb_coin_detail_metric_low_24h">24시간 최저가</string>
+    <string name="cb_coin_detail_metric_volume_24h">24시간 거래량</string>
+    <string name="cb_coin_detail_metric_open_price">시가</string>
+
+    <!-- Update required screen -->
+    <string name="cb_update_required_title">업데이트가 필요합니다</string>
+    <string name="cb_update_required_message">새로운 버전이 출시되었습니다.\n앱을 업데이트해주세요.</string>
+    <string name="cb_update_required_button">업데이트</string>
+</resources>

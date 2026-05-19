@@ -5,10 +5,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
 import io.soma.cryptobook.settings.presentation.navigation.SettingsNavKey
-import io.soma.cryptobook.home.presentation.R as homeR
-import io.soma.cryptobook.settings.presentation.R as settingsR
 
 data class TopLevelNavItem(
     val icon: ImageVector,
@@ -17,12 +16,12 @@ data class TopLevelNavItem(
 
 val HOME = TopLevelNavItem(
     icon = Icons.Outlined.Home,
-    iconTextId = homeR.string.feature_home_title,
+    iconTextId = CryptoString.cb_top_level_home,
 )
 
 val SETTINGS = TopLevelNavItem(
     icon = Icons.Outlined.Settings,
-    iconTextId = settingsR.string.feature_settings_title,
+    iconTextId = CryptoString.cb_top_level_settings,
 )
 
 val TOP_LEVEL_NAV_ITEMS = mapOf(

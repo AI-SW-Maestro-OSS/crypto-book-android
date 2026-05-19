@@ -1,16 +1,19 @@
 package io.soma.cryptobook.coindetail.presentation
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveCoinDetailUseCase
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Effect
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.mapper.CoinDetailPresentationModelMapper
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
@@ -22,6 +25,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = CoinDetailViewModel.Factory::class)
 class CoinDetailViewModel @AssistedInject constructor(
     @Assisted private val coinName: String,
+    @ApplicationContext private val context: Context,
     private val observeCoinDetailUseCase: ObserveCoinDetailUseCase,
     private val mapper: CoinDetailPresentationModelMapper,
     private val coinImageResolver: CoinImageResolver,
@@ -80,9 +84,18 @@ class CoinDetailViewModel @AssistedInject constructor(
 
                     is ObserveCoinDetailUseCase.Result.Error.Connection -> {
                         updateState { state ->
-                            state.copy(isLoading = false, errorMsg = "연결 오류")
+                            state.copy(
+                                isLoading = false,
+                                errorMsg = context.getString(
+                                    CryptoString.cb_coin_detail_connection_error_state,
+                                ),
+                            )
                         }
-                        messageHelper.showToast("연결 오류가 발생했습니다")
+                        messageHelper.showToast(
+                            context.getString(
+                                CryptoString.cb_coin_detail_connection_error_toast,
+                            ),
+                        )
                     }
                 }
             }
@@ -105,7 +118,11 @@ class CoinDetailViewModel @AssistedInject constructor(
         MarketRealtimeState.Inactive,
         -> null
 
-        MarketRealtimeState.Recovering -> "실시간 연결을 복구하는 중입니다"
-        is MarketRealtimeState.Failed -> "실시간 데이터 연결이 중단되었습니다"
+        MarketRealtimeState.Recovering -> context.getString(
+            CryptoString.cb_realtime_recovering,
+        )
+        is MarketRealtimeState.Failed -> context.getString(
+            CryptoString.cb_realtime_disconnected,
+        )
     }
 }

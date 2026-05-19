@@ -6,17 +6,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.IconPrimary
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
@@ -63,7 +64,7 @@ fun CbDetailTopAppBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_back),
-                    contentDescription = "Back",
+                    contentDescription = stringResource(CryptoString.cb_coin_detail_back_cd),
                     tint = IconPrimary,
                     modifier = Modifier.size(24.dp)
                 )
@@ -73,7 +74,7 @@ fun CbDetailTopAppBar(
             IconButton(onClick = onSearchClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
-                    contentDescription = "Search",
+                    contentDescription = stringResource(CryptoString.cb_coin_detail_search_cd),
                     tint = IconPrimary,
                     modifier = Modifier.size(24.dp)
                 )
@@ -81,7 +82,7 @@ fun CbDetailTopAppBar(
             IconButton(onClick = onFavoriteClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_favorite),
-                    contentDescription = "Favorite",
+                    contentDescription = stringResource(CryptoString.cb_coin_detail_favorite_cd),
                     tint = IconPrimary,
                     modifier = Modifier.size(24.dp)
                 )

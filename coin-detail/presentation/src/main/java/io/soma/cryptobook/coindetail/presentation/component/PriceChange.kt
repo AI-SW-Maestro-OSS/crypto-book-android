@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import io.soma.cryptobook.core.designsystem.R
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.PriceDown
 import io.soma.cryptobook.core.designsystem.theme.PriceFlat
 import io.soma.cryptobook.core.designsystem.theme.PriceUp
@@ -92,7 +94,7 @@ fun PriceChange(
             placeholder = painterResource(R.drawable.ic_coin_placeholder),
             error = painterResource(R.drawable.ic_coin_placeholder),
             fallback = painterResource(R.drawable.ic_coin_placeholder),
-            contentDescription = "coin icon",
+            contentDescription = stringResource(CryptoString.cb_coin_detail_coin_icon_cd),
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape),

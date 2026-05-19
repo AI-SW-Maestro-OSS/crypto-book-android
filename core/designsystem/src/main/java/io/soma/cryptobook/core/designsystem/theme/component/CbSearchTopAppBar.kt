@@ -19,11 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
 import io.soma.cryptobook.core.designsystem.theme.textSecondary
@@ -71,12 +73,12 @@ fun CbSearchTopAppBar(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = "Search",
+                contentDescription = stringResource(CryptoString.cb_home_search_icon_cd),
                 tint = textSecondary,
                 modifier = Modifier.size(24.dp)
             )
             Text(
-                text = "Search",
+                text = stringResource(CryptoString.cb_home_search_hint),
                 fontFamily = fontFamily,
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,

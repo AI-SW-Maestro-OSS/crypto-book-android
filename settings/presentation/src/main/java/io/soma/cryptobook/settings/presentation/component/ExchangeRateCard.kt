@@ -15,11 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
 import io.soma.cryptobook.core.designsystem.theme.surfaceCardDefault
 import io.soma.cryptobook.core.designsystem.theme.textPrimary
@@ -91,7 +93,9 @@ fun ExchangeRateCard(
         }
         Icon(
             painter = painterResource(id = R.drawable.ic_refresh),
-            contentDescription = "Refresh exchange rate",
+            contentDescription = stringResource(
+                CryptoString.cb_settings_exchange_rate_refresh_cd,
+            ),
             tint = textPrimary,
             modifier = Modifier
                 .size(32.dp)
@@ -104,9 +108,9 @@ fun ExchangeRateCard(
 @Composable
 private fun ExchangeRateCardPreview() {
     ExchangeRateCard(
-        title = "Exchange Rate",
-        rateText = "1 USD = 1,450 WON",
-        updateTimeText = "Rates updated just now",
+        title = stringResource(CryptoString.cb_settings_exchange_rate_title),
+        rateText = stringResource(CryptoString.cb_settings_exchange_rate_format, "1,450"),
+        updateTimeText = stringResource(CryptoString.cb_settings_exchange_rate_updated_now),
         onRefreshClick = {},
     )
 }

@@ -9,5 +9,6 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.designsystem)
     implementation(projects.splash.domain)
 }

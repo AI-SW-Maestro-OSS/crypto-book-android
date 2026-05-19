@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 
 /**
@@ -65,17 +67,17 @@ fun SortHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SortHeaderItem(
-                label = "Symbol",
+                label = stringResource(CryptoString.cb_home_sort_symbol),
                 sortDirection = symbolSort,
                 onClick = onSymbolClick,
             )
             SortHeaderItem(
-                label = "Price ($)",
+                label = stringResource(CryptoString.cb_home_sort_price),
                 sortDirection = priceSort,
                 onClick = onPriceClick,
             )
             SortHeaderItem(
-                label = "24h Change %",
+                label = stringResource(CryptoString.cb_home_sort_change_24h),
                 sortDirection = changeSort,
                 onClick = onChangeClick,
             )

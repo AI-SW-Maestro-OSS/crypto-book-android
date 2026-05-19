@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.component.CbTitleTopAppBar
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
@@ -27,7 +29,7 @@ fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = 
     val (state, dispatch) = viewModel.observeWithoutEffect()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CbTitleTopAppBar("Settings")
+        CbTitleTopAppBar(stringResource(CryptoString.cb_settings_title))
         SettingsScreen(
             state = state.value,
             onEvent = dispatch,
@@ -55,9 +57,12 @@ internal fun SettingsScreen(
     ) {
         // Price Currency Unit
         SettingsOptionCard(
-            title = "Price Currency Unit",
-            description = "Choose the currency unit for all prices.",
-            options = listOf("Dollar", "Won"),
+            title = stringResource(CryptoString.cb_settings_currency_unit_title),
+            description = stringResource(CryptoString.cb_settings_currency_unit_description),
+            options = listOf(
+                stringResource(CryptoString.cb_settings_currency_dollar),
+                stringResource(CryptoString.cb_settings_currency_won),
+            ),
             selectedIndex = when (currentCurrency) {
                 CurrencyUnit.DOLLAR -> 0
                 CurrencyUnit.WON -> 1
@@ -73,9 +78,12 @@ internal fun SettingsScreen(
 
         // Language
         SettingsOptionCard(
-            title = "Language",
-            description = "Change the display language of the app.",
-            options = listOf("English", "Korean"),
+            title = stringResource(CryptoString.cb_settings_language_title),
+            description = stringResource(CryptoString.cb_settings_language_description),
+            options = listOf(
+                stringResource(CryptoString.cb_settings_language_english),
+                stringResource(CryptoString.cb_settings_language_korean),
+            ),
             selectedIndex = when (currentLanguage) {
                 Language.ENGLISH -> 0
                 Language.KOREAN -> 1
@@ -91,9 +99,11 @@ internal fun SettingsScreen(
 
         // Exchange Rate
         ExchangeRateCard(
-            title = "Exchange Rate",
+            title = stringResource(CryptoString.cb_settings_exchange_rate_title),
             rateText = formatExchangeRate(exchangeRate),
-            updateTimeText = "Rates updated just now",
+            updateTimeText = stringResource(
+                CryptoString.cb_settings_exchange_rate_updated_now,
+            ),
             onRefreshClick = {
                 // TODO: Add refresh event
             },
@@ -101,10 +111,14 @@ internal fun SettingsScreen(
     }
 }
 
+@Composable
 private fun formatExchangeRate(rate: BigDecimal?): String {
-    if (rate == null) return "Loading..."
+    if (rate == null) return stringResource(CryptoString.cb_settings_exchange_rate_loading)
     val numberFormat = NumberFormat.getNumberInstance(Locale.US)
-    return "1 USD = ${numberFormat.format(rate)} WON"
+    return stringResource(
+        CryptoString.cb_settings_exchange_rate_format,
+        numberFormat.format(rate),
+    )
 }
 
 @Preview(showBackground = true)

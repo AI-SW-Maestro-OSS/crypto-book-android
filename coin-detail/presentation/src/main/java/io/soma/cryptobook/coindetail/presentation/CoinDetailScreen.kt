@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -30,6 +31,7 @@ import io.soma.cryptobook.coindetail.presentation.component.CoinCandlestickChart
 import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContainer
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIcon
@@ -85,13 +87,17 @@ internal fun CoinDetailScreen(
             title = state.symbol,
             navigationIcon = NavigationIcon(
                 navigationIcon = painterResource(id = CbDrawable.ic_arrow_back),
-                navigationIconContentDescription = "Back",
+                navigationIconContentDescription = stringResource(
+                    CryptoString.cb_coin_detail_back_cd,
+                ),
                 onNavigationIconClick = { onEvent(Event.OnBackClicked) },
             ),
             actions = {
                 CbStandardIconButton(
                     vectorIconRes = CbDrawable.ic_favorite,
-                    contentDescription = "favorite",
+                    contentDescription = stringResource(
+                        CryptoString.cb_coin_detail_favorite_cd,
+                    ),
                     onClick = { },
                     modifier = Modifier,
                 )
@@ -202,7 +208,7 @@ private fun CoinDetailScreenErrorPreview() {
     CoinDetailScreen(
         state = State(
             isLoading = false,
-            errorMsg = "Network error occurred",
+            errorMsg = stringResource(CryptoString.cb_coin_detail_connection_error_state),
         ),
         onEvent = {},
         modifier = Modifier.background(ScreenBackground),
@@ -215,7 +221,7 @@ private fun CoinDetailScreenRealtimeWarningPreview() {
     CoinDetailScreen(
         state = State(
             isLoading = false,
-            realtimeStatusMessage = "실시간 연결을 복구하는 중입니다",
+            realtimeStatusMessage = stringResource(CryptoString.cb_realtime_recovering),
         ),
         onEvent = {},
         modifier = Modifier.background(ScreenBackground),

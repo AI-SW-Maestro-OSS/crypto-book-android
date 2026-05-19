@@ -15,10 +15,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
@@ -158,7 +160,7 @@ private fun HomeScreenLoadingPreview() {
 @Composable
 private fun HomeScreenErrorPreview() {
     HomeScreen(
-        state = HomeUiState(errorMsg = "Network error occurred"),
+        state = HomeUiState(errorMsg = stringResource(CryptoString.cb_error_network)),
         onEvent = {},
         modifier = Modifier.background(ScreenBackground),
     )
@@ -168,7 +170,9 @@ private fun HomeScreenErrorPreview() {
 @Composable
 private fun HomeScreenRealtimeWarningPreview() {
     HomeScreen(
-        state = HomeUiState(realtimeStatusMessage = "실시간 연결을 복구하는 중입니다"),
+        state = HomeUiState(
+            realtimeStatusMessage = stringResource(CryptoString.cb_realtime_recovering),
+        ),
         onEvent = {},
         modifier = Modifier.background(ScreenBackground),
     )

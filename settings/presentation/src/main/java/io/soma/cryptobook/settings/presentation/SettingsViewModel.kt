@@ -1,7 +1,10 @@
 package io.soma.cryptobook.settings.presentation
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
@@ -19,6 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
     private val getUserDataUseCase: GetUserDataUseCase,
@@ -34,6 +38,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsContract.Event.SetCurrencyUnit -> onPriceCurrencyChanged(
                 event.currencyUnit,
             )
+
             is SettingsContract.Event.NavigateToHome -> navigateToHome()
             is SettingsContract.Event.ShowLoadingMessage -> showLoadingMessage()
             is SettingsContract.Event.ShowSnackbarMessage -> showSnackbarMessage()
@@ -74,8 +79,8 @@ class SettingsViewModel @Inject constructor(
 
     private fun showSnackbarMessage() {
         messageHelper.showSnackbar(
-            message = "스낵바 테스트 메시지입니다",
-            actionLabel = "확인",
+            message = context.getString(CryptoString.cb_settings_test_snackbar_message),
+            actionLabel = context.getString(CryptoString.cb_settings_test_snackbar_action),
             onAction = { },
         )
     }

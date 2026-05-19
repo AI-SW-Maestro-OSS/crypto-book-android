@@ -13,10 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
 import io.soma.cryptobook.core.designsystem.theme.surfaceCardDefault
 import io.soma.cryptobook.core.designsystem.theme.textPrimary
@@ -65,12 +67,12 @@ fun MetricCardGridContainer(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MetricCard(
-                label = "24h High",
+                label = stringResource(CryptoString.cb_coin_detail_metric_high_24h),
                 value = high24h,
                 modifier = Modifier.weight(1f),
             )
             MetricCard(
-                label = "24h Low",
+                label = stringResource(CryptoString.cb_coin_detail_metric_low_24h),
                 value = low24h,
                 modifier = Modifier.weight(1f),
             )
@@ -82,12 +84,12 @@ fun MetricCardGridContainer(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MetricCard(
-                label = "24h Volume",
+                label = stringResource(CryptoString.cb_coin_detail_metric_volume_24h),
                 value = volume24h,
                 modifier = Modifier.weight(1f),
             )
             MetricCard(
-                label = "Open Price",
+                label = stringResource(CryptoString.cb_coin_detail_metric_open_price),
                 value = openPrice,
                 modifier = Modifier.weight(1f),
             )
@@ -157,7 +159,7 @@ fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
 @Composable
 private fun MetricCard24hHighPreview() {
     MetricCard(
-        label = "24h High",
+        label = stringResource(CryptoString.cb_coin_detail_metric_high_24h),
         value = "$73,800.00",
     )
 }
@@ -166,7 +168,7 @@ private fun MetricCard24hHighPreview() {
 @Composable
 private fun MetricCard24hLowPreview() {
     MetricCard(
-        label = "24h Low",
+        label = stringResource(CryptoString.cb_coin_detail_metric_low_24h),
         value = "$68,200.00",
     )
 }
@@ -175,7 +177,7 @@ private fun MetricCard24hLowPreview() {
 @Composable
 private fun MetricCardVolumePreview() {
     MetricCard(
-        label = "Volume (24h)",
+        label = stringResource(CryptoString.cb_coin_detail_metric_volume_24h),
         value = "100M USDT",
     )
 }

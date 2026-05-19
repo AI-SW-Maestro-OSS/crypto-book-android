@@ -1,7 +1,10 @@
 package io.soma.cryptobook.home.presentation
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.domain.error.CoinPriceError
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
 import io.soma.cryptobook.core.domain.message.MessageHelper
@@ -18,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val observeCoinListUseCase: ObserveCoinListUseCase,
     private val coinImageResolver: CoinImageResolver,
     private val navigationHelper: NavigationHelper,
@@ -65,7 +69,7 @@ class HomeViewModel @Inject constructor(
                         }
                     },
                     onFailure = { error ->
-                        val message = error.toHomeErrorMessage()
+                        val message = context.getString(error.toMessageRes())
                         reduce {
                             copy(
                                 isLoading = false,
@@ -95,17 +99,19 @@ class HomeViewModel @Inject constructor(
         MarketRealtimeState.Inactive,
             -> null
 
-        MarketRealtimeState.Recovering -> "실시간 연결을 복구하는 중입니다"
-        is MarketRealtimeState.Failed -> "실시간 데이터 연결이 중단되었습니다"
+        MarketRealtimeState.Recovering -> context.getString(
+            CryptoString.cb_realtime_recovering,
+        )
+        is MarketRealtimeState.Failed -> context.getString(
+            CryptoString.cb_realtime_disconnected,
+        )
     }
 
-    private fun CoinPriceError.toHomeErrorMessage(): String {
-        return when (this) {
-            CoinPriceError.Network -> "네트워크 연결을 확인해주세요"
-            CoinPriceError.RateLimited -> "요청이 너무 많습니다. 잠시 후 다시 시도해주세요"
-            CoinPriceError.Server -> "가격 정보를 불러오지 못했습니다"
-            CoinPriceError.UnexpectedResponse -> "가격 정보 응답이 올바르지 않습니다"
-            is CoinPriceError.Unknown -> "알 수 없는 오류가 발생했습니다"
-        }
+    private fun CoinPriceError.toMessageRes(): Int = when (this) {
+        CoinPriceError.Network -> CryptoString.cb_error_network
+        CoinPriceError.RateLimited -> CryptoString.cb_error_rate_limited
+        CoinPriceError.Server -> CryptoString.cb_error_server
+        CoinPriceError.UnexpectedResponse -> CryptoString.cb_error_unexpected_response
+        is CoinPriceError.Unknown -> CryptoString.cb_error_unknown
     }
 }
