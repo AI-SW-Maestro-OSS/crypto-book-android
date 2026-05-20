@@ -14,6 +14,10 @@
     <string name="cb_settings_language_description">Change the display language of the app.</string>
     <string name="cb_settings_language_english">English</string>
     <string name="cb_settings_language_korean">Korean</string>
+    <string name="cb_settings_theme_title">Theme</string>
+    <string name="cb_settings_theme_description">Choose the app appearance.</string>
+    <string name="cb_settings_theme_light">Light</string>
+    <string name="cb_settings_theme_dark">Dark</string>
     <string name="cb_settings_exchange_rate_title">Exchange Rate</string>
     <string name="cb_settings_exchange_rate_updated_now">Rates updated just now</string>
     <string name="cb_settings_exchange_rate_loading">Loading…</string>

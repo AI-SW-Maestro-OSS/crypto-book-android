@@ -12,8 +12,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
-import io.soma.cryptobook.core.designsystem.theme.component.CbTitleTopAppBar
+import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
@@ -29,7 +30,9 @@ fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = 
     val (state, dispatch) = viewModel.observeWithoutEffect()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CbTitleTopAppBar(stringResource(CryptoString.cb_settings_title))
+        CbMediumTopAppBar(
+            title = "Settings",
+        )
         SettingsScreen(
             state = state.value,
             onEvent = dispatch,
@@ -46,15 +49,37 @@ internal fun SettingsScreen(
 ) {
     val currentLanguage = state.userData?.language ?: Language.ENGLISH
     val currentCurrency = state.userData?.currencyUnit ?: CurrencyUnit.DOLLAR
+    val currentAppTheme = state.userData?.appTheme ?: AppTheme.DARK
     val exchangeRate = state.userData?.usdKrwExchangeRate
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(ScreenBackground)
+            .background(CbTheme.colorScheme.background.secondary)
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // App Theme
+        SettingsOptionCard(
+            title = stringResource(CryptoString.cb_settings_theme_title),
+            description = stringResource(CryptoString.cb_settings_theme_description),
+            options = listOf(
+                stringResource(CryptoString.cb_settings_theme_light),
+                stringResource(CryptoString.cb_settings_theme_dark),
+            ),
+            selectedIndex = when (currentAppTheme) {
+                AppTheme.LIGHT -> 0
+                AppTheme.DARK -> 1
+            },
+            onOptionSelected = { index ->
+                val appTheme = when (index) {
+                    0 -> AppTheme.LIGHT
+                    else -> AppTheme.DARK
+                }
+                onEvent(SettingsContract.Event.SetAppTheme(appTheme))
+            },
+        )
+
         // Price Currency Unit
         SettingsOptionCard(
             title = stringResource(CryptoString.cb_settings_currency_unit_title),
@@ -130,6 +155,7 @@ private fun SettingsScreenPreview() {
                 language = Language.KOREAN,
                 currencyUnit = CurrencyUnit.DOLLAR,
                 usdKrwExchangeRate = BigDecimal("1450"),
+                appTheme = AppTheme.DARK,
             ),
             isLoading = false,
         ),

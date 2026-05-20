@@ -1,5 +1,6 @@
 package io.soma.cryptobook.settings.presentation
 
+import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
@@ -16,6 +17,7 @@ interface SettingsContract {
     sealed interface Event {
         data class SetLanguage(val language: Language) : Event
         data class SetCurrencyUnit(val currencyUnit: CurrencyUnit) : Event
+        data class SetAppTheme(val appTheme: AppTheme) : Event
         data object NavigateToHome : Event
         data object ShowLoadingMessage : Event
         data object ShowSnackbarMessage : Event
