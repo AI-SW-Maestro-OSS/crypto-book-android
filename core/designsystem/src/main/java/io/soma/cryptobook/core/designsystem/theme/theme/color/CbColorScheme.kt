@@ -11,6 +11,8 @@ data class CbColorScheme(
     val filledButton: FilledButtonColors,
     val outlineButton: OutlineButtonColors,
     val stroke: StrokeColors,
+    val toggleButton: ToggleButtonColors,
+    val price: PriceColors,
 ) {
     @Immutable
     data class TextColors(
@@ -23,6 +25,8 @@ data class CbColorScheme(
     data class BackgroundColors(
         val primary: Color,
         val secondary: Color,
+        val tertiary: Color,
+        val selected: Color,
     )
 
     @Immutable
@@ -44,5 +48,20 @@ data class CbColorScheme(
     @Immutable
     data class OutlineButtonColors(
         val foregroundDisabled: Color,
+    )
+
+    @Immutable
+    data class ToggleButtonColors(
+        val backgroundOn: Color,
+        val backgroundOff: Color,
+        val foregroundOn: Color,
+        val foregroundOff: Color,
+    )
+
+    @Immutable
+    data class PriceColors(
+        val up: Color,
+        val down: Color,
+        val flat: Color,
     )
 }
