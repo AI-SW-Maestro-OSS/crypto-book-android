@@ -65,6 +65,10 @@ class MainActivity : AppCompatActivity() {
                             LocaleListCompat.forLanguageTags(effect.localeTag),
                         )
                     }
+
+                    is MainContract.Effect.ApplyTheme -> {
+                        AppCompatDelegate.setDefaultNightMode(effect.nightMode)
+                    }
                 }
             }
 

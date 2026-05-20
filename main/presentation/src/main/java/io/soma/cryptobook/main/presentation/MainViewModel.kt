@@ -6,6 +6,7 @@ import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
 import io.soma.cryptobook.core.domain.usecase.SetLanguageUseCase
 import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
+import io.soma.cryptobook.main.presentation.util.toNightMode
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -23,6 +24,7 @@ class MainViewModel @Inject constructor(
     MainContract.ViewModel {
     init {
         observeLanguage()
+        observeAppTheme()
     }
 
     override fun event(event: MainContract.Event) {
@@ -37,6 +39,16 @@ class MainViewModel @Inject constructor(
             .distinctUntilChanged()
             .onEach { language ->
                 emitEffect(MainContract.Effect.ApplyLocale(localeTag = language.localeTag))
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun observeAppTheme() {
+        getUserDataUseCase()
+            .map { it.appTheme }
+            .distinctUntilChanged()
+            .onEach { appTheme ->
+                emitEffect(MainContract.Effect.ApplyTheme(nightMode = appTheme.toNightMode()))
             }
             .launchIn(viewModelScope)
     }

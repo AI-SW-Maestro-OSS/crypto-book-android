@@ -14,5 +14,6 @@ interface MainContract {
 
     sealed interface Effect {
         data class ApplyLocale(val localeTag: String) : Effect
+        data class ApplyTheme(val nightMode: Int) : Effect
     }
 }
