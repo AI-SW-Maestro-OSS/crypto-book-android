@@ -170,7 +170,7 @@ fun CryptoBookApp(
                         onBack = navigator::goBack,
                         onCoinClick = { coinName ->
                             navigator.navigateTo(CoinDetailNavKey(coinName))
-                        }
+                        },
                     )
                 },
             )

@@ -47,7 +47,7 @@ class HomeViewModel @Inject constructor(
             )
 
             HomeEvent.SearchIconClick -> navigationHelper.navigate(
-                AppPage.Search
+                AppPage.Search,
             )
         }
     }
@@ -97,7 +97,7 @@ class HomeViewModel @Inject constructor(
         MarketRealtimeState.Connected,
         MarketRealtimeState.Connecting,
         MarketRealtimeState.Inactive,
-            -> null
+        -> null
 
         MarketRealtimeState.Recovering -> context.getString(
             CryptoString.cb_realtime_recovering,

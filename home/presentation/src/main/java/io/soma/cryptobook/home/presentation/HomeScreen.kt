@@ -44,15 +44,11 @@ fun HomeRoute(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltView
 }
 
 @Composable
-internal fun HomeScreen(
-    state: HomeUiState,
-    onEvent: (HomeEvent) -> Unit,
-    modifier: Modifier,
-) {
+internal fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifier: Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(ScreenBackground)
+            .background(ScreenBackground),
     ) {
         CbMediumTopAppBar(
             title = "Crypto-Book-Android",
