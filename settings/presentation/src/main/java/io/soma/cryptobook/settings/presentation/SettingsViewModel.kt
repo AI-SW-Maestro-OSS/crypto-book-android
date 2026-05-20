@@ -11,8 +11,8 @@ import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
+import io.soma.cryptobook.core.domain.usecase.SetLanguageUseCase
 import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
-import io.soma.cryptobook.settings.domain.usecase.SetLanguageUseCase
 import io.soma.cryptobook.settings.domain.usecase.SetPriceCurrencyUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn

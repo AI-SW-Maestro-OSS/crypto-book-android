@@ -1,4 +1,4 @@
-package io.soma.cryptobook.settings.domain.usecase
+package io.soma.cryptobook.core.domain.usecase
 
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.repository.UserDataRepository
