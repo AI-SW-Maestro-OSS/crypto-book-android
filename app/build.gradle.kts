@@ -1,3 +1,6 @@
+import com.android.build.api.dsl.ApplicationExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,7 +9,7 @@ plugins {
     alias(libs.plugins.cryptobook.spotless)
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "io.soma.cryptobook"
     compileSdk {
         version = release(36)
@@ -22,6 +25,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    androidResources {
+        @Suppress("UnstableApiUsage")
+        generateLocaleConfig = true
+        localeFilters += listOf("en", "ko")
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -35,14 +44,19 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+}
+
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget("17"))
     }
 }
 
 dependencies {
     implementation(projects.main.presentation)
 
+    implementation(libs.androidx.appcompat)
     implementation(projects.home.data)
     implementation(projects.splash.data)
     implementation(projects.splash.domain)
@@ -51,7 +65,6 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.coinDetail.data)
     implementation(projects.coinDetail.domain)
-
 
     // Networking (for DI modules)
     implementation(libs.kotlinx.serialization.json)

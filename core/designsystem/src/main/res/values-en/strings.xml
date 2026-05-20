@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Top-level navigation -->
+    <string name="cb_top_level_home">Home</string>
+    <string name="cb_top_level_settings">Settings</string>
+
+    <!-- Settings screen -->
+    <string name="cb_settings_title">Settings</string>
+    <string name="cb_settings_currency_unit_title">Price Currency Unit</string>
+    <string name="cb_settings_currency_unit_description">Choose the currency unit for all prices.</string>
+    <string name="cb_settings_currency_dollar">Dollar</string>
+    <string name="cb_settings_currency_won">Won</string>
+    <string name="cb_settings_language_title">Language</string>
+    <string name="cb_settings_language_description">Change the display language of the app.</string>
+    <string name="cb_settings_language_english">English</string>
+    <string name="cb_settings_language_korean">Korean</string>
+    <string name="cb_settings_exchange_rate_title">Exchange Rate</string>
+    <string name="cb_settings_exchange_rate_updated_now">Rates updated just now</string>
+    <string name="cb_settings_exchange_rate_loading">Loading…</string>
+    <string name="cb_settings_exchange_rate_format">1 USD = %1$s WON</string>
+    <string name="cb_settings_exchange_rate_refresh_cd">Refresh exchange rate</string>
+    <string name="cb_settings_test_snackbar_message">This is a test snackbar message</string>
+    <string name="cb_settings_test_snackbar_action">OK</string>
+
+    <!-- Realtime status (shared by Home & Coin detail) -->
+    <string name="cb_realtime_recovering">Reconnecting realtime…</string>
+    <string name="cb_realtime_disconnected">Realtime data connection lost</string>
+
+    <!-- Coin price errors (shared) -->
+    <string name="cb_error_network">Please check your network connection</string>
+    <string name="cb_error_rate_limited">Too many requests. Please try again shortly.</string>
+    <string name="cb_error_server">Failed to load price information</string>
+    <string name="cb_error_unexpected_response">Invalid price information response</string>
+    <string name="cb_error_unknown">An unknown error occurred</string>
+
+    <!-- Home screen -->
+    <string name="cb_home_search_hint">Search</string>
+    <string name="cb_home_search_icon_cd">Search</string>
+    <string name="cb_home_sort_symbol">Symbol</string>
+    <string name="cb_home_sort_price">Price ($)</string>
+    <string name="cb_home_sort_change_24h">24h Change %</string>
+    <string name="cb_home_sort_icon_cd_format">Sort %1$s</string>
+    <string name="cb_home_coin_icon_cd_format">%1$s coin icon</string>
+
+    <!-- Coin detail screen -->
+    <string name="cb_coin_detail_back_cd">Back</string>
+    <string name="cb_coin_detail_favorite_cd">Favorite</string>
+    <string name="cb_coin_detail_search_cd">Search</string>
+    <string name="cb_coin_detail_coin_icon_cd">Coin icon</string>
+    <string name="cb_coin_detail_chart_loading">Loading chart…</string>
+    <string name="cb_coin_detail_connection_error_state">Connection error</string>
+    <string name="cb_coin_detail_connection_error_toast">A connection error occurred</string>
+    <string name="cb_coin_detail_metric_high_24h">24h High</string>
+    <string name="cb_coin_detail_metric_low_24h">24h Low</string>
+    <string name="cb_coin_detail_metric_volume_24h">24h Volume</string>
+    <string name="cb_coin_detail_metric_open_price">Open Price</string>
+
+    <!-- Update required screen -->
+    <string name="cb_update_required_title">Update required</string>
+    <string name="cb_update_required_message">A new version is available.\nPlease update the app.</string>
+    <string name="cb_update_required_button">Update</string>
+</resources>
