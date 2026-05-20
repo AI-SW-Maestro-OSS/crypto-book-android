@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_package = "io.soma.cryptobook.core.data";
+option java_multiple_files = true;
+
+enum AppThemeProto {
+  APP_THEME_UNSPECIFIED = 0;
+  APP_THEME_LIGHT = 1;
+  APP_THEME_DARK = 2;
+}
