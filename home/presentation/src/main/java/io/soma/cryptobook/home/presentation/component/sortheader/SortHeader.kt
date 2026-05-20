@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Sort header container component
@@ -59,7 +59,7 @@ fun SortHeader(
         modifier = modifier
             .fillMaxWidth()
             .height(45.dp)
-            .background(ScreenBackground),
+            .background(CbTheme.colorScheme.background.secondary),
         contentAlignment = Alignment.Center,
     ) {
         Row(

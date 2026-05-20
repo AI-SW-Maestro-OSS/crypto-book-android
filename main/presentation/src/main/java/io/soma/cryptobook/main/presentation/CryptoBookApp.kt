@@ -39,8 +39,8 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.soma.cryptobook.coindetail.presentation.navigation.CoinDetailNavKey
 import io.soma.cryptobook.coindetail.presentation.navigation.coinDetailEntry
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.cbNavigationItemColors
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
 import io.soma.cryptobook.home.presentation.navigation.homeEntry
 import io.soma.cryptobook.main.presentation.message.MessageCommand
@@ -142,8 +142,8 @@ fun CryptoBookApp(
         },
         layoutType = layoutType,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = ScreenBackground,
-            navigationRailContainerColor = ScreenBackground,
+            navigationBarContainerColor = CbTheme.colorScheme.background.primary,
+            navigationRailContainerColor = CbTheme.colorScheme.background.primary,
         ),
     ) {
         Scaffold(

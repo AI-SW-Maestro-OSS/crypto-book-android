@@ -19,10 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.surfaceControlDefault
-import io.soma.cryptobook.core.designsystem.theme.surfaceControlSelected
-import io.soma.cryptobook.core.designsystem.theme.textControlDefault
-import io.soma.cryptobook.core.designsystem.theme.textControlOnSelected
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Segmented control component for selecting between two options
@@ -50,7 +47,7 @@ fun SegmentedControl(
     Row(
         modifier = modifier
             .background(
-                color = surfaceControlDefault,
+                color = CbTheme.colorScheme.toggleButton.backgroundOff,
                 shape = RoundedCornerShape(6.dp),
             )
             .padding(4.dp),
@@ -62,7 +59,11 @@ fun SegmentedControl(
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
                     .background(
-                        color = if (isSelected) surfaceControlSelected else surfaceControlDefault,
+                        color = if (isSelected) {
+                            CbTheme.colorScheme.toggleButton.backgroundOn
+                        } else {
+                            CbTheme.colorScheme.toggleButton.backgroundOff
+                        },
                     )
                     .clickable { onOptionSelected(index) }
                     .padding(horizontal = 13.dp, vertical = 5.dp),
@@ -74,7 +75,11 @@ fun SegmentedControl(
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,
                     lineHeight = 22.sp,
-                    color = if (isSelected) textControlOnSelected else textControlDefault,
+                    color = if (isSelected) {
+                        CbTheme.colorScheme.toggleButton.foregroundOn
+                    } else {
+                        CbTheme.colorScheme.toggleButton.foregroundOff
+                    },
                 )
             }
         }

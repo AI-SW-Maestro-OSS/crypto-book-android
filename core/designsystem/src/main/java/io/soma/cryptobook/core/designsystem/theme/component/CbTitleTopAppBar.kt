@@ -13,9 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.textPrimary
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Settings variant TopAppBar
@@ -44,12 +43,12 @@ fun CbTitleTopAppBar(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     lineHeight = 20.sp,
-                    color = textPrimary
+                    color = CbTheme.colorScheme.text.primary
                 )
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = ScreenBackground
+            containerColor = CbTheme.colorScheme.background.primary
         ),
         modifier = modifier
     )

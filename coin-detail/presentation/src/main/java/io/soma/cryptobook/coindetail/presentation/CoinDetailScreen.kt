@@ -32,11 +32,11 @@ import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContai
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIcon
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.presentation.mvi.observe
 
 @Composable
@@ -64,7 +64,7 @@ fun CoinDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScreenBackground),
+            .background(CbTheme.colorScheme.background.primary),
     ) {
         CoinDetailScreen(
             state = state.value,
@@ -188,7 +188,7 @@ private fun CoinDetailScreenPreview() {
             isLoading = false,
         ),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
@@ -198,7 +198,7 @@ private fun CoinDetailScreenLoadingPreview() {
     CoinDetailScreen(
         state = State(isLoading = true),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
@@ -211,7 +211,7 @@ private fun CoinDetailScreenErrorPreview() {
             errorMsg = stringResource(CryptoString.cb_coin_detail_connection_error_state),
         ),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
@@ -224,6 +224,6 @@ private fun CoinDetailScreenRealtimeWarningPreview() {
             realtimeStatusMessage = stringResource(CryptoString.cb_realtime_recovering),
         ),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }

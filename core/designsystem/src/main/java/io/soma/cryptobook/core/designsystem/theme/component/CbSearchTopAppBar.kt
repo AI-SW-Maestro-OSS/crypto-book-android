@@ -26,9 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.textSecondary
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 // Hardcoded: not defined in Figma variables
 private val SearchBarBackground = Color(0xFF2A2A2A)
@@ -55,7 +54,7 @@ fun CbSearchTopAppBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(ScreenBackground)
+            .background(CbTheme.colorScheme.background.primary)
             .windowInsetsPadding(windowInsets)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.Center,
@@ -74,7 +73,7 @@ fun CbSearchTopAppBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = stringResource(CryptoString.cb_home_search_icon_cd),
-                tint = textSecondary,
+                tint = CbTheme.colorScheme.text.secondary,
                 modifier = Modifier.size(24.dp)
             )
             Text(
@@ -83,7 +82,7 @@ fun CbSearchTopAppBar(
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                color = textSecondary
+                color = CbTheme.colorScheme.text.secondary
             )
         }
     }

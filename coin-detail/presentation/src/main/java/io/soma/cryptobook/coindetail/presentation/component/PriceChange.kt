@@ -22,12 +22,8 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.PriceDown
-import io.soma.cryptobook.core.designsystem.theme.PriceFlat
-import io.soma.cryptobook.core.designsystem.theme.PriceUp
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.textPrimary
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Price change type for color variation
@@ -76,15 +72,15 @@ fun PriceChange(
     modifier: Modifier = Modifier,
 ) {
     val changeColor = when (priceChangeType) {
-        PriceChangeType.Up -> PriceUp
-        PriceChangeType.Down -> PriceDown
-        PriceChangeType.Flat -> PriceFlat
+        PriceChangeType.Up -> CbTheme.colorScheme.price.up
+        PriceChangeType.Down -> CbTheme.colorScheme.price.down
+        PriceChangeType.Flat -> CbTheme.colorScheme.price.flat
     }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(ScreenBackground),
+            .background(CbTheme.colorScheme.background.primary),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -113,7 +109,7 @@ fun PriceChange(
                 fontWeight = FontWeight.Bold,
                 fontSize = 36.sp,
                 lineHeight = 40.sp,
-                color = textPrimary,
+                color = CbTheme.colorScheme.text.primary,
                 textAlign = TextAlign.Start,
             )
 

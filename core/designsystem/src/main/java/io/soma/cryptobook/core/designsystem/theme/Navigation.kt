@@ -5,6 +5,7 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItemColors
 import androidx.compose.runtime.Composable
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 
 @Composable
@@ -33,11 +34,11 @@ fun cbNavigationItemColors() = NavigationSuiteItemColors(
 
 object CbNavigationDefaults {
     @Composable
-    fun navigationDefaultItemColor() = iconDefault
+    fun navigationDefaultItemColor() = CbTheme.colorScheme.icon.primary
 
     @Composable
-    fun navigationSelectedItemColor() = iconSelected
+    fun navigationSelectedItemColor() = CbTheme.colorScheme.icon.secondary
 
     @Composable
-    fun navigationIndicatorColor() = SelectionBackground
+    fun navigationIndicatorColor() = CbTheme.colorScheme.background.selected
 }

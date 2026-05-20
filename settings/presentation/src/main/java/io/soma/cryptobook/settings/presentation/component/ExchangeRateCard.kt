@@ -23,9 +23,7 @@ import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.surfaceCardDefault
-import io.soma.cryptobook.core.designsystem.theme.textPrimary
-import io.soma.cryptobook.core.designsystem.theme.textSecondary
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Exchange rate card component
@@ -56,7 +54,7 @@ fun ExchangeRateCard(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = surfaceCardDefault,
+                color = CbTheme.colorScheme.background.tertiary,
                 shape = RoundedCornerShape(10.dp),
             )
             .padding(16.dp),
@@ -72,7 +70,7 @@ fun ExchangeRateCard(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                color = textPrimary,
+                color = CbTheme.colorScheme.text.primary,
             )
             Text(
                 text = rateText,
@@ -80,7 +78,7 @@ fun ExchangeRateCard(
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 lineHeight = 32.sp,
-                color = textPrimary,
+                color = CbTheme.colorScheme.text.primary,
             )
             Text(
                 text = updateTimeText,
@@ -88,7 +86,7 @@ fun ExchangeRateCard(
                 fontWeight = FontWeight.Normal,
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
-                color = textSecondary,
+                color = CbTheme.colorScheme.text.secondary,
             )
         }
         Icon(
@@ -96,7 +94,7 @@ fun ExchangeRateCard(
             contentDescription = stringResource(
                 CryptoString.cb_settings_exchange_rate_refresh_cd,
             ),
-            tint = textPrimary,
+            tint = CbTheme.colorScheme.text.primary,
             modifier = Modifier
                 .size(32.dp)
                 .clickable { onRefreshClick() },

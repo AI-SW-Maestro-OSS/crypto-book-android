@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListItemData
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListTable
@@ -48,7 +48,7 @@ internal fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifi
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(ScreenBackground),
+            .background(CbTheme.colorScheme.background.secondary),
     ) {
         CbMediumTopAppBar(
             title = "Crypto-Book-Android",
@@ -138,7 +138,7 @@ private fun HomeScreenPreview() {
     HomeScreen(
         state = HomeUiState(coins = sampleCoins),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
@@ -148,7 +148,7 @@ private fun HomeScreenLoadingPreview() {
     HomeScreen(
         state = HomeUiState(isLoading = true),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
@@ -158,7 +158,7 @@ private fun HomeScreenErrorPreview() {
     HomeScreen(
         state = HomeUiState(errorMsg = stringResource(CryptoString.cb_error_network)),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
@@ -170,6 +170,6 @@ private fun HomeScreenRealtimeWarningPreview() {
             realtimeStatusMessage = stringResource(CryptoString.cb_realtime_recovering),
         ),
         onEvent = {},
-        modifier = Modifier.background(ScreenBackground),
+        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }

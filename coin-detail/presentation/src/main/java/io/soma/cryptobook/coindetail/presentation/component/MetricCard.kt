@@ -20,9 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.surfaceCardDefault
-import io.soma.cryptobook.core.designsystem.theme.textPrimary
-import io.soma.cryptobook.core.designsystem.theme.textSecondary
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Metric card grid container displaying 2×2 grid of metrics
@@ -126,7 +124,7 @@ fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
             .width(175.dp)
             .height(72.dp)
             .background(
-                color = surfaceCardDefault,
+                color = CbTheme.colorScheme.background.tertiary,
                 shape = RoundedCornerShape(10.dp),
             )
             .padding(horizontal = 16.dp, vertical = 13.dp),
@@ -140,7 +138,7 @@ fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Normal,
             fontSize = 14.sp,
             lineHeight = 20.sp,
-            color = textSecondary,
+            color = CbTheme.colorScheme.text.secondary,
         )
 
         // Value
@@ -150,7 +148,7 @@ fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp,
             lineHeight = 24.sp,
-            color = textPrimary,
+            color = CbTheme.colorScheme.text.primary,
         )
     }
 }

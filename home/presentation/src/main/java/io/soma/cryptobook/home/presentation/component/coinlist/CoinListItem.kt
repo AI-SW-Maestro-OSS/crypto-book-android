@@ -27,13 +27,8 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.PriceDown
-import io.soma.cryptobook.core.designsystem.theme.PriceFlat
-import io.soma.cryptobook.core.designsystem.theme.PriceUp
-import io.soma.cryptobook.core.designsystem.theme.ScreenBackground
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.textPrimary
-import io.soma.cryptobook.core.designsystem.theme.textSecondary
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Coin list item component
@@ -81,9 +76,9 @@ fun CoinListItem(
     modifier: Modifier = Modifier,
 ) {
     val changeColor = when {
-        changePercent > 0 -> PriceUp
-        changePercent < 0 -> PriceDown
-        else -> PriceFlat
+        changePercent > 0 -> CbTheme.colorScheme.price.up
+        changePercent < 0 -> CbTheme.colorScheme.price.down
+        else -> CbTheme.colorScheme.price.flat
     }
 
     val changeText = when {
@@ -94,7 +89,7 @@ fun CoinListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(ScreenBackground)
+            .background(CbTheme.colorScheme.background.secondary)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -130,7 +125,7 @@ fun CoinListItem(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
                     lineHeight = 24.sp,
-                    color = textPrimary,
+                    color = CbTheme.colorScheme.text.primary,
                 )
                 Text(
                     text = name,
@@ -138,7 +133,7 @@ fun CoinListItem(
                     fontWeight = FontWeight.Normal,
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
-                    color = textSecondary,
+                    color = CbTheme.colorScheme.text.secondary,
                 )
             }
         }
@@ -153,7 +148,7 @@ fun CoinListItem(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                color = textPrimary,
+                color = CbTheme.colorScheme.text.primary,
                 textAlign = TextAlign.End,
             )
             Text(

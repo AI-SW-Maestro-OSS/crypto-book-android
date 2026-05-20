@@ -16,9 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.IconPrimary
-import io.soma.cryptobook.core.designsystem.theme.Selectedicon
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Sort direction state
@@ -64,8 +63,8 @@ fun SortHeaderItem(
     modifier: Modifier = Modifier,
 ) {
     val textColor = when (sortDirection) {
-        SortDirection.None -> IconPrimary
-        SortDirection.Asc, SortDirection.Desc -> Selectedicon
+        SortDirection.None -> CbTheme.colorScheme.text.primary
+        SortDirection.Asc, SortDirection.Desc -> CbTheme.colorScheme.text.interaction
     }
 
     val iconRes = when (sortDirection) {
@@ -98,7 +97,7 @@ fun SortHeaderItem(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun SortHeaderItemAscPreview() {
     SortHeaderItem(
@@ -108,7 +107,7 @@ private fun SortHeaderItemAscPreview() {
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun SortHeaderItemDescPreview() {
     SortHeaderItem(
@@ -118,7 +117,7 @@ private fun SortHeaderItemDescPreview() {
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun SortHeaderItemNonePreview() {
     SortHeaderItem(

@@ -18,9 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.surfaceCardDefault
-import io.soma.cryptobook.core.designsystem.theme.textPrimary
-import io.soma.cryptobook.core.designsystem.theme.textSecondary
+import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
  * Settings option card component
@@ -54,7 +52,7 @@ fun SettingsOptionCard(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = surfaceCardDefault,
+                color = CbTheme.colorScheme.background.tertiary,
                 shape = RoundedCornerShape(10.dp),
             )
             .padding(16.dp),
@@ -70,7 +68,7 @@ fun SettingsOptionCard(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                color = textPrimary,
+                color = CbTheme.colorScheme.text.primary,
             )
             Text(
                 text = description,
@@ -78,7 +76,7 @@ fun SettingsOptionCard(
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
-                color = textSecondary,
+                color = CbTheme.colorScheme.text.secondary,
             )
         }
         SegmentedControl(
