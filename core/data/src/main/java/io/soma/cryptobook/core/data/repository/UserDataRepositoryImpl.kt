@@ -1,6 +1,7 @@
 package io.soma.cryptobook.core.data.repository
 
 import io.soma.cryptobook.core.data.datastore.CbPreferencesDataSource
+import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
@@ -24,5 +25,9 @@ class UserDataRepositoryImpl @Inject constructor(
 
     override suspend fun setUsdKrwExchangeRate(usdKrwExchangeRate: Long) {
         cbPreferencesDataSource.setUsdKrwExchangeRate(usdKrwExchangeRate)
+    }
+
+    override suspend fun setAppTheme(appTheme: AppTheme) {
+        cbPreferencesDataSource.setAppTheme(appTheme)
     }
 }

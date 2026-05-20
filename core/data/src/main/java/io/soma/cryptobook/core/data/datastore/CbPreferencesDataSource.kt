@@ -1,10 +1,12 @@
 package io.soma.cryptobook.core.data.datastore
 
 import androidx.datastore.core.DataStore
+import io.soma.cryptobook.core.data.AppThemeProto
 import io.soma.cryptobook.core.data.CurrencyUnitProto
 import io.soma.cryptobook.core.data.LanguageProto
 import io.soma.cryptobook.core.data.UserPreferences
 import io.soma.cryptobook.core.data.copy
+import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
@@ -42,6 +44,16 @@ class CbPreferencesDataSource @Inject constructor(
                     -> CurrencyUnit.WON
                 },
                 usdKrwExchangeRate = BigDecimal.valueOf(it.usdKrwExchangeRate, 4),
+                appTheme = when (it.appTheme) {
+                    null,
+                    AppThemeProto.APP_THEME_UNSPECIFIED,
+                    AppThemeProto.UNRECOGNIZED,
+                    AppThemeProto.APP_THEME_DARK,
+                    -> AppTheme.DARK
+
+                    AppThemeProto.APP_THEME_LIGHT,
+                    -> AppTheme.LIGHT
+                },
             )
         }
 
@@ -62,6 +74,17 @@ class CbPreferencesDataSource @Inject constructor(
                 this.currencyUnit = when (currencyUnit) {
                     CurrencyUnit.DOLLAR -> CurrencyUnitProto.CURRENCY_UNIT_DOLLAR
                     CurrencyUnit.WON -> CurrencyUnitProto.CURRENCY_UNIT_WON
+                }
+            }
+        }
+    }
+
+    suspend fun setAppTheme(appTheme: AppTheme) {
+        userPreferences.updateData {
+            it.copy {
+                this.appTheme = when (appTheme) {
+                    AppTheme.LIGHT -> AppThemeProto.APP_THEME_LIGHT
+                    AppTheme.DARK -> AppThemeProto.APP_THEME_DARK
                 }
             }
         }

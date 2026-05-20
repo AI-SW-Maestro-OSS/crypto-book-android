@@ -1,5 +1,6 @@
 package io.soma.cryptobook.core.domain.repository
 
+import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
@@ -13,4 +14,6 @@ interface UserDataRepository {
     suspend fun setPriceCurrency(currencyUnit: CurrencyUnit)
 
     suspend fun setUsdKrwExchangeRate(usdKrwExchangeRate: Long)
+
+    suspend fun setAppTheme(appTheme: AppTheme)
 }
