@@ -41,6 +41,7 @@ import io.soma.cryptobook.coindetail.presentation.navigation.CoinDetailNavKey
 import io.soma.cryptobook.coindetail.presentation.navigation.coinDetailEntry
 import io.soma.cryptobook.core.designsystem.theme.cbNavigationItemColors
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.presentation.jank.TrackDisposableJank
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
 import io.soma.cryptobook.home.presentation.navigation.homeEntry
 import io.soma.cryptobook.main.presentation.message.MessageCommand
@@ -50,6 +51,7 @@ import io.soma.cryptobook.main.presentation.navigation.LinkRouter
 import io.soma.cryptobook.main.presentation.navigation.NavCommand
 import io.soma.cryptobook.main.presentation.navigation.NavCommandSource
 import io.soma.cryptobook.main.presentation.navigation.TOP_LEVEL_NAV_ITEMS
+import io.soma.cryptobook.navigation.NavigationState
 import io.soma.cryptobook.navigation.rememberNavigationState
 import io.soma.cryptobook.search.presentation.navigation.searchEntry
 import io.soma.cryptobook.settings.presentation.navigation.settingsEntry
@@ -71,6 +73,7 @@ fun CryptoBookApp(
     if (appLinkKey !is HomeNavKey) {
         navigationState.backStack.add(appLinkKey)
     }
+    NavigationTrackingSideEffect(navigationState)
     val navigator = remember { CbNavigator(navigationState) }
 
     // message
@@ -187,5 +190,13 @@ fun CryptoBookApp(
         ) {
             CircularProgressIndicator(color = Color.Black)
         }
+    }
+}
+
+@Composable
+private fun NavigationTrackingSideEffect(navigationState: NavigationState) {
+    TrackDisposableJank(navigationState.currentTopKey) { metricsHolder ->
+        metricsHolder.state?.putState("Navigation", navigationState.currentTopKey.toString())
+        onDispose {}
     }
 }
