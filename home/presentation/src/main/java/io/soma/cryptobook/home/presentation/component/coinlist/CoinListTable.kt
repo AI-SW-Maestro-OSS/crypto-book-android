@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.soma.cryptobook.core.presentation.jank.TrackScrollJank
 
 /**
  * Data class for coin list item display
@@ -50,7 +52,11 @@ fun CoinListTable(
     onCoinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lazyListState = rememberLazyListState()
+    TrackScrollJank(scrollableState = lazyListState, stateName = "home:coinList")
+
     LazyColumn(
+        state = lazyListState,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 7.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
