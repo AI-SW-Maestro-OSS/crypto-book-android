@@ -63,6 +63,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.domain)
     implementation(projects.core.data)
+    implementation(projects.core.presentation)
     implementation(projects.coinDetail.data)
     implementation(projects.coinDetail.domain)
 

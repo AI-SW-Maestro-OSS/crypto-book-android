@@ -9,6 +9,7 @@ android {
 }
 
 dependencies {
+    api(libs.androidx.metrics)
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)

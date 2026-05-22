@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.metrics.performance.JankStats
 import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
@@ -28,6 +29,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var lazyStats: dagger.Lazy<JankStats>
 
     @Inject
     lateinit var linkRouter: LinkRouter
@@ -103,6 +107,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        lazyStats.get().isTrackingEnabled = true
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
 
         val locales = AppCompatDelegate.getApplicationLocales()
@@ -112,5 +117,10 @@ class MainActivity : AppCompatActivity() {
         val language = systemLocale.toLanguage() ?: return
 
         mainViewModel.event(MainContract.Event.OnSystemLocaleDetected(language))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lazyStats.get().isTrackingEnabled = false
     }
 }
