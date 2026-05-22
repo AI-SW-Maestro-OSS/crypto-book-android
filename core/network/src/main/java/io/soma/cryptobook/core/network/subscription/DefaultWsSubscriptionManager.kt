@@ -1,6 +1,5 @@
 package io.soma.cryptobook.core.network.subscription
 
-import android.util.Log
 import io.soma.cryptobook.core.network.BinanceWebSocketClient
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import kotlinx.atomicfu.atomic
@@ -9,13 +8,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -33,23 +28,15 @@ class DefaultWsSubscriptionManager @Inject constructor(
     private val scope: CoroutineScope,
     private val policy: WsSubscriptionPolicy,
 ) : WsSubscriptionManager {
-    companion object {
-        private const val TAG = "WsSubscription"
-    }
 
     private val requestIdCounter = atomic(1)
     private val mutex = Mutex()
     private val commandMutex = Mutex()
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
+    private val json = Json { ignoreUnknownKeys = true }
 
     private val desiredRefCount = LinkedHashMap<String, Int>()
     private val confirmed = LinkedHashSet<String>()
     private val pendingById = LinkedHashMap<Int, PendingRequest>()
-
-    private val _state = MutableStateFlow(WsSubscriptionState())
-    override val state: StateFlow<WsSubscriptionState> = _state.asStateFlow()
 
     private val _failures = MutableSharedFlow<WsSubscriptionFailure>(extraBufferCapacity = 64)
     override val failures: SharedFlow<WsSubscriptionFailure> = _failures.asSharedFlow()
@@ -58,9 +45,7 @@ class DefaultWsSubscriptionManager @Inject constructor(
 
     init {
         scope.launch {
-            sessionManager.events.collect { event ->
-                handleSessionEvent(event)
-            }
+            sessionManager.events.collect(::handleSessionEvent)
         }
     }
 
@@ -68,30 +53,19 @@ class DefaultWsSubscriptionManager @Inject constructor(
         val normalized = normalizeStreams(streams)
         if (normalized.isEmpty()) return
 
-        val subscribeDelta = mutex.withLock {
-            val delta = LinkedHashSet<String>()
-            normalized.forEach { stream ->
-                val previous = desiredRefCount[stream] ?: 0
-                desiredRefCount[stream] = previous + 1
-                if (previous == 0) delta.add(stream)
-            }
-            refreshStateLocked()
-            delta
-        }
-        logSubscriptionState(
-            action = "retain",
-            method = WsSubscriptionMethod.Subscribe,
-            streams = subscribeDelta,
-        )
-
-        if (subscribeDelta.isEmpty()) return
-        if (!sessionManager.isConnected) return
-
         commandMutex.withLock {
-            sendWithRetry(
-                method = WsSubscriptionMethod.Subscribe,
-                streams = subscribeDelta,
-            )
+            val subscribeDelta = mutex.withLock {
+                val delta = LinkedHashSet<String>()
+                normalized.forEach { stream ->
+                    val previous = desiredRefCount[stream] ?: 0
+                    desiredRefCount[stream] = previous + 1
+                    if (previous == 0 && stream !in confirmed) delta.add(stream)
+                }
+                delta
+            }
+            if (subscribeDelta.isEmpty()) return@withLock
+            if (!sessionManager.isConnected) return@withLock
+            sendWithRetry(WsSubscriptionMethod.Subscribe, subscribeDelta)
         }
     }
 
@@ -99,48 +73,25 @@ class DefaultWsSubscriptionManager @Inject constructor(
         val normalized = normalizeStreams(streams)
         if (normalized.isEmpty()) return
 
-        val unsubscribeDelta = mutex.withLock {
-            val delta = LinkedHashSet<String>()
-            normalized.forEach { stream ->
-                val previous = desiredRefCount[stream] ?: 0
-                when {
-                    previous <= 0 -> Unit
-                    previous == 1 -> {
-                        desiredRefCount.remove(stream)
-                        delta.add(stream)
-                    }
-
-                    else -> desiredRefCount[stream] = previous - 1
-                }
-            }
-            refreshStateLocked()
-            delta
-        }
-        logSubscriptionState(
-            action = "release",
-            method = WsSubscriptionMethod.Unsubscribe,
-            streams = unsubscribeDelta,
-        )
-
-        if (unsubscribeDelta.isEmpty()) return
-        if (!sessionManager.isConnected) return
-
         commandMutex.withLock {
-            sendWithRetry(
-                method = WsSubscriptionMethod.Unsubscribe,
-                streams = unsubscribeDelta,
-            )
-        }
-    }
-
-    override fun snapshot(): WsSubscriptionSnapshot = runBlocking {
-        mutex.withLock {
-            WsSubscriptionSnapshot(
-                desiredRefCount = desiredRefCount.toMap(),
-                desiredStreams = desiredRefCount.keys.toSet(),
-                confirmedStreams = confirmed.toSet(),
-                pendingRequestIds = pendingById.keys.toSet(),
-            )
+            val unsubscribeDelta = mutex.withLock {
+                val delta = LinkedHashSet<String>()
+                normalized.forEach { stream ->
+                    val previous = desiredRefCount[stream] ?: 0
+                    when {
+                        previous <= 0 -> Unit
+                        previous == 1 -> {
+                            desiredRefCount.remove(stream)
+                            if (stream in confirmed) delta.add(stream)
+                        }
+                        else -> desiredRefCount[stream] = previous - 1
+                    }
+                }
+                delta
+            }
+            if (unsubscribeDelta.isEmpty()) return@withLock
+            if (!sessionManager.isConnected) return@withLock
+            sendWithRetry(WsSubscriptionMethod.Unsubscribe, unsubscribeDelta)
         }
     }
 
@@ -150,16 +101,12 @@ class DefaultWsSubscriptionManager @Inject constructor(
             is BinanceWebSocketClient.Event.Message -> {
                 scope.launch { handleControlMessage(event.message) }
             }
-
             is BinanceWebSocketClient.Event.Disconnected,
             is BinanceWebSocketClient.Event.Error,
-            -> {
-                scope.launch {
-                    mutex.withLock {
-                        confirmed.clear()
-                        pendingById.clear()
-                        refreshStateLocked()
-                    }
+            -> scope.launch {
+                mutex.withLock {
+                    confirmed.clear()
+                    pendingById.clear()
                 }
             }
         }
@@ -168,19 +115,14 @@ class DefaultWsSubscriptionManager @Inject constructor(
     private fun scheduleReconcile() {
         reconcileJob?.cancel()
         reconcileJob = scope.launch {
-            commandMutex.withLock {
-                reconcileWithServer()
-            }
+            commandMutex.withLock { reconcileWithServer() }
         }
     }
 
     private suspend fun reconcileWithServer() {
         if (!sessionManager.isConnected) return
 
-        val listAck = sendWithRetry(
-            method = WsSubscriptionMethod.ListSubscriptions,
-            streams = emptySet(),
-        )
+        val listAck = sendWithRetry(WsSubscriptionMethod.ListSubscriptions, emptySet())
         val serverSet = (listAck as? RequestAck.ListSuccess)?.streams ?: return
 
         val desiredSet = mutex.withLock { desiredRefCount.keys.toSet() }
@@ -188,17 +130,10 @@ class DefaultWsSubscriptionManager @Inject constructor(
         val toUnsubscribe = serverSet - desiredSet
 
         if (toSubscribe.isNotEmpty()) {
-            sendWithRetry(
-                method = WsSubscriptionMethod.Subscribe,
-                streams = toSubscribe,
-            )
+            sendWithRetry(WsSubscriptionMethod.Subscribe, toSubscribe)
         }
-
         if (toUnsubscribe.isNotEmpty()) {
-            sendWithRetry(
-                method = WsSubscriptionMethod.Unsubscribe,
-                streams = toUnsubscribe,
-            )
+            sendWithRetry(WsSubscriptionMethod.Unsubscribe, toUnsubscribe)
         }
     }
 
@@ -211,53 +146,30 @@ class DefaultWsSubscriptionManager @Inject constructor(
         }
 
         var lastCause: Throwable = IllegalStateException("Subscription command failed")
-
         for (attempt in 1..policy.maxRequestRetry) {
             val id = requestIdCounter.getAndIncrement()
-            logSubscriptionState(
-                action = "send",
-                method = method,
-                streams = streams,
-                attempt = attempt,
-            )
             when (val ack = sendAndAwait(method, streams, id)) {
                 is RequestAck.Success -> {
                     applySuccess(method, streams)
                     return ack
                 }
-
                 is RequestAck.ListSuccess -> {
                     applyListResult(ack.streams)
                     return ack
                 }
-
-                is RequestAck.Failure -> {
-                    lastCause = ack.cause
-                }
+                is RequestAck.Failure -> lastCause = ack.cause
             }
-
-            if (attempt < policy.maxRequestRetry) {
-                delay(policy.backoffForAttempt(attempt))
-            }
+            if (attempt < policy.maxRequestRetry) delay(policy.backoffForAttempt(attempt))
         }
 
-        val failure = WsSubscriptionFailure(
-            method = method,
-            streams = streams,
-            attempt = policy.maxRequestRetry,
-            cause = lastCause,
+        _failures.tryEmit(
+            WsSubscriptionFailure(
+                method = method,
+                streams = streams,
+                attempt = policy.maxRequestRetry,
+                cause = lastCause,
+            ),
         )
-        mutex.withLock {
-            refreshStateLocked(lastFailure = failure)
-        }
-        logSubscriptionState(
-            action = "fail",
-            method = method,
-            streams = streams,
-            attempt = policy.maxRequestRetry,
-            cause = lastCause,
-        )
-        _failures.tryEmit(failure)
         return RequestAck.Failure(lastCause)
     }
 
@@ -267,17 +179,8 @@ class DefaultWsSubscriptionManager @Inject constructor(
         id: Int,
     ): RequestAck {
         val deferred = CompletableDeferred<RequestAck>()
-        val pending = PendingRequest(
-            id = id,
-            method = method,
-            streams = streams,
-            deferred = deferred,
-        )
-
-        mutex.withLock {
-            pendingById[id] = pending
-            refreshStateLocked()
-        }
+        val pending = PendingRequest(id, method, streams, deferred)
+        mutex.withLock { pendingById[id] = pending }
 
         val sent = transport.sendCommand(
             method = method.wireValue,
@@ -285,10 +188,7 @@ class DefaultWsSubscriptionManager @Inject constructor(
             id = id,
         )
         if (!sent) {
-            mutex.withLock {
-                pendingById.remove(id)
-                refreshStateLocked()
-            }
+            mutex.withLock { pendingById.remove(id) }
             return RequestAck.Failure(
                 IllegalStateException("Failed to send ${method.wireValue}: $streams"),
             )
@@ -296,21 +196,14 @@ class DefaultWsSubscriptionManager @Inject constructor(
 
         val timeoutJob = scope.launch {
             delay(policy.requestTimeoutMs)
-            deferred.complete(
-                RequestAck.Failure(
-                    AckTimeoutException(method = method, id = id),
-                ),
-            )
+            deferred.complete(RequestAck.Failure(AckTimeoutException(method, id)))
         }
 
         return try {
             deferred.await()
         } finally {
             timeoutJob.cancel()
-            mutex.withLock {
-                pendingById.remove(id)
-                refreshStateLocked()
-            }
+            mutex.withLock { pendingById.remove(id) }
         }
     }
 
@@ -319,19 +212,11 @@ class DefaultWsSubscriptionManager @Inject constructor(
         val pending = mutex.withLock { pendingById[control.id] } ?: return
 
         when (control) {
-            is ControlMessage.Error -> {
-                pending.deferred.complete(
-                    RequestAck.Failure(
-                        AckErrorException(
-                            method = pending.method,
-                            id = control.id,
-                            code = control.code,
-                            msg = control.msg,
-                        ),
-                    ),
-                )
-            }
-
+            is ControlMessage.Error -> pending.deferred.complete(
+                RequestAck.Failure(
+                    AckErrorException(pending.method, control.id, control.code, control.msg),
+                ),
+            )
             is ControlMessage.Result -> {
                 if (pending.method == WsSubscriptionMethod.ListSubscriptions) {
                     pending.deferred.complete(
@@ -351,50 +236,31 @@ class DefaultWsSubscriptionManager @Inject constructor(
                 WsSubscriptionMethod.Unsubscribe -> confirmed.removeAll(streams)
                 WsSubscriptionMethod.ListSubscriptions -> Unit
             }
-            refreshStateLocked(lastFailure = null)
         }
-        logSubscriptionState(
-            action = "ack",
-            method = method,
-            streams = streams,
-        )
     }
 
     private suspend fun applyListResult(streams: Set<String>) {
         mutex.withLock {
             confirmed.clear()
             confirmed.addAll(streams)
-            refreshStateLocked(lastFailure = null)
         }
-        logSubscriptionState(
-            action = "ack",
-            method = WsSubscriptionMethod.ListSubscriptions,
-            streams = streams,
-        )
     }
 
     private fun parseControlMessage(message: String): ControlMessage? {
-        val jsonObject = runCatching {
-            json.parseToJsonElement(message).jsonObject
-        }.getOrNull() ?: return null
-
-        val id = (jsonObject["id"] as? JsonPrimitive)?.intOrNull ?: return null
-        val code = (jsonObject["code"] as? JsonPrimitive)?.intOrNull
-        val msg = (jsonObject["msg"] as? JsonPrimitive)?.contentOrNull
-
-        if (code != null || msg != null) {
-            return ControlMessage.Error(id = id, code = code, msg = msg)
-        }
-
-        if (!jsonObject.containsKey("result")) return null
-        return ControlMessage.Result(id = id, result = jsonObject.getValue("result"))
+        val obj = runCatching { json.parseToJsonElement(message).jsonObject }.getOrNull()
+            ?: return null
+        val id = (obj["id"] as? JsonPrimitive)?.intOrNull ?: return null
+        val code = (obj["code"] as? JsonPrimitive)?.intOrNull
+        val msg = (obj["msg"] as? JsonPrimitive)?.contentOrNull
+        if (code != null || msg != null) return ControlMessage.Error(id, code, msg)
+        if (!obj.containsKey("result")) return null
+        return ControlMessage.Result(id, obj.getValue("result"))
     }
 
     private fun parseStreamsFromResult(result: JsonElement): Set<String> {
         val array = result as? JsonArray ?: return emptySet()
         return array.mapNotNull { element ->
-            val primitive = element as? JsonPrimitive ?: return@mapNotNull null
-            primitive.contentOrNull?.trim()?.takeIf { it.isNotEmpty() }
+            (element as? JsonPrimitive)?.contentOrNull?.trim()?.takeIf { it.isNotEmpty() }
         }.toSet()
     }
 
@@ -403,39 +269,6 @@ class DefaultWsSubscriptionManager @Inject constructor(
         .map { it.trim() }
         .filter { it.isNotEmpty() }
         .toSet()
-
-    private fun refreshStateLocked(lastFailure: WsSubscriptionFailure? = _state.value.lastFailure) {
-        _state.value = WsSubscriptionState(
-            desiredStreams = desiredRefCount.keys.toSet(),
-            confirmedStreams = confirmed.toSet(),
-            pendingRequestIds = pendingById.keys.toSet(),
-            lastFailure = lastFailure,
-        )
-    }
-
-    private fun logSubscriptionState(
-        action: String,
-        method: WsSubscriptionMethod,
-        streams: Set<String>,
-        attempt: Int? = null,
-        cause: Throwable? = null,
-    ) {
-        val state = _state.value
-        val desired = state.desiredStreams.sorted()
-        val confirmed = state.confirmedStreams.sorted()
-        val pending = state.pendingRequestIds.sorted()
-
-        val attemptPart = attempt?.let { " attempt=$it" }.orEmpty()
-        val causePart = cause?.message?.let { " cause=$it" }.orEmpty()
-
-        Log.d(
-            TAG,
-            "[WS_SUB] action=$action method=${method.wireValue} " +
-                "streams=${streams.sorted()}$attemptPart$causePart " +
-                "desired=${desired.size}:$desired confirmed=${confirmed.size}:$confirmed " +
-                "pending=${pending.size}:$pending",
-        )
-    }
 
     private data class PendingRequest(
         val id: Int,
@@ -452,23 +285,12 @@ class DefaultWsSubscriptionManager @Inject constructor(
 
     private sealed interface ControlMessage {
         val id: Int
-
-        data class Result(
-            override val id: Int,
-            val result: JsonElement,
-        ) : ControlMessage
-
-        data class Error(
-            override val id: Int,
-            val code: Int?,
-            val msg: String?,
-        ) : ControlMessage
+        data class Result(override val id: Int, val result: JsonElement) : ControlMessage
+        data class Error(override val id: Int, val code: Int?, val msg: String?) : ControlMessage
     }
 
-    private class AckTimeoutException(
-        method: WsSubscriptionMethod,
-        id: Int,
-    ) : Exception("ACK timeout for ${method.wireValue} (id=$id)")
+    private class AckTimeoutException(method: WsSubscriptionMethod, id: Int) :
+        Exception("ACK timeout for ${method.wireValue} (id=$id)")
 
     private class AckErrorException(
         method: WsSubscriptionMethod,
