@@ -8,7 +8,6 @@ import io.soma.cryptobook.coindetail.data.network.BinanceSpotKlineClient
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotTickerClient
 import io.soma.cryptobook.core.data.datasource.ticksize.BinanceExchangeInfoApiService
 import io.soma.cryptobook.core.data.network.ExchangeApiService
-import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.market.DefaultMarketRealtimeCoordinator
 import io.soma.cryptobook.core.data.realtime.market.DefaultObserveMarketRealtimeState
 import io.soma.cryptobook.core.data.realtime.market.MarketRealtimeCoordinator
@@ -22,6 +21,8 @@ import io.soma.cryptobook.core.network.market.WsMarketMessageRouter
 import io.soma.cryptobook.core.network.session.DefaultWsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionPolicy
+import io.soma.cryptobook.core.network.stream.DefaultWsStreamSource
+import io.soma.cryptobook.core.network.stream.WsStreamSource
 import io.soma.cryptobook.core.network.subscription.DefaultWsSubscriptionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionManager
 import io.soma.cryptobook.core.network.subscription.WsSubscriptionPolicy
@@ -174,20 +175,28 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideMarketRealtimeCoordinator(
+    fun provideWsStreamSource(
         sessionManager: WsSessionManager,
         subscriptionManager: WsSubscriptionManager,
         marketMessageRouter: WsMarketMessageRouter,
+        @ApplicationScope scope: CoroutineScope,
+    ): WsStreamSource = DefaultWsStreamSource(
+        sessionManager = sessionManager,
+        subscriptionManager = subscriptionManager,
+        router = marketMessageRouter,
+        scope = scope,
+    )
+
+    @Provides
+    @Singleton
+    fun provideMarketRealtimeCoordinator(
+        wsStreamSource: WsStreamSource,
         tickerTable: WsTickerTable,
-        klineTable: WsKlineTable,
         payloadMapper: MarketRealtimePayloadMapper,
         @ApplicationScope scope: CoroutineScope,
     ): MarketRealtimeCoordinator = DefaultMarketRealtimeCoordinator(
-        sessionManager = sessionManager,
-        subscriptionManager = subscriptionManager,
-        marketMessageRouter = marketMessageRouter,
+        wsStreamSource = wsStreamSource,
         tickerTable = tickerTable,
-        klineTable = klineTable,
         payloadMapper = payloadMapper,
         scope = scope,
     )
@@ -196,8 +205,10 @@ object NetworkModule {
     @Singleton
     fun provideObserveMarketRealtimeState(
         coordinator: MarketRealtimeCoordinator,
+        sessionManager: WsSessionManager,
     ): ObserveMarketRealtimeState = DefaultObserveMarketRealtimeState(
         coordinator = coordinator,
+        sessionManager = sessionManager,
     )
 
     @Provides
