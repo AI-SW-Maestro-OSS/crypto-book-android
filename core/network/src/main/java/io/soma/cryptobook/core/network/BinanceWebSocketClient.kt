@@ -3,9 +3,12 @@ package io.soma.cryptobook.core.network
 import android.util.Log
 import io.soma.cryptobook.core.network.subscription.WsControlTransport
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -13,10 +16,10 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONArray
 import org.json.JSONObject
-import javax.inject.Inject
 
-class BinanceWebSocketClient @Inject constructor(
+class BinanceWebSocketClient(
     private val client: OkHttpClient,
+    scope: CoroutineScope,
 ) : WsControlTransport {
     sealed interface Event {
         data class Message(val message: String) : Event
@@ -31,11 +34,26 @@ class BinanceWebSocketClient @Inject constructor(
     val isConnected: Boolean get() = isConnectedRef.value
     override val isSocketReady: Boolean get() = isConnected
 
+    /**
+     * Listener thread receives raw events here without ever blocking.
+     * A single dispatcher coroutine forwards them to [_events] in order, suspending
+     * when the SharedFlow buffer is full instead of dropping messages.
+     */
+    private val inbox = Channel<Event>(capacity = Channel.UNLIMITED)
+
     private val _events = MutableSharedFlow<Event>(
-        extraBufferCapacity = 64,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        extraBufferCapacity = 256,
+        onBufferOverflow = BufferOverflow.SUSPEND,
     )
     val events = _events.asSharedFlow()
+
+    init {
+        scope.launch {
+            for (event in inbox) {
+                _events.emit(event)
+            }
+        }
+    }
 
     companion object {
         private const val TAG = "BinanceWS"
@@ -48,24 +66,24 @@ class BinanceWebSocketClient @Inject constructor(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d(TAG, "Connected")
             isConnectedRef.value = true
-            _events.tryEmit(Event.Connected)
+            inbox.trySend(Event.Connected)
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            _events.tryEmit(Event.Message(text))
+            inbox.trySend(Event.Message(text))
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             Log.e(TAG, "Failed: ${t.message}")
             isConnectedRef.value = false
-            _events.tryEmit(Event.Error(t))
+            inbox.trySend(Event.Error(t))
             this@BinanceWebSocketClient.webSocket = null
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             Log.d(TAG, "Closed: code=$code reason=$reason")
             isConnectedRef.value = false
-            _events.tryEmit(Event.Disconnected)
+            inbox.trySend(Event.Disconnected)
             this@BinanceWebSocketClient.webSocket = null
         }
     }

@@ -120,7 +120,8 @@ object NetworkModule {
     @Singleton
     fun provideBinanceWebSocketClient(
         @BinanceNetwork okHttpClient: OkHttpClient,
-    ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient)
+        @ApplicationScope scope: CoroutineScope,
+    ): BinanceWebSocketClient = BinanceWebSocketClient(okHttpClient, scope)
 
     @Provides
     @Singleton
