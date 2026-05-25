@@ -5,22 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.WindowAdaptiveInfo
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -39,22 +24,23 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.soma.cryptobook.coindetail.presentation.navigation.CoinDetailNavKey
 import io.soma.cryptobook.coindetail.presentation.navigation.coinDetailEntry
-import io.soma.cryptobook.core.designsystem.theme.cbNavigationItemColors
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.theme.component.scaffold.model.ScaffoldNavigationData
 import io.soma.cryptobook.core.presentation.jank.TrackDisposableJank
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
 import io.soma.cryptobook.home.presentation.navigation.homeEntry
 import io.soma.cryptobook.main.presentation.message.MessageCommand
 import io.soma.cryptobook.main.presentation.message.MessageCommandSource
 import io.soma.cryptobook.main.presentation.navigation.CbNavigator
+import io.soma.cryptobook.main.presentation.navigation.CbTopLevelNavItem
 import io.soma.cryptobook.main.presentation.navigation.LinkRouter
 import io.soma.cryptobook.main.presentation.navigation.NavCommand
 import io.soma.cryptobook.main.presentation.navigation.NavCommandSource
-import io.soma.cryptobook.main.presentation.navigation.TOP_LEVEL_NAV_ITEMS
 import io.soma.cryptobook.navigation.NavigationState
 import io.soma.cryptobook.navigation.rememberNavigationState
 import io.soma.cryptobook.search.presentation.navigation.searchEntry
 import io.soma.cryptobook.settings.presentation.navigation.settingsEntry
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun CryptoBookApp(
@@ -62,23 +48,21 @@ fun CryptoBookApp(
     messageSource: MessageCommandSource,
     linkRouter: LinkRouter,
     appLinkKey: NavKey,
-    windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
     modifier: Modifier = Modifier,
 ) {
-    val navigationSuiteItemColors = cbNavigationItemColors()
-    val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(windowAdaptiveInfo)
-
     // navigation
-    val navigationState = rememberNavigationState(HomeNavKey, TOP_LEVEL_NAV_ITEMS.keys)
+    val navigationState = rememberNavigationState(
+        startKey = HomeNavKey,
+        topLevelKeys = CbTopLevelNavItem.entries.map { it.navKey }.toSet(),
+    )
     if (appLinkKey !is HomeNavKey) {
         navigationState.backStack.add(appLinkKey)
     }
     NavigationTrackingSideEffect(navigationState)
     val navigator = remember { CbNavigator(navigationState) }
 
-    // message
+    // message (global loading + toast only; snackbar is handled per-screen)
     var isLoading by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -110,57 +94,31 @@ fun CryptoBookApp(
                 is MessageCommand.ShowToast -> {
                     Toast.makeText(context, cmd.message, Toast.LENGTH_SHORT).show()
                 }
-
-                is MessageCommand.ShowSnackbar -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = cmd.message,
-                        actionLabel = cmd.actionLabel,
-                        duration = SnackbarDuration.Short,
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        cmd.onAction?.invoke()
-                    }
-                }
-
-                is MessageCommand.DismissSnackbar -> {
-                    snackbarHostState.currentSnackbarData?.dismiss()
-                }
             }
         }
     }
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
-                val selected =
-                    navKey == navigationState.currentTopKey
-                item(
-                    selected = selected,
-                    icon = { Icon(navItem.icon, contentDescription = null) },
-                    label = { Text(stringResource(navItem.iconTextId)) },
-                    onClick = { navigator.navigateTo(navKey) },
-                    colors = navigationSuiteItemColors,
-                )
-            }
-        },
-        layoutType = layoutType,
-        navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = CbTheme.colorScheme.background.primary,
-            navigationRailContainerColor = CbTheme.colorScheme.background.primary,
-        ),
-    ) {
-        Scaffold(
-            modifier = modifier,
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        ) { padding ->
+    val selectedNavItem = CbTopLevelNavItem.entries
+        .find { it.navKey == navigationState.currentTopKey }
+    val navigationData = selectedNavItem?.let { selected ->
+        ScaffoldNavigationData(
+            onNavigationClick = { item ->
+                if (item is CbTopLevelNavItem) navigator.navigateTo(item.navKey)
+            },
+            navigationItems = CbTopLevelNavItem.entries.toImmutableList(),
+            selectedNavigationItem = selected,
+        )
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        CbScaffold(
+            navigationData = navigationData,
+            contentWindowInsets = WindowInsets(0),
+        ) {
             NavDisplay(
                 backStack = navigationState.backStack,
                 onBack = { navigator.goBack() },
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .consumeWindowInsets(padding),
+                modifier = Modifier.fillMaxSize(),
                 entryDecorators = listOf(
                     rememberSaveableStateHolderNavEntryDecorator(),
                     rememberViewModelStoreNavEntryDecorator(),
@@ -178,17 +136,17 @@ fun CryptoBookApp(
                 },
             )
         }
-    }
 
-    if (isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(enabled = false) { },
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(color = Color.Black)
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(enabled = false) { },
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(color = Color.Black)
+            }
         }
     }
 }
