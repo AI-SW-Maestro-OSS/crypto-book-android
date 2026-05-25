@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
+import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
@@ -44,69 +45,79 @@ fun HomeRoute(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltView
 }
 
 @Composable
-internal fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifier: Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(CbTheme.colorScheme.background.secondary),
+internal fun HomeScreen(
+    state: HomeUiState,
+    onEvent: (HomeEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    CbScaffold(
+        modifier = modifier,
+        topBar = {
+            CbMediumTopAppBar(
+                title = "Crypto-Book-Android",
+                actions = {
+                    CbStandardIconButton(
+                        vectorIconRes = CbDrawable.ic_search,
+                        contentDescription = "search",
+                        onClick = { onEvent(HomeEvent.SearchIconClick) },
+                        modifier = Modifier,
+                    )
+                },
+            )
+        },
     ) {
-        CbMediumTopAppBar(
-            title = "Crypto-Book-Android",
-            actions = {
-                CbStandardIconButton(
-                    vectorIconRes = CbDrawable.ic_search,
-                    contentDescription = "search",
-                    onClick = { onEvent(HomeEvent.SearchIconClick) },
-                    modifier = Modifier,
-                )
-            },
-        )
-        state.realtimeStatusMessage?.let { msg ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFF3CD))
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Text(text = msg, color = Color(0xFF8A6D3B))
-            }
-        }
-
-        // Error message
-        state.errorMsg?.let { msg ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Red.copy(alpha = 0.1f))
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Text(text = msg, color = Color.Red)
-            }
-        }
-
-        // Sort Header (TODO: 정렬 기능 구현)
-        SortHeader(
-            symbolSort = SortDirection.None,
-            priceSort = SortDirection.Desc,
-            changeSort = SortDirection.None,
-            onSymbolClick = { /* TODO: 정렬 기능 구현 */ },
-            onPriceClick = { /* TODO: 정렬 기능 구현 */ },
-            onChangeClick = { /* TODO: 정렬 기능 구현 */ },
-        )
-
-        // Coin List
-        Box(modifier = Modifier.fillMaxSize()) {
-            if (state.coins.isNotEmpty()) {
-                CoinListTable(
-                    coins = state.coins.map { it.toCoinListItemData() },
-                    onCoinClick = { symbol -> onEvent(HomeEvent.OnCoinClicked(symbol)) },
-                )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(CbTheme.colorScheme.background.secondary),
+        ) {
+            state.realtimeStatusMessage?.let { msg ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFF3CD))
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(text = msg, color = Color(0xFF8A6D3B))
+                }
             }
 
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            // Error message
+            state.errorMsg?.let { msg ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Red.copy(alpha = 0.1f))
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(text = msg, color = Color.Red)
+                }
+            }
+
+            // Sort Header (TODO: 정렬 기능 구현)
+            SortHeader(
+                symbolSort = SortDirection.None,
+                priceSort = SortDirection.Desc,
+                changeSort = SortDirection.None,
+                onSymbolClick = { /* TODO: 정렬 기능 구현 */ },
+                onPriceClick = { /* TODO: 정렬 기능 구현 */ },
+                onChangeClick = { /* TODO: 정렬 기능 구현 */ },
+            )
+
+            // Coin List
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (state.coins.isNotEmpty()) {
+                    CoinListTable(
+                        coins = state.coins.map { it.toCoinListItemData() },
+                        onCoinClick = { symbol -> onEvent(HomeEvent.OnCoinClicked(symbol)) },
+                    )
+                }
+
+                if (state.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
             }
         }
     }
