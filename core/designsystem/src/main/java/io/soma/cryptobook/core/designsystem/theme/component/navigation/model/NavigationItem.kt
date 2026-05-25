@@ -4,6 +4,4 @@ interface NavigationItem {
     val iconResSelected: Int
     val iconRes: Int
     val labelRes: Int
-    val graphRoute: Any
-    val startDestinationRoute: Any
 }
