@@ -35,12 +35,4 @@ class MessageHelperImpl @Inject constructor() : MessageHelper, MessageCommandSou
     override fun showToast(message: String) {
         _commands.tryEmit(MessageCommand.ShowToast(message))
     }
-
-    override fun showSnackbar(message: String, actionLabel: String?, onAction: (() -> Unit)?) {
-        _commands.tryEmit(MessageCommand.ShowSnackbar(message, actionLabel, onAction))
-    }
-
-    override fun dismissSnackbar() {
-        _commands.tryEmit(MessageCommand.DismissSnackbar)
-    }
 }
