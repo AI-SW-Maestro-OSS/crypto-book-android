@@ -13,12 +13,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.theme.component.snackbar.CbSnackbarHost
+import io.soma.cryptobook.core.designsystem.theme.component.snackbar.model.rememberCbSnackbarHostState
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
-import io.soma.cryptobook.core.presentation.mvi.observeWithoutEffect
+import io.soma.cryptobook.core.presentation.mvi.observe
 import io.soma.cryptobook.settings.presentation.component.ExchangeRateCard
 import io.soma.cryptobook.settings.presentation.component.SettingsOptionCard
 import java.math.BigDecimal
@@ -27,16 +30,28 @@ import java.util.Locale
 
 @Composable
 fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
-    val (state, dispatch) = viewModel.observeWithoutEffect()
+    val snackbarHostState = rememberCbSnackbarHostState()
+    val (state, dispatch) = viewModel.observe { effect ->
+        when (effect) {
+            is SettingsContract.Effect.ShowSnackbar -> snackbarHostState.showSnackbar(
+                message = effect.message,
+                actionLabel = effect.actionLabel,
+            )
+        }
+    }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        CbMediumTopAppBar(
-            title = "Settings",
-        )
+    CbScaffold(
+        modifier = modifier,
+        topBar = {
+            CbMediumTopAppBar(
+                title = "Settings",
+            )
+        },
+        snackbarHost = { CbSnackbarHost(snackbarHostState) },
+    ) {
         SettingsScreen(
             state = state.value,
             onEvent = dispatch,
-            modifier = modifier,
         )
     }
 }

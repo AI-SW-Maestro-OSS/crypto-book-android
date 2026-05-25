@@ -86,10 +86,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun showSnackbarMessage() {
-        messageHelper.showSnackbar(
-            message = context.getString(CryptoString.cb_settings_test_snackbar_message),
-            actionLabel = context.getString(CryptoString.cb_settings_test_snackbar_action),
-            onAction = { },
+        emitEffect(
+            SettingsContract.Effect.ShowSnackbar(
+                message = context.getString(CryptoString.cb_settings_test_snackbar_message),
+                actionLabel = context.getString(CryptoString.cb_settings_test_snackbar_action),
+            ),
         )
     }
 }

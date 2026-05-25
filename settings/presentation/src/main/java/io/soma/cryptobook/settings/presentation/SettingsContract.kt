@@ -23,5 +23,7 @@ interface SettingsContract {
         data object ShowSnackbarMessage : Event
     }
 
-    sealed interface Effect
+    sealed interface Effect {
+        data class ShowSnackbar(val message: String, val actionLabel: String? = null) : Effect
+    }
 }
