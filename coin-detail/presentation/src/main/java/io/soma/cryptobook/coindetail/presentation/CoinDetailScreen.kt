@@ -12,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,8 +34,8 @@ import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIcon
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
+import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.presentation.mvi.observe
 
 @Composable
@@ -61,17 +60,11 @@ fun CoinDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(CbTheme.colorScheme.background.primary),
-    ) {
-        CoinDetailScreen(
-            state = state.value,
-            onEvent = dispatch,
-            modifier = modifier,
-        )
-    }
+    CoinDetailScreen(
+        state = state.value,
+        onEvent = dispatch,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -80,55 +73,60 @@ internal fun CoinDetailScreen(
     onEvent: (Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        CbMediumTopAppBar(
-            title = state.symbol,
-            navigationIcon = NavigationIcon(
-                navigationIcon = painterResource(id = CbDrawable.ic_arrow_back),
-                navigationIconContentDescription = stringResource(
-                    CryptoString.cb_coin_detail_back_cd,
-                ),
-                onNavigationIconClick = { onEvent(Event.OnBackClicked) },
-            ),
-            actions = {
-                CbStandardIconButton(
-                    vectorIconRes = CbDrawable.ic_favorite,
-                    contentDescription = stringResource(
-                        CryptoString.cb_coin_detail_favorite_cd,
+    CbScaffold(
+        modifier = modifier,
+        topBar = {
+            CbMediumTopAppBar(
+                title = state.symbol,
+                navigationIcon = NavigationIcon(
+                    navigationIcon = painterResource(id = CbDrawable.ic_arrow_back),
+                    navigationIconContentDescription = stringResource(
+                        CryptoString.cb_coin_detail_back_cd,
                     ),
-                    onClick = { },
-                    modifier = Modifier,
-                )
-            },
-        )
-
-        state.realtimeStatusMessage?.let { message ->
-            Text(
-                text = message,
-                color = Color(0xFF8A6D3B),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFF3CD))
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    onNavigationIconClick = { onEvent(Event.OnBackClicked) },
+                ),
+                actions = {
+                    CbStandardIconButton(
+                        vectorIconRes = CbDrawable.ic_favorite,
+                        contentDescription = stringResource(
+                            CryptoString.cb_coin_detail_favorite_cd,
+                        ),
+                        onClick = { },
+                        modifier = Modifier,
+                    )
+                },
             )
-        }
-
-        when {
-            state.isLoading -> {
-                CircularProgressIndicator()
-            }
-
-            state.errorMsg != null -> {
+        },
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            state.realtimeStatusMessage?.let { message ->
                 Text(
-                    text = state.errorMsg,
-                    color = MaterialTheme.colorScheme.error,
+                    text = message,
+                    color = Color(0xFF8A6D3B),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFF3CD))
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 )
             }
 
-            else -> {
-                CoinDetailContent(state = state)
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator()
+                }
+
+                state.errorMsg != null -> {
+                    Text(
+                        text = state.errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+
+                else -> {
+                    CoinDetailContent(state = state)
+                }
             }
         }
     }
@@ -171,7 +169,7 @@ private fun CoinDetailContent(state: State, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun CoinDetailScreenPreview() {
     CoinDetailScreen(
@@ -188,21 +186,19 @@ private fun CoinDetailScreenPreview() {
             isLoading = false,
         ),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun CoinDetailScreenLoadingPreview() {
     CoinDetailScreen(
         state = State(isLoading = true),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun CoinDetailScreenErrorPreview() {
     CoinDetailScreen(
@@ -211,11 +207,10 @@ private fun CoinDetailScreenErrorPreview() {
             errorMsg = stringResource(CryptoString.cb_coin_detail_connection_error_state),
         ),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun CoinDetailScreenRealtimeWarningPreview() {
     CoinDetailScreen(
@@ -224,6 +219,5 @@ private fun CoinDetailScreenRealtimeWarningPreview() {
             realtimeStatusMessage = stringResource(CryptoString.cb_realtime_recovering),
         ),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
 }
