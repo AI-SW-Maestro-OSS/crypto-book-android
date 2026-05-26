@@ -9,5 +9,6 @@ class CoinPriceDomainModelMapper @Inject constructor() {
         symbol = coinTickerDto.symbol,
         price = coinTickerDto.lastPrice.toBigDecimal(),
         priceChangePercentage24h = coinTickerDto.priceChangePercent.toDouble(),
+        quoteVolume = coinTickerDto.quoteAssetVolume.toBigDecimal(),
     )
 }

@@ -1,6 +1,8 @@
 package io.soma.cryptobook.home.presentation
 
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
+import io.soma.cryptobook.core.domain.model.CoinSortColumn
+import io.soma.cryptobook.core.domain.model.CoinSortDirection
 import io.soma.cryptobook.core.presentation.Event
 import io.soma.cryptobook.core.presentation.SideEffect
 import io.soma.cryptobook.core.presentation.UiState
@@ -11,6 +13,8 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val errorMsg: String? = null,
     val realtimeStatusMessage: String? = null,
+    val sortColumn: CoinSortColumn = CoinSortColumn.NONE,
+    val sortDirection: CoinSortDirection = CoinSortDirection.NONE,
 ) : UiState
 
 data class CoinItem(
@@ -26,6 +30,7 @@ sealed interface HomeEvent : Event {
     data object OnBackClicked : HomeEvent
     data class OnCoinClicked(val symbol: String) : HomeEvent
     data object SearchIconClick : HomeEvent
+    data class OnSortClick(val column: CoinSortColumn) : HomeEvent
 }
 
 sealed interface HomeSideEffect : SideEffect

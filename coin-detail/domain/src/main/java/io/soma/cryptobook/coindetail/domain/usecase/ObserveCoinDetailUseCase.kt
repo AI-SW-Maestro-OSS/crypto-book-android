@@ -9,15 +9,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class ObserveCoinDetailUseCase @Inject constructor(
-    private val repository: CoinDetailRepository,
-) {
+class ObserveCoinDetailUseCase @Inject constructor(private val repository: CoinDetailRepository) {
     sealed interface Result {
         data object Loading : Result
-        data class Success(
-            val coinDetail: CoinDetailVO,
-            val candles: List<CoinCandleVO>,
-        ) : Result
+        data class Success(val coinDetail: CoinDetailVO, val candles: List<CoinCandleVO>) : Result
 
         sealed interface Error : Result {
             data class Connection(val throwable: Throwable) : Error
@@ -28,6 +23,7 @@ class ObserveCoinDetailUseCase @Inject constructor(
         .map<CoinDetailStreamState, Result> { state ->
             when (state) {
                 is CoinDetailStreamState.Loading -> Result.Loading
+
                 is CoinDetailStreamState.Data -> Result.Success(
                     coinDetail = state.value,
                     candles = state.candles,

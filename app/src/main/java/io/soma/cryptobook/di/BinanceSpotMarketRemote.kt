@@ -26,7 +26,8 @@ interface BinanceSpotApiService {
 
 class DefaultBinanceSpotKlineClient @Inject constructor(
     private val apiService: BinanceSpotApiService,
-) : BaseDataSource(), BinanceSpotKlineClient {
+) : BaseDataSource(),
+    BinanceSpotKlineClient {
     override suspend fun getKlines(
         symbol: String,
         interval: String,
@@ -46,7 +47,8 @@ class DefaultBinanceSpotKlineClient @Inject constructor(
 
 class DefaultBinanceSpotTickerClient @Inject constructor(
     private val apiService: BinanceSpotApiService,
-) : BaseDataSource(), BinanceSpotTickerClient {
+) : BaseDataSource(),
+    BinanceSpotTickerClient {
     override suspend fun getTicker(symbol: String): BinanceSpotTickerDto = checkResponse(
         apiService.getTicker(symbol = symbol),
     )

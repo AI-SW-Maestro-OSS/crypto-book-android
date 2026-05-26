@@ -7,9 +7,8 @@ import io.soma.cryptobook.home.data.model.BinanceTickerDto
 import io.soma.cryptobook.home.data.network.BinanceApiService
 import javax.inject.Inject
 
-class CoinListRemoteDataSource @Inject constructor(
-    private val apiService: BinanceApiService,
-) : BaseDataSource() {
+class CoinListRemoteDataSource @Inject constructor(private val apiService: BinanceApiService) :
+    BaseDataSource() {
     suspend fun getAllTickerPrices(): Outcome<List<BinanceTickerDto>, ApiError> = executeApiCall {
         apiService.getAllTickerPrices()
     }

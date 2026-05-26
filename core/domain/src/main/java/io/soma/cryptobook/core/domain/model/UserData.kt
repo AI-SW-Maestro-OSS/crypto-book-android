@@ -7,4 +7,6 @@ data class UserData(
     val currencyUnit: CurrencyUnit,
     val usdKrwExchangeRate: BigDecimal,
     val appTheme: AppTheme,
+    val coinSortColumn: CoinSortColumn,
+    val coinSortDirection: CoinSortDirection,
 )

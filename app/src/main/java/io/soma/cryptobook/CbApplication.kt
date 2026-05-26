@@ -12,7 +12,9 @@ import io.soma.cryptobook.core.data.realtime.market.MarketRealtimeCoordinator
 import javax.inject.Inject
 
 @HiltAndroidApp
-class CbApplication : Application(), SingletonImageLoader.Factory {
+class CbApplication :
+    Application(),
+    SingletonImageLoader.Factory {
     @Inject
     lateinit var imageLoader: dagger.Lazy<ImageLoader>
 

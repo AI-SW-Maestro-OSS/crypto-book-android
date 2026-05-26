@@ -9,11 +9,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class ObserveSearchCoinsUseCase @Inject constructor(
-    private val coinRepository: CoinRepository,
-) {
-    operator fun invoke(): Flow<Outcome<List<SearchCoin>, CoinPriceError>> {
-        return coinRepository.observeCoinPrices()
+class ObserveSearchCoinsUseCase @Inject constructor(private val coinRepository: CoinRepository) {
+    operator fun invoke(): Flow<Outcome<List<SearchCoin>, CoinPriceError>> =
+        coinRepository.observeCoinPrices()
             .map { outcome ->
                 outcome.mapSuccess { coins ->
                     coins
@@ -22,5 +20,4 @@ class ObserveSearchCoinsUseCase @Inject constructor(
                         .sortedBy { it.symbol }
                 }
             }
-    }
 }

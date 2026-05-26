@@ -12,10 +12,13 @@ data class BinanceTickerDto(
     val lastPrice: String,
     @SerialName("priceChangePercent")
     val priceChangePercent: String,
+    @SerialName("quoteVolume")
+    val quoteVolume: String,
 )
 
 fun BinanceTickerDto.toCoinPriceVO() = CoinPriceVO(
     symbol = symbol,
     price = lastPrice.toBigDecimal(),
     priceChangePercentage24h = priceChangePercent.toDouble(),
+    quoteVolume = quoteVolume.toBigDecimal(),
 )

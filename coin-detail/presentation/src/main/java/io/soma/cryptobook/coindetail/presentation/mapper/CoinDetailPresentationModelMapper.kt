@@ -29,23 +29,21 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
         imageUrl: String,
         isLoading: Boolean = false,
         errorMsg: String? = null,
-    ): CoinDetailContract.State {
-        return CoinDetailContract.State(
-            symbol = vo.symbol,
-            imageUrl = imageUrl,
-            currentPrice = formatPrice(vo.currentPrice, vo.tickSize),
-            priceChangeText = formatPriceChange(vo.priceChange, vo.priceChangePercent, vo.tickSize),
-            priceChangePercent = vo.priceChangePercent,
-            candles = candles.map { it.toUiModel() },
-            high24h = formatPrice(vo.high24h, vo.tickSize),
-            low24h = formatPrice(vo.low24h, vo.tickSize),
-            volume24h = formatVolume(vo.volume24h),
-            openPrice = formatPrice(vo.openPrice, vo.tickSize),
-            tickSize = vo.tickSize,
-            isLoading = isLoading,
-            errorMsg = errorMsg,
-        )
-    }
+    ): CoinDetailContract.State = CoinDetailContract.State(
+        symbol = vo.symbol,
+        imageUrl = imageUrl,
+        currentPrice = formatPrice(vo.currentPrice, vo.tickSize),
+        priceChangeText = formatPriceChange(vo.priceChange, vo.priceChangePercent, vo.tickSize),
+        priceChangePercent = vo.priceChangePercent,
+        candles = candles.map { it.toUiModel() },
+        high24h = formatPrice(vo.high24h, vo.tickSize),
+        low24h = formatPrice(vo.low24h, vo.tickSize),
+        volume24h = formatVolume(vo.volume24h),
+        openPrice = formatPrice(vo.openPrice, vo.tickSize),
+        tickSize = vo.tickSize,
+        isLoading = isLoading,
+        errorMsg = errorMsg,
+    )
 
     /**
      * Formats price as "$70,123.45"

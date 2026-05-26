@@ -18,6 +18,8 @@ import io.soma.cryptobook.core.designsystem.theme.component.snackbar.CbSnackbarH
 import io.soma.cryptobook.core.designsystem.theme.component.snackbar.model.rememberCbSnackbarHostState
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.domain.model.AppTheme
+import io.soma.cryptobook.core.domain.model.CoinSortColumn
+import io.soma.cryptobook.core.domain.model.CoinSortDirection
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
@@ -171,6 +173,8 @@ private fun SettingsScreenPreview() {
                 currencyUnit = CurrencyUnit.DOLLAR,
                 usdKrwExchangeRate = BigDecimal("1450"),
                 appTheme = AppTheme.DARK,
+                coinSortColumn = CoinSortColumn.NONE,
+                coinSortDirection = CoinSortDirection.NONE,
             ),
             isLoading = false,
         ),

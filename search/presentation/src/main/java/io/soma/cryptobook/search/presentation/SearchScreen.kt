@@ -25,6 +25,7 @@ fun SearchRoute(
     val (state, dispatch) = viewModel.observe { effect ->
         when (effect) {
             Effect.NavigateBack -> onBack()
+
             is Effect.NavigateToCoinDetail -> {
                 onCoinClick(effect.coinName)
             }

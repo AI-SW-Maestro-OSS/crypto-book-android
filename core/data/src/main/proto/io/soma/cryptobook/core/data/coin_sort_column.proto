@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "io.soma.cryptobook.core.data";
+option java_multiple_files = true;
+
+enum CoinSortColumnProto {
+  COIN_SORT_COLUMN_UNSPECIFIED = 0;
+  COIN_SORT_COLUMN_SYMBOL = 1;
+  COIN_SORT_COLUMN_PRICE = 2;
+  COIN_SORT_COLUMN_CHANGE = 3;
+  COIN_SORT_COLUMN_VOLUME = 4;
+}

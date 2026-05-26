@@ -9,6 +9,7 @@ class CbNavigator(val state: NavigationState) {
     fun navigateTo(key: NavKey) {
         when (key) {
             in state.topLevelKeys -> goToTopLevel(key)
+
             else -> {
                 state.backStack.remove(key)
                 state.backStack.add(key)

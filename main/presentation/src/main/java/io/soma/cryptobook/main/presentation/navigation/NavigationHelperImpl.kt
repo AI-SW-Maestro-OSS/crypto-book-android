@@ -10,7 +10,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NavigationHelperImpl @Inject constructor() : NavigationHelper, NavCommandSource {
+class NavigationHelperImpl @Inject constructor() :
+    NavigationHelper,
+    NavCommandSource {
     private val _commands = MutableSharedFlow<NavCommand>(
         extraBufferCapacity = 64,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,

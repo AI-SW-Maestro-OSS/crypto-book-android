@@ -80,10 +80,12 @@ class DefaultWsSubscriptionManager @Inject constructor(
                     val previous = desiredRefCount[stream] ?: 0
                     when {
                         previous <= 0 -> Unit
+
                         previous == 1 -> {
                             desiredRefCount.remove(stream)
                             if (stream in confirmed) delta.add(stream)
                         }
+
                         else -> desiredRefCount[stream] = previous - 1
                     }
                 }
@@ -98,9 +100,11 @@ class DefaultWsSubscriptionManager @Inject constructor(
     private fun handleSessionEvent(event: BinanceWebSocketClient.Event) {
         when (event) {
             is BinanceWebSocketClient.Event.Connected -> scheduleReconcile()
+
             is BinanceWebSocketClient.Event.Message -> {
                 scope.launch { handleControlMessage(event.message) }
             }
+
             is BinanceWebSocketClient.Event.Disconnected,
             is BinanceWebSocketClient.Event.Error,
             -> scope.launch {
@@ -153,10 +157,12 @@ class DefaultWsSubscriptionManager @Inject constructor(
                     applySuccess(method, streams)
                     return ack
                 }
+
                 is RequestAck.ListSuccess -> {
                     applyListResult(ack.streams)
                     return ack
                 }
+
                 is RequestAck.Failure -> lastCause = ack.cause
             }
             if (attempt < policy.maxRequestRetry) delay(policy.backoffForAttempt(attempt))
@@ -217,6 +223,7 @@ class DefaultWsSubscriptionManager @Inject constructor(
                     AckErrorException(pending.method, control.id, control.code, control.msg),
                 ),
             )
+
             is ControlMessage.Result -> {
                 if (pending.method == WsSubscriptionMethod.ListSubscriptions) {
                     pending.deferred.complete(

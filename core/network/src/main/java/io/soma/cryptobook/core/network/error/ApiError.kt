@@ -18,7 +18,5 @@ sealed interface ApiError {
         val message: String?,
     ) : ApiError
 
-    data class Unknown(
-        val message: String?,
-    ) : ApiError
+    data class Unknown(val message: String?) : ApiError
 }

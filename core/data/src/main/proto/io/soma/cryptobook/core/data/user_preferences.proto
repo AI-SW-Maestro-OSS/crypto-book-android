@@ -3,6 +3,8 @@ syntax = "proto3";
 import "io/soma/cryptobook/core/data/language.proto";
 import "io/soma/cryptobook/core/data/currency_unit.proto";
 import "io/soma/cryptobook/core/data/app_theme.proto";
+import "io/soma/cryptobook/core/data/coin_sort_column.proto";
+import "io/soma/cryptobook/core/data/coin_sort_direction.proto";
 
 option java_package = "io.soma.cryptobook.core.data";
 option java_multiple_files = true;
@@ -13,4 +15,6 @@ message UserPreferences {
   int64 usd_krw_exchange_rate = 3;
   int64 last_tick_size_checked_at_millis = 4;
   AppThemeProto app_theme = 5;
+  CoinSortColumnProto coin_sort_column = 6;
+  CoinSortDirectionProto coin_sort_direction = 7;
 }

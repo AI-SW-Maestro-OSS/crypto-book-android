@@ -19,13 +19,17 @@ class DefaultObserveMarketRealtimeState @Inject constructor(
     ) { started, sessionState ->
         when {
             !started -> MarketRealtimeState.Inactive
+
             sessionState is WsSessionState.Exhausted -> MarketRealtimeState.Failed(
                 cause = sessionState.cause ?: IllegalStateException("ws session exhausted"),
                 occurredAtMillis = System.currentTimeMillis(),
             )
+
             sessionState is WsSessionState.Connected -> MarketRealtimeState.Connected
+
             sessionState is WsSessionState.Reconnecting ||
                 sessionState is WsSessionState.Rotating -> MarketRealtimeState.Recovering
+
             else -> MarketRealtimeState.Connecting
         }
     }.distinctUntilChanged()

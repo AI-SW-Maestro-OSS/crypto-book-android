@@ -121,6 +121,7 @@ class CoinDetailViewModel @AssistedInject constructor(
         MarketRealtimeState.Recovering -> context.getString(
             CryptoString.cb_realtime_recovering,
         )
+
         is MarketRealtimeState.Failed -> context.getString(
             CryptoString.cb_realtime_disconnected,
         )

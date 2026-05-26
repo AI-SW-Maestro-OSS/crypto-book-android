@@ -9,10 +9,7 @@ import io.soma.cryptobook.core.presentation.mvi.UnidirectionalViewModel
 interface SettingsContract {
     interface ViewModel : UnidirectionalViewModel<State, Event, Effect>
 
-    data class State(
-        val userData: UserData? = null,
-        val isLoading: Boolean = true,
-    )
+    data class State(val userData: UserData? = null, val isLoading: Boolean = true)
 
     sealed interface Event {
         data class SetLanguage(val language: Language) : Event

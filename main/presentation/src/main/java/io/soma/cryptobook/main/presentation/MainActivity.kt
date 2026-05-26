@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             CbTheme {
                 when {
                     uiState.shouldKeepSplashScreen() -> {}
+
                     uiState.shouldNavigateToUpdate() -> {
                         UpdateRequiredScreen()
                     }

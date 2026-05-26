@@ -24,7 +24,9 @@ class LinkRouter @Inject constructor() {
             }
 
             "home" -> HomeNavKey
+
             "settings" -> SettingsNavKey
+
             else -> HomeNavKey
         }
     }

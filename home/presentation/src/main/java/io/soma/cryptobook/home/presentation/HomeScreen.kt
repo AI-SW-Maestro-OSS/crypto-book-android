@@ -26,6 +26,8 @@ import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIco
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.domain.model.CoinSortColumn
+import io.soma.cryptobook.core.domain.model.CoinSortDirection
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListItemData
 import io.soma.cryptobook.home.presentation.component.coinlist.CoinListTable
@@ -96,16 +98,15 @@ internal fun HomeScreen(
                 }
             }
 
-            // Sort Header (TODO: 정렬 기능 구현)
             SortHeader(
-                symbolSort = SortDirection.Asc,
-                priceSort = SortDirection.Desc,
-                changeSort = SortDirection.None,
-                volumeSort = SortDirection.None,
-                onSymbolClick = { /* TODO: 정렬 기능 구현 */ },
-                onPriceClick = { /* TODO: 정렬 기능 구현 */ },
-                onChangeClick = { /* TODO: 정렬 기능 구현 */ },
-                onVolumeClick = { /* TODO: 정렬 기능 구현 */ },
+                symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
+                priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
+                changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
+                volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
+                onSymbolClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.SYMBOL)) },
+                onPriceClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.PRICE)) },
+                onChangeClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.CHANGE)) },
+                onVolumeClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.VOLUME)) },
             )
 
             // Coin List
@@ -124,6 +125,17 @@ internal fun HomeScreen(
         }
     }
 }
+
+private fun HomeUiState.sortDirectionFor(column: CoinSortColumn): SortDirection =
+    if (sortColumn != column) {
+        SortDirection.None
+    } else {
+        when (sortDirection) {
+            CoinSortDirection.NONE -> SortDirection.None
+            CoinSortDirection.ASC -> SortDirection.Asc
+            CoinSortDirection.DESC -> SortDirection.Desc
+        }
+    }
 
 /**
  * Convert CoinItem to CoinListItemData

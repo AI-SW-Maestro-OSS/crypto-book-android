@@ -4,10 +4,7 @@ import io.soma.cryptobook.core.data.model.CoinKlineDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-data class KlineKey(
-    val symbol: String,
-    val interval: String,
-)
+data class KlineKey(val symbol: String, val interval: String)
 
 interface WsKlineTable {
     val table: StateFlow<Map<KlineKey, List<CoinKlineDto>>>

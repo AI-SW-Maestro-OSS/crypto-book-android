@@ -11,9 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-public abstract class BaseViewModel<STATE, EVENT, EFFECT>(
-    initialState: STATE,
-) : ViewModel(),
+public abstract class BaseViewModel<STATE, EVENT, EFFECT>(initialState: STATE) :
+    ViewModel(),
     UnidirectionalViewModel<STATE, EVENT, EFFECT> {
 
     private val _state = MutableStateFlow(initialState)

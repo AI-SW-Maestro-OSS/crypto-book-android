@@ -90,7 +90,9 @@ fun CryptoBookApp(
         messageSource.commands.collect { cmd ->
             when (cmd) {
                 is MessageCommand.ShowLoading -> isLoading = true
+
                 is MessageCommand.HideLoading -> isLoading = false
+
                 is MessageCommand.ShowToast -> {
                     Toast.makeText(context, cmd.message, Toast.LENGTH_SHORT).show()
                 }

@@ -11,22 +11,20 @@ import kotlin.coroutines.cancellation.CancellationException
 abstract class BaseDataSource {
     protected suspend fun <T> executeApiCall(
         block: suspend () -> Response<T>,
-    ): Outcome<T, ApiError> {
-        return try {
-            responseToOutcome(block())
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: IOException) {
-            Outcome.Failure(
-                error = ApiError.Network,
-                cause = exception,
-            )
-        } catch (exception: Exception) {
-            Outcome.Failure(
-                error = ApiError.Unknown(exception.message),
-                cause = exception,
-            )
-        }
+    ): Outcome<T, ApiError> = try {
+        responseToOutcome(block())
+    } catch (exception: CancellationException) {
+        throw exception
+    } catch (exception: IOException) {
+        Outcome.Failure(
+            error = ApiError.Network,
+            cause = exception,
+        )
+    } catch (exception: Exception) {
+        Outcome.Failure(
+            error = ApiError.Unknown(exception.message),
+            cause = exception,
+        )
     }
 
     protected fun <T> checkResponse(response: Response<T>): T {

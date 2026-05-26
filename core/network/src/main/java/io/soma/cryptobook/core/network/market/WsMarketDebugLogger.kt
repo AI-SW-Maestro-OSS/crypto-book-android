@@ -58,7 +58,9 @@ internal class WsMarketDebugLogger(
 
     private fun streamOf(message: WsMarketMessage): String = when (message) {
         is WsMarketMessage.AllMiniTickers -> ALL_MINI_TICKERS_STREAM
+
         is WsMarketMessage.SymbolTicker -> "${message.ticker.symbol.lowercase()}@ticker"
+
         is WsMarketMessage.SymbolKline -> {
             val symbol = message.klineEvent.symbol.lowercase()
             val interval = message.klineEvent.kline.interval.lowercase()

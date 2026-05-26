@@ -10,7 +10,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MessageHelperImpl @Inject constructor() : MessageHelper, MessageCommandSource {
+class MessageHelperImpl @Inject constructor() :
+    MessageHelper,
+    MessageCommandSource {
     private val loadingCount = atomic(0)
 
     private val _commands = MutableSharedFlow<MessageCommand>(

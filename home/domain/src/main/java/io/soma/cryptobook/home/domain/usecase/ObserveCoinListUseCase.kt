@@ -7,10 +7,7 @@ import io.soma.cryptobook.core.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class ObserveCoinListUseCase @Inject constructor(
-    private val coinRepository: CoinRepository,
-) {
-    operator fun invoke(): Flow<Outcome<List<CoinPriceVO>, CoinPriceError>> {
-        return coinRepository.observeCoinPrices()
-    }
+class ObserveCoinListUseCase @Inject constructor(private val coinRepository: CoinRepository) {
+    operator fun invoke(): Flow<Outcome<List<CoinPriceVO>, CoinPriceError>> =
+        coinRepository.observeCoinPrices()
 }

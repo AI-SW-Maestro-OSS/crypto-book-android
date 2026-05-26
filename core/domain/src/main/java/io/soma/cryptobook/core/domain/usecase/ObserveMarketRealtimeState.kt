@@ -12,8 +12,5 @@ sealed interface MarketRealtimeState {
     data object Connected : MarketRealtimeState
     data object Recovering : MarketRealtimeState
 
-    data class Failed(
-        val cause: Throwable,
-        val occurredAtMillis: Long,
-    ) : MarketRealtimeState
+    data class Failed(val cause: Throwable, val occurredAtMillis: Long) : MarketRealtimeState
 }

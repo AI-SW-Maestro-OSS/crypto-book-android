@@ -142,27 +142,25 @@ constructor(
         coinPrice.copy(tickSize = tickSizes[coinPrice.symbol])
     }
 
-    private fun ApiError.toCoinPriceError(): CoinPriceError {
-        return when (this) {
-            ApiError.Network -> CoinPriceError.Network
+    private fun ApiError.toCoinPriceError(): CoinPriceError = when (this) {
+        ApiError.Network -> CoinPriceError.Network
 
-            is ApiError.Http -> when {
-                status == HttpResponseStatus.RateLimitExceeded ||
-                    status == HttpResponseStatus.IpBanned -> CoinPriceError.RateLimited
+        is ApiError.Http -> when {
+            status == HttpResponseStatus.RateLimitExceeded ||
+                status == HttpResponseStatus.IpBanned -> CoinPriceError.RateLimited
 
-                status == HttpResponseStatus.InternalError ||
-                    status == HttpResponseStatus.Unavailable ||
-                    rawCode in 500..599 -> CoinPriceError.Server
+            status == HttpResponseStatus.InternalError ||
+                status == HttpResponseStatus.Unavailable ||
+                rawCode in 500..599 -> CoinPriceError.Server
 
-                status == HttpResponseStatus.ClientTimeout -> CoinPriceError.Network
+            status == HttpResponseStatus.ClientTimeout -> CoinPriceError.Network
 
-                else -> CoinPriceError.Unknown(message)
-            }
-
-            is ApiError.UnexpectedBody -> CoinPriceError.UnexpectedResponse
-
-            is ApiError.Unknown -> CoinPriceError.Unknown(message)
+            else -> CoinPriceError.Unknown(message)
         }
+
+        is ApiError.UnexpectedBody -> CoinPriceError.UnexpectedResponse
+
+        is ApiError.Unknown -> CoinPriceError.Unknown(message)
     }
 
     private fun String.isUsdtPair(): Boolean = endsWith(QUOTE_USDT) && this != QUOTE_USDT

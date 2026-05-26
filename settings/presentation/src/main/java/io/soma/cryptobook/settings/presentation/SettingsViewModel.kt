@@ -38,13 +38,17 @@ class SettingsViewModel @Inject constructor(
     override fun event(event: SettingsContract.Event) {
         when (event) {
             is SettingsContract.Event.SetLanguage -> onLanguageChanged(event.language)
+
             is SettingsContract.Event.SetCurrencyUnit -> onPriceCurrencyChanged(
                 event.currencyUnit,
             )
+
             is SettingsContract.Event.SetAppTheme -> onAppThemeChanged(event.appTheme)
 
             is SettingsContract.Event.NavigateToHome -> navigateToHome()
+
             is SettingsContract.Event.ShowLoadingMessage -> showLoadingMessage()
+
             is SettingsContract.Event.ShowSnackbarMessage -> showSnackbarMessage()
         }
     }

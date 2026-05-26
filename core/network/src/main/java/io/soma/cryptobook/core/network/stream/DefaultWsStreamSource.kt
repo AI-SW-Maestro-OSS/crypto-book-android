@@ -75,10 +75,13 @@ class DefaultWsStreamSource(
 
     private fun WsMarketMessage.matches(streams: Set<String>): Boolean = when (this) {
         is WsMarketMessage.AllMiniTickers -> OVERVIEW_STREAM in streams
+
         is WsMarketMessage.SymbolTicker -> "${ticker.symbol.lowercase()}@ticker" in streams
+
         is WsMarketMessage.SymbolKline ->
             "${klineEvent.symbol.lowercase()}@kline_${klineEvent.kline.interval.lowercase()}" in
                 streams
+
         WsMarketMessage.Ignored -> false
     }
 

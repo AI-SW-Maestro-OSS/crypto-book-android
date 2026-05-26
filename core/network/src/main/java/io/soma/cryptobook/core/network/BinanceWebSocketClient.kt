@@ -17,10 +17,8 @@ import okhttp3.WebSocketListener
 import org.json.JSONArray
 import org.json.JSONObject
 
-class BinanceWebSocketClient(
-    private val client: OkHttpClient,
-    scope: CoroutineScope,
-) : WsControlTransport {
+class BinanceWebSocketClient(private val client: OkHttpClient, scope: CoroutineScope) :
+    WsControlTransport {
     sealed interface Event {
         data class Message(val message: String) : Event
         data class Error(val throwable: Throwable) : Event

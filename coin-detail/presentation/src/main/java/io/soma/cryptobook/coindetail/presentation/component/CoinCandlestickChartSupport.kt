@@ -185,10 +185,7 @@ private fun List<CandleUiModel>.visibleSlice(
     return subList(startIndex, endExclusive)
 }
 
-internal data class ChartPriceRange(
-    val min: Double,
-    val max: Double,
-)
+internal data class ChartPriceRange(val min: Double, val max: Double)
 
 private fun List<CandleUiModel>.toPriceRange(): ChartPriceRange? {
     if (isEmpty()) return null

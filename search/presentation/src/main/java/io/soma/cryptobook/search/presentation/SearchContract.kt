@@ -12,22 +12,16 @@ interface SearchContract {
         sealed interface ViewState {
             data object Loading : ViewState
             data class Empty(val message: String?) : ViewState
-            data class Content(
-                val items: List<DisplayItem>,
-            ) : ViewState
+            data class Content(val items: List<DisplayItem>) : ViewState
 
             data class Error(val message: String) : ViewState
         }
     }
 
     sealed interface Event {
-        data class OnSearchTermChanged(
-            val searchTerm: String,
-        ) : Event
+        data class OnSearchTermChanged(val searchTerm: String) : Event
 
-        data class OnListItemClick(
-            val coinName: String,
-        ) : Event
+        data class OnListItemClick(val coinName: String) : Event
 
         object OnBackClicked : Event
     }
@@ -35,13 +29,8 @@ interface SearchContract {
     sealed interface Effect {
         data object NavigateBack : Effect
 
-        data class NavigateToCoinDetail(
-            val coinName: String,
-        ) : Effect
+        data class NavigateToCoinDetail(val coinName: String) : Effect
     }
 }
 
-data class DisplayItem(
-    val symbol: String,
-    val imageUrl: String,
-)
+data class DisplayItem(val symbol: String, val imageUrl: String)

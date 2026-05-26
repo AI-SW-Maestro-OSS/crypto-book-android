@@ -9,9 +9,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 
-class WsMarketMessageParser @Inject constructor(
-    private val json: Json,
-) {
+class WsMarketMessageParser @Inject constructor(private val json: Json) {
     companion object {
         private const val TAG = "WsMarketMessageParser"
         private const val EVENT_24HR_TICKER = "24hrTicker"

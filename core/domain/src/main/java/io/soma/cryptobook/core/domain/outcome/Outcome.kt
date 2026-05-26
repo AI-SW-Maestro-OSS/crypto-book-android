@@ -10,10 +10,8 @@ sealed interface Outcome<out SUCCESS, out FAILURE> {
 
     data class Success<out SUCCESS>(val data: SUCCESS) : Outcome<SUCCESS, Nothing>
 
-    data class Failure<out FAILURE>(
-        val error: FAILURE,
-        val cause: Any? = null,
-    ) : Outcome<Nothing, FAILURE>
+    data class Failure<out FAILURE>(val error: FAILURE, val cause: Any? = null) :
+        Outcome<Nothing, FAILURE>
 
     val isSuccess: Boolean
         get() = this is Success
@@ -47,11 +45,9 @@ sealed interface Outcome<out SUCCESS, out FAILURE> {
 inline fun <IN_SUCCESS, IN_FAILURE, OUT_SUCCESS, OUT_FAILURE> Outcome<IN_SUCCESS, IN_FAILURE>.map(
     transformSuccess: (IN_SUCCESS) -> OUT_SUCCESS,
     transformFailure: (IN_FAILURE, Any?) -> OUT_FAILURE,
-): Outcome<OUT_SUCCESS, OUT_FAILURE> {
-    return when (this) {
-        is Outcome.Success -> Outcome.success(transformSuccess(data))
-        is Outcome.Failure -> Outcome.failure(transformFailure(error, cause))
-    }
+): Outcome<OUT_SUCCESS, OUT_FAILURE> = when (this) {
+    is Outcome.Success -> Outcome.success(transformSuccess(data))
+    is Outcome.Failure -> Outcome.failure(transformFailure(error, cause))
 }
 
 /**
@@ -61,11 +57,9 @@ inline fun <IN_SUCCESS, IN_FAILURE, OUT_SUCCESS, OUT_FAILURE> Outcome<IN_SUCCESS
  */
 inline fun <IN_SUCCESS, FAILURE, OUT_SUCCESS> Outcome<IN_SUCCESS, FAILURE>.mapSuccess(
     transformSuccess: (IN_SUCCESS) -> OUT_SUCCESS,
-): Outcome<OUT_SUCCESS, FAILURE> {
-    return when (this) {
-        is Outcome.Success -> Outcome.success(transformSuccess(data))
-        is Outcome.Failure -> this
-    }
+): Outcome<OUT_SUCCESS, FAILURE> = when (this) {
+    is Outcome.Success -> Outcome.success(transformSuccess(data))
+    is Outcome.Failure -> this
 }
 
 /**
@@ -73,11 +67,9 @@ inline fun <IN_SUCCESS, FAILURE, OUT_SUCCESS> Outcome<IN_SUCCESS, FAILURE>.mapSu
  */
 inline fun <IN_SUCCESS, FAILURE, OUT_SUCCESS> Outcome<IN_SUCCESS, FAILURE>.flatMapSuccess(
     transformSuccess: (IN_SUCCESS) -> Outcome<OUT_SUCCESS, FAILURE>,
-): Outcome<OUT_SUCCESS, FAILURE> {
-    return when (this) {
-        is Outcome.Success -> transformSuccess(data)
-        is Outcome.Failure -> this
-    }
+): Outcome<OUT_SUCCESS, FAILURE> = when (this) {
+    is Outcome.Success -> transformSuccess(data)
+    is Outcome.Failure -> this
 }
 
 /**
@@ -87,11 +79,9 @@ inline fun <IN_SUCCESS, FAILURE, OUT_SUCCESS> Outcome<IN_SUCCESS, FAILURE>.flatM
  */
 inline fun <SUCCESS, IN_FAILURE, OUT_FAILURE> Outcome<SUCCESS, IN_FAILURE>.mapFailure(
     transformFailure: (IN_FAILURE, Any?) -> OUT_FAILURE,
-): Outcome<SUCCESS, OUT_FAILURE> {
-    return when (this) {
-        is Outcome.Success -> this
-        is Outcome.Failure -> Outcome.failure(transformFailure(error, cause))
-    }
+): Outcome<SUCCESS, OUT_FAILURE> = when (this) {
+    is Outcome.Success -> this
+    is Outcome.Failure -> Outcome.failure(transformFailure(error, cause))
 }
 
 /**
@@ -132,9 +122,7 @@ suspend fun <SUCCESS, FAILURE> Outcome<SUCCESS, FAILURE>.handleAsync(
 inline fun <SUCCESS, FAILURE, R> Outcome<SUCCESS, FAILURE>.fold(
     onSuccess: (SUCCESS) -> R,
     onFailure: (FAILURE) -> R,
-): R {
-    return when (this) {
-        is Outcome.Success -> onSuccess(data)
-        is Outcome.Failure -> onFailure(error)
-    }
+): R = when (this) {
+    is Outcome.Success -> onSuccess(data)
+    is Outcome.Failure -> onFailure(error)
 }
