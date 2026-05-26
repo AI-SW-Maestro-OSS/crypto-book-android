@@ -37,8 +37,9 @@
     <string name="cb_home_search_hint">Search</string>
     <string name="cb_home_search_icon_cd">Search</string>
     <string name="cb_home_sort_symbol">Symbol</string>
-    <string name="cb_home_sort_price">Price ($)</string>
-    <string name="cb_home_sort_change_24h">24h Change %</string>
+    <string name="cb_home_sort_price">Last Price</string>
+    <string name="cb_home_sort_change_24h">24h Chg</string>
+    <string name="cb_home_sort_volume">Volume</string>
     <string name="cb_home_sort_icon_cd_format">Sort %1$s</string>
     <string name="cb_home_coin_icon_cd_format">%1$s coin icon</string>
 

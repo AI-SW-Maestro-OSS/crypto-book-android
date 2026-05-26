@@ -98,12 +98,14 @@ internal fun HomeScreen(
 
             // Sort Header (TODO: 정렬 기능 구현)
             SortHeader(
-                symbolSort = SortDirection.None,
+                symbolSort = SortDirection.Asc,
                 priceSort = SortDirection.Desc,
                 changeSort = SortDirection.None,
+                volumeSort = SortDirection.None,
                 onSymbolClick = { /* TODO: 정렬 기능 구현 */ },
                 onPriceClick = { /* TODO: 정렬 기능 구현 */ },
                 onChangeClick = { /* TODO: 정렬 기능 구현 */ },
+                onVolumeClick = { /* TODO: 정렬 기능 구현 */ },
             )
 
             // Coin List

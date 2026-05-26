@@ -1,6 +1,7 @@
 package io.soma.cryptobook.home.presentation.component.sortheader
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -8,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.fontFamily
+import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 
 /**
@@ -62,42 +65,43 @@ fun SortHeaderItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val textColor = when (sortDirection) {
-        SortDirection.None -> CbTheme.colorScheme.text.primary
-        SortDirection.Asc, SortDirection.Desc -> CbTheme.colorScheme.text.interaction
-    }
-
-    val iconRes = when (sortDirection) {
-        SortDirection.None -> R.drawable.ic_sort_none
-        SortDirection.Asc -> R.drawable.ic_sort_asc
-        SortDirection.Desc -> R.drawable.ic_sort_desc
-    }
-
     Row(
         modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
-            color = textColor,
+            style = CbTheme.typography.labelMedium,
+            color = CbTheme.colorScheme.text.primary,
         )
-        Icon(
-            painter = painterResource(id = iconRes),
-            contentDescription = stringResource(
-                CryptoString.cb_home_sort_icon_cd_format,
-                label,
-            ),
-            tint = textColor,
-            modifier = Modifier.size(20.dp),
-        )
+        Box(modifier = Modifier.size(16.dp)) {
+            // 베이스: 양쪽 화살표, 항상 표시 (흐리게)
+            Icon(
+                painter = painterResource(CbDrawable.ic_sort_none),
+                contentDescription = stringResource(CryptoString.cb_home_sort_icon_cd_format, label),
+                tint = CbTheme.colorScheme.background.selected, // dimmed 기본색
+                modifier = Modifier.matchParentSize(),
+            )
+            // 오버레이: 활성 방향만 강조
+            val overlayRes = when (sortDirection) {
+                SortDirection.Asc -> CbDrawable.ic_sort_asc
+                SortDirection.Desc -> CbDrawable.ic_sort_desc
+                SortDirection.None -> null
+            }
+            overlayRes?.let {
+                Icon(
+                    painter = painterResource(it),
+                    contentDescription = null,
+                    tint = CbTheme.colorScheme.text.primary,
+                    modifier = Modifier.matchParentSize(),
+                )
+            }
+        }
+
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SortHeaderItemAscPreview() {
     SortHeaderItem(
@@ -107,7 +111,7 @@ private fun SortHeaderItemAscPreview() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SortHeaderItemDescPreview() {
     SortHeaderItem(
@@ -117,7 +121,7 @@ private fun SortHeaderItemDescPreview() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SortHeaderItemNonePreview() {
     SortHeaderItem(

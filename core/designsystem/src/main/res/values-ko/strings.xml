@@ -43,6 +43,7 @@
     <string name="cb_home_sort_symbol">심볼</string>
     <string name="cb_home_sort_price">가격 ($)</string>
     <string name="cb_home_sort_change_24h">24시간 변동률 %</string>
+    <string name="cb_home_sort_volume">거래량</string>
     <string name="cb_home_sort_icon_cd_format">%1$s 정렬</string>
     <string name="cb_home_coin_icon_cd_format">%1$s 코인 아이콘</string>
 
