@@ -10,12 +10,19 @@ import androidx.compose.runtime.compositionLocalOf
 import io.soma.cryptobook.core.designsystem.theme.theme.color.CbColorScheme
 import io.soma.cryptobook.core.designsystem.theme.theme.color.darkCbColorScheme
 import io.soma.cryptobook.core.designsystem.theme.theme.color.lightCbColorScheme
+import io.soma.cryptobook.core.designsystem.theme.theme.type.CryptoTypography
+import io.soma.cryptobook.core.designsystem.theme.theme.type.cryptoTypography
 
 object CbTheme {
     val colorScheme: CbColorScheme
         @Composable
         @ReadOnlyComposable
         get() = LocalCbColorScheme.current
+
+    val typography: CryptoTypography
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalCryptoTypography.current
 }
 
 @Composable
@@ -35,6 +42,7 @@ fun CbTheme(
     CompositionLocalProvider(
         LocalBackgroundTheme provides defaultBackgroundTheme,
         LocalCbColorScheme provides cbColorScheme,
+        LocalCryptoTypography provides cryptoTypography
     ) {
         MaterialTheme(
             content = content,
@@ -44,3 +52,6 @@ fun CbTheme(
 
 val LocalCbColorScheme: ProvidableCompositionLocal<CbColorScheme> =
     compositionLocalOf { darkCbColorScheme }
+
+val LocalCryptoTypography: ProvidableCompositionLocal<CryptoTypography> =
+    compositionLocalOf { cryptoTypography }
