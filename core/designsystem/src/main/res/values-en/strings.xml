@@ -42,7 +42,10 @@
     <string name="cb_home_sort_volume">Volume</string>
     <string name="cb_home_sort_icon_cd_format">Sort %1$s</string>
     <string name="cb_home_coin_icon_cd_format">%1$s coin icon</string>
-
+    <string name="cb_settings_theme_title">Theme</string>
+    <string name="cb_settings_theme_description">Choose the app appearance.</string>
+    <string name="cb_settings_theme_light">Light</string>
+    <string name="cb_settings_theme_dark">Dark</string>
     <!-- Coin detail screen -->
     <string name="cb_coin_detail_back_cd">Back</string>
     <string name="cb_coin_detail_favorite_cd">Favorite</string>
