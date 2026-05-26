@@ -43,7 +43,7 @@ val darkCbColorScheme: CbColorScheme = CbColorScheme(
 val lightCbColorScheme: CbColorScheme = CbColorScheme(
     text = CbColorScheme.TextColors(
         primary = Color(0xFF1A1A1A),
-        secondary = Color(0xFF4B5563),
+        secondary = Color(0xFF9CA3AF),
         interaction = Color(0xFF0d59f2)
     ),
     background = CbColorScheme.BackgroundColors(
