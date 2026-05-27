@@ -2,6 +2,8 @@
 <resources>
     <!-- Top-level navigation -->
     <string name="cb_top_level_home">Home</string>
+    <string name="cb_top_level_watchlist">Watchlist</string>
+    <string name="cb_top_level_diary">Diary</string>
     <string name="cb_top_level_settings">Settings</string>
 
     <!-- Settings screen -->

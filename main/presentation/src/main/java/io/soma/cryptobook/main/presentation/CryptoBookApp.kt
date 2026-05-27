@@ -27,6 +27,7 @@ import io.soma.cryptobook.coindetail.presentation.navigation.coinDetailEntry
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.model.ScaffoldNavigationData
 import io.soma.cryptobook.core.presentation.jank.TrackDisposableJank
+import io.soma.cryptobook.diary.presentation.navigation.diaryEntry
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
 import io.soma.cryptobook.home.presentation.navigation.homeEntry
 import io.soma.cryptobook.main.presentation.message.MessageCommand
@@ -40,6 +41,7 @@ import io.soma.cryptobook.navigation.NavigationState
 import io.soma.cryptobook.navigation.rememberNavigationState
 import io.soma.cryptobook.search.presentation.navigation.searchEntry
 import io.soma.cryptobook.settings.presentation.navigation.settingsEntry
+import io.soma.cryptobook.watchlist.presentation.navigation.watchlistEntry
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -128,6 +130,8 @@ fun CryptoBookApp(
                 entryProvider = entryProvider {
                     settingsEntry()
                     homeEntry()
+                    watchlistEntry()
+                    diaryEntry()
                     coinDetailEntry(navigator::goBack)
                     searchEntry(
                         onBack = navigator::goBack,

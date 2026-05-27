@@ -2,6 +2,8 @@
 <resources>
     <!-- Top-level navigation -->
     <string name="cb_top_level_home">홈</string>
+    <string name="cb_top_level_watchlist">관심목록</string>
+    <string name="cb_top_level_diary">다이어리</string>
     <string name="cb_top_level_settings">설정</string>
 
     <!-- Settings screen -->

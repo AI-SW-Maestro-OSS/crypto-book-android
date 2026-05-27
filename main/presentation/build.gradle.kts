@@ -15,6 +15,8 @@ dependencies {
     implementation(projects.home.presentation)
     implementation(projects.settings.presentation)
     implementation(projects.search.presentation)
+    implementation(projects.watchlist.presentation)
+    implementation(projects.diary.presentation)
     implementation(projects.core.presentation)
 
     implementation(libs.androidx.appcompat)

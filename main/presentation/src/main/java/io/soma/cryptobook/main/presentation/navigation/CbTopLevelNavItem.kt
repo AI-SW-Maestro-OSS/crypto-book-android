@@ -4,8 +4,10 @@ import androidx.navigation3.runtime.NavKey
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.component.navigation.model.NavigationItem
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
+import io.soma.cryptobook.diary.presentation.navigation.DiaryNavKey
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
 import io.soma.cryptobook.settings.presentation.navigation.SettingsNavKey
+import io.soma.cryptobook.watchlist.presentation.navigation.WatchlistNavKey
 
 enum class CbTopLevelNavItem(
     override val iconRes: Int,
@@ -18,6 +20,18 @@ enum class CbTopLevelNavItem(
         iconResSelected = CbDrawable.ic_home_filled,
         labelRes = CryptoString.cb_top_level_home,
         navKey = HomeNavKey,
+    ),
+    WATCHLIST(
+        iconRes = CbDrawable.ic_watchlist,
+        iconResSelected = CbDrawable.ic_watchlist_filled,
+        labelRes = CryptoString.cb_top_level_watchlist,
+        navKey = WatchlistNavKey,
+    ),
+    DIARY(
+        iconRes = CbDrawable.ic_diary,
+        iconResSelected = CbDrawable.ic_diary_filled,
+        labelRes = CryptoString.cb_top_level_diary,
+        navKey = DiaryNavKey,
     ),
     SETTINGS(
         iconRes = CbDrawable.ic_settings,
