@@ -96,7 +96,11 @@ fun CryptoBookApp(
                 is MessageCommand.HideLoading -> isLoading = false
 
                 is MessageCommand.ShowToast -> {
-                    Toast.makeText(context, cmd.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        cmd.text.toString(context.resources),
+                        Toast.LENGTH_SHORT,
+                    ).show()
                 }
             }
         }

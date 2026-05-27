@@ -1,10 +1,9 @@
 package io.soma.cryptobook.splash.presentation
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import io.soma.cryptobook.core.domain.manager.BuildInfoManager
 import io.soma.cryptobook.core.domain.outcome.handle
 import io.soma.cryptobook.core.domain.repository.CoinRepository
 import io.soma.cryptobook.core.domain.usecase.RefreshExchangeRateUseCase
@@ -20,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val buildInfoManager: BuildInfoManager,
     private val checkUpdateRequirementUseCase: CheckUpdateRequirementUseCase,
     private val refreshExchangeRateUseCase: RefreshExchangeRateUseCase,
     private val refreshTickSizesIfRequiredUseCase: RefreshTickSizesIfRequiredUseCase,
@@ -32,9 +31,7 @@ class SplashViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val currentVersion = context.packageManager
-                .getPackageInfo(context.packageName, 0)
-                .versionName.orEmpty()
+            val currentVersion = buildInfoManager.versionName
 
             val versionCheckJob = async {
                 runCatching {

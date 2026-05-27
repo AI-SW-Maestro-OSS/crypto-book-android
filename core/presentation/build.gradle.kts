@@ -10,6 +10,7 @@ android {
 
 dependencies {
     api(libs.androidx.metrics)
+    implementation(projects.core.designsystem)
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)

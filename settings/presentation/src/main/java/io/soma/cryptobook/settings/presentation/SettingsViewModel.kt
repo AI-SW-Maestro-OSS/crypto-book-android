@@ -1,11 +1,9 @@
 package io.soma.cryptobook.settings.presentation
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.domain.message.MessageHelper
+import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
@@ -13,6 +11,7 @@ import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
 import io.soma.cryptobook.core.domain.usecase.SetLanguageUseCase
+import io.soma.cryptobook.core.presentation.message.MessageHelper
 import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
 import io.soma.cryptobook.settings.domain.usecase.SetAppThemeUseCase
 import io.soma.cryptobook.settings.domain.usecase.SetPriceCurrencyUseCase
@@ -24,7 +23,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
     private val getUserDataUseCase: GetUserDataUseCase,
@@ -92,8 +90,8 @@ class SettingsViewModel @Inject constructor(
     private fun showSnackbarMessage() {
         emitEffect(
             SettingsContract.Effect.ShowSnackbar(
-                message = context.getString(CryptoString.cb_settings_test_snackbar_message),
-                actionLabel = context.getString(CryptoString.cb_settings_test_snackbar_action),
+                message = CryptoString.cb_settings_test_snackbar_message.asText(),
+                actionLabel = CryptoString.cb_settings_test_snackbar_action.asText(),
             ),
         )
     }

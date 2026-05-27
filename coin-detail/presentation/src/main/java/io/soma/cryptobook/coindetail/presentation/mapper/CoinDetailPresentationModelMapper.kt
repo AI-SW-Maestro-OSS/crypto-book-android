@@ -4,6 +4,7 @@ import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.presentation.CandleUiModel
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract
+import io.soma.cryptobook.core.designsystem.util.Text
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -28,7 +29,7 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
         candles: List<CoinCandleVO>,
         imageUrl: String,
         isLoading: Boolean = false,
-        errorMsg: String? = null,
+        errorMsg: Text? = null,
     ): CoinDetailContract.State = CoinDetailContract.State(
         symbol = vo.symbol,
         imageUrl = imageUrl,

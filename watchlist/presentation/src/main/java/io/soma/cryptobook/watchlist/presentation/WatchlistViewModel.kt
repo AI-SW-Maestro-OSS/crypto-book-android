@@ -1,13 +1,12 @@
 package io.soma.cryptobook.watchlist.presentation
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
+import io.soma.cryptobook.core.designsystem.util.Text
+import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.domain.error.CoinPriceError
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
-import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortState
 import io.soma.cryptobook.core.domain.model.next
@@ -18,6 +17,7 @@ import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveSortedCoinListUseCase
 import io.soma.cryptobook.core.presentation.MviViewModel
+import io.soma.cryptobook.core.presentation.message.MessageHelper
 import io.soma.cryptobook.watchlist.domain.usecase.ObserveWatchlistSortUseCase
 import io.soma.cryptobook.watchlist.domain.usecase.ObserveWatchlistUseCase
 import io.soma.cryptobook.watchlist.domain.usecase.SetWatchlistSortUseCase
@@ -27,7 +27,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WatchlistViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val observeWatchlistUseCase: ObserveWatchlistUseCase,
     private val observeWatchlistSortUseCase: ObserveWatchlistSortUseCase,
     private val setWatchlistSortUseCase: SetWatchlistSortUseCase,
@@ -78,11 +77,11 @@ class WatchlistViewModel @Inject constructor(
                         }
                     },
                     onFailure = { error ->
-                        val message = context.getString(error.toMessageRes())
+                        val text = error.toText()
                         reduce {
-                            copy(isLoading = false, errorMsg = message)
+                            copy(isLoading = false, errorMsg = text)
                         }
-                        messageHelper.showToast(message)
+                        messageHelper.showToast(text)
                     },
                 )
             }
@@ -108,32 +107,28 @@ class WatchlistViewModel @Inject constructor(
         viewModelScope.launch {
             observeMarketRealtimeState().collect { runtimeState ->
                 reduce {
-                    copy(realtimeStatusMessage = runtimeState.toRealtimeStatusMessage())
+                    copy(realtimeStatusMessage = runtimeState.toRealtimeStatusText())
                 }
             }
         }
     }
 
-    private fun MarketRealtimeState.toRealtimeStatusMessage(): String? = when (this) {
+    private fun MarketRealtimeState.toRealtimeStatusText(): Text? = when (this) {
         MarketRealtimeState.Connected,
         MarketRealtimeState.Connecting,
         MarketRealtimeState.Inactive,
         -> null
 
-        MarketRealtimeState.Recovering -> context.getString(
-            CryptoString.cb_realtime_recovering,
-        )
+        MarketRealtimeState.Recovering -> CryptoString.cb_realtime_recovering.asText()
 
-        is MarketRealtimeState.Failed -> context.getString(
-            CryptoString.cb_realtime_disconnected,
-        )
+        is MarketRealtimeState.Failed -> CryptoString.cb_realtime_disconnected.asText()
     }
 
-    private fun CoinPriceError.toMessageRes(): Int = when (this) {
-        CoinPriceError.Network -> CryptoString.cb_error_network
-        CoinPriceError.RateLimited -> CryptoString.cb_error_rate_limited
-        CoinPriceError.Server -> CryptoString.cb_error_server
-        CoinPriceError.UnexpectedResponse -> CryptoString.cb_error_unexpected_response
-        is CoinPriceError.Unknown -> CryptoString.cb_error_unknown
+    private fun CoinPriceError.toText(): Text = when (this) {
+        CoinPriceError.Network -> CryptoString.cb_error_network.asText()
+        CoinPriceError.RateLimited -> CryptoString.cb_error_rate_limited.asText()
+        CoinPriceError.Server -> CryptoString.cb_error_server.asText()
+        CoinPriceError.UnexpectedResponse -> CryptoString.cb_error_unexpected_response.asText()
+        is CoinPriceError.Unknown -> CryptoString.cb_error_unknown.asText()
     }
 }

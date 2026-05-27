@@ -1,5 +1,6 @@
 package io.soma.cryptobook.home.presentation
 
+import io.soma.cryptobook.core.designsystem.util.Text
 import io.soma.cryptobook.core.domain.model.CoinPriceVO
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
@@ -11,8 +12,8 @@ import java.math.BigDecimal
 data class HomeUiState(
     val coins: List<CoinItem> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMsg: String? = null,
-    val realtimeStatusMessage: String? = null,
+    val errorMsg: Text? = null,
+    val realtimeStatusMessage: Text? = null,
     val sortColumn: CoinSortColumn = CoinSortColumn.NONE,
     val sortDirection: CoinSortDirection = CoinSortDirection.NONE,
 ) : UiState

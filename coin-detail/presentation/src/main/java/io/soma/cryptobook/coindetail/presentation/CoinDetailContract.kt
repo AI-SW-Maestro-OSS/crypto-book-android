@@ -1,5 +1,6 @@
 package io.soma.cryptobook.coindetail.presentation
 
+import io.soma.cryptobook.core.designsystem.util.Text
 import io.soma.cryptobook.core.presentation.UiState
 import io.soma.cryptobook.core.presentation.mvi.UnidirectionalViewModel
 import java.math.BigDecimal
@@ -22,8 +23,8 @@ interface CoinDetailContract {
         val tickSize: BigDecimal? = null,
         val isWatchlisted: Boolean = false,
         val isLoading: Boolean = true,
-        val errorMsg: String? = null,
-        val realtimeStatusMessage: String? = null,
+        val errorMsg: Text? = null,
+        val realtimeStatusMessage: Text? = null,
     ) : UiState
 
     sealed interface Event {

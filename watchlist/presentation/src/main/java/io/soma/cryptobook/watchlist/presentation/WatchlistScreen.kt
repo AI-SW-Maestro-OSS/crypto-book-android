@@ -74,7 +74,7 @@ internal fun WatchlistScreen(
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    Text(text = msg, color = Color(0xFF8A6D3B))
+                    Text(text = msg(), color = Color(0xFF8A6D3B))
                 }
             }
 
@@ -86,7 +86,7 @@ internal fun WatchlistScreen(
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    Text(text = msg, color = Color.Red)
+                    Text(text = msg(), color = Color.Red)
                 }
             }
 

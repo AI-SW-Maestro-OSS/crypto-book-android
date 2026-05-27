@@ -1,5 +1,6 @@
 package io.soma.cryptobook.settings.presentation
 
+import io.soma.cryptobook.core.designsystem.util.Text
 import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
@@ -21,6 +22,6 @@ interface SettingsContract {
     }
 
     sealed interface Effect {
-        data class ShowSnackbar(val message: String, val actionLabel: String? = null) : Effect
+        data class ShowSnackbar(val message: Text, val actionLabel: Text? = null) : Effect
     }
 }

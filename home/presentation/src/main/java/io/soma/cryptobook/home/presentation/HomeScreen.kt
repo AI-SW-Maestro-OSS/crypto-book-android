@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -27,6 +26,7 @@ import io.soma.cryptobook.core.designsystem.theme.component.coinlist.SortDirecti
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
@@ -82,7 +82,7 @@ internal fun HomeScreen(
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    Text(text = msg, color = Color(0xFF8A6D3B))
+                    Text(text = msg(), color = Color(0xFF8A6D3B))
                 }
             }
 
@@ -95,7 +95,7 @@ internal fun HomeScreen(
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    Text(text = msg, color = Color.Red)
+                    Text(text = msg(), color = Color.Red)
                 }
             }
 
@@ -172,7 +172,7 @@ private fun HomeScreenLoadingPreview() {
 @Composable
 private fun HomeScreenErrorPreview() {
     HomeScreen(
-        state = HomeUiState(errorMsg = stringResource(CryptoString.cb_error_network)),
+        state = HomeUiState(errorMsg = CryptoString.cb_error_network.asText()),
         onEvent = {},
         modifier = Modifier.background(CbTheme.colorScheme.background.primary),
     )
@@ -183,7 +183,7 @@ private fun HomeScreenErrorPreview() {
 private fun HomeScreenRealtimeWarningPreview() {
     HomeScreen(
         state = HomeUiState(
-            realtimeStatusMessage = stringResource(CryptoString.cb_realtime_recovering),
+            realtimeStatusMessage = CryptoString.cb_realtime_recovering.asText(),
         ),
         onEvent = {},
         modifier = Modifier.background(CbTheme.colorScheme.background.primary),

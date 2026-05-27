@@ -4,7 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.soma.cryptobook.core.domain.message.MessageHelper
+import io.soma.cryptobook.core.presentation.message.MessageHelper
 import io.soma.cryptobook.main.presentation.message.MessageCommandSource
 import io.soma.cryptobook.main.presentation.message.MessageHelperImpl
 

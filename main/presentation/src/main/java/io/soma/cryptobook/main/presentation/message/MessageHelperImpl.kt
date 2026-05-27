@@ -1,6 +1,8 @@
 package io.soma.cryptobook.main.presentation.message
 
-import io.soma.cryptobook.core.domain.message.MessageHelper
+import io.soma.cryptobook.core.designsystem.util.Text
+import io.soma.cryptobook.core.designsystem.util.asText
+import io.soma.cryptobook.core.presentation.message.MessageHelper
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,6 +37,10 @@ class MessageHelperImpl @Inject constructor() :
     }
 
     override fun showToast(message: String) {
-        _commands.tryEmit(MessageCommand.ShowToast(message))
+        showToast(message.asText())
+    }
+
+    override fun showToast(text: Text) {
+        _commands.tryEmit(MessageCommand.ShowToast(text))
     }
 }

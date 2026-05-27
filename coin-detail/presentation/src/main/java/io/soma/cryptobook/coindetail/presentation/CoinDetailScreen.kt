@@ -36,6 +36,7 @@ import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIco
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
+import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.presentation.mvi.observe
 
 @Composable
@@ -107,7 +108,7 @@ internal fun CoinDetailScreen(
         ) {
             state.realtimeStatusMessage?.let { message ->
                 Text(
-                    text = message,
+                    text = message(),
                     color = Color(0xFF8A6D3B),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -123,7 +124,7 @@ internal fun CoinDetailScreen(
 
                 state.errorMsg != null -> {
                     Text(
-                        text = state.errorMsg,
+                        text = state.errorMsg(),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -208,7 +209,7 @@ private fun CoinDetailScreenErrorPreview() {
     CoinDetailScreen(
         state = State(
             isLoading = false,
-            errorMsg = stringResource(CryptoString.cb_coin_detail_connection_error_state),
+            errorMsg = CryptoString.cb_coin_detail_connection_error_state.asText(),
         ),
         onEvent = {},
     )
@@ -220,7 +221,7 @@ private fun CoinDetailScreenRealtimeWarningPreview() {
     CoinDetailScreen(
         state = State(
             isLoading = false,
-            realtimeStatusMessage = stringResource(CryptoString.cb_realtime_recovering),
+            realtimeStatusMessage = CryptoString.cb_realtime_recovering.asText(),
         ),
         onEvent = {},
     )

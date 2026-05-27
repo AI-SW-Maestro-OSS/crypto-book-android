@@ -1,12 +1,10 @@
 package io.soma.cryptobook.coindetail.presentation
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveCoinDetailUseCase
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveIsWatchlistedUseCase
 import io.soma.cryptobook.coindetail.domain.usecase.ToggleWatchlistUseCase
@@ -16,10 +14,12 @@ import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.mapper.CoinDetailPresentationModelMapper
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
+import io.soma.cryptobook.core.designsystem.util.Text
+import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.domain.image.CoinImageResolver
-import io.soma.cryptobook.core.domain.message.MessageHelper
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
+import io.soma.cryptobook.core.presentation.message.MessageHelper
 import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -27,7 +27,6 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = CoinDetailViewModel.Factory::class)
 class CoinDetailViewModel @AssistedInject constructor(
     @Assisted private val coinName: String,
-    @ApplicationContext private val context: Context,
     private val observeCoinDetailUseCase: ObserveCoinDetailUseCase,
     private val observeIsWatchlistedUseCase: ObserveIsWatchlistedUseCase,
     private val toggleWatchlistUseCase: ToggleWatchlistUseCase,
@@ -100,15 +99,13 @@ class CoinDetailViewModel @AssistedInject constructor(
                         updateState { state ->
                             state.copy(
                                 isLoading = false,
-                                errorMsg = context.getString(
-                                    CryptoString.cb_coin_detail_connection_error_state,
-                                ),
+                                errorMsg = CryptoString
+                                    .cb_coin_detail_connection_error_state
+                                    .asText(),
                             )
                         }
                         messageHelper.showToast(
-                            context.getString(
-                                CryptoString.cb_coin_detail_connection_error_toast,
-                            ),
+                            CryptoString.cb_coin_detail_connection_error_toast.asText(),
                         )
                     }
                 }
@@ -120,24 +117,20 @@ class CoinDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             observeMarketRealtimeState().collect { runtimeState ->
                 updateState { state ->
-                    state.copy(realtimeStatusMessage = runtimeState.toRealtimeStatusMessage())
+                    state.copy(realtimeStatusMessage = runtimeState.toRealtimeStatusText())
                 }
             }
         }
     }
 
-    private fun MarketRealtimeState.toRealtimeStatusMessage(): String? = when (this) {
+    private fun MarketRealtimeState.toRealtimeStatusText(): Text? = when (this) {
         MarketRealtimeState.Connected,
         MarketRealtimeState.Connecting,
         MarketRealtimeState.Inactive,
         -> null
 
-        MarketRealtimeState.Recovering -> context.getString(
-            CryptoString.cb_realtime_recovering,
-        )
+        MarketRealtimeState.Recovering -> CryptoString.cb_realtime_recovering.asText()
 
-        is MarketRealtimeState.Failed -> context.getString(
-            CryptoString.cb_realtime_disconnected,
-        )
+        is MarketRealtimeState.Failed -> CryptoString.cb_realtime_disconnected.asText()
     }
 }
