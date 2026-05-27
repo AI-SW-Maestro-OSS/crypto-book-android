@@ -36,4 +36,11 @@ class UserDataRepositoryImpl @Inject constructor(
     override suspend fun setCoinSort(column: CoinSortColumn, direction: CoinSortDirection) {
         cbPreferencesDataSource.setCoinSort(column, direction)
     }
+
+    override suspend fun setWatchlistCoinSort(
+        column: CoinSortColumn,
+        direction: CoinSortDirection,
+    ) {
+        cbPreferencesDataSource.setWatchlistCoinSort(column, direction)
+    }
 }

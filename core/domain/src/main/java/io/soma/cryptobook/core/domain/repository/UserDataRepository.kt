@@ -20,4 +20,6 @@ interface UserDataRepository {
     suspend fun setAppTheme(appTheme: AppTheme)
 
     suspend fun setCoinSort(column: CoinSortColumn, direction: CoinSortDirection)
+
+    suspend fun setWatchlistCoinSort(column: CoinSortColumn, direction: CoinSortDirection)
 }

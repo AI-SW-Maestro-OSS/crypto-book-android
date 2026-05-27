@@ -9,4 +9,6 @@ data class UserData(
     val appTheme: AppTheme,
     val coinSortColumn: CoinSortColumn,
     val coinSortDirection: CoinSortDirection,
+    val watchlistCoinSortColumn: CoinSortColumn,
+    val watchlistCoinSortDirection: CoinSortDirection,
 )

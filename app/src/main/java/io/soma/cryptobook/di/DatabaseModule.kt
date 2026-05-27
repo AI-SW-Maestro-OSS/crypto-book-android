@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.soma.cryptobook.core.data.database.CryptoBookDatabase
 import io.soma.cryptobook.core.data.database.ticksize.SymbolTickSizeDao
+import io.soma.cryptobook.core.data.database.watchlist.WatchlistDao
 import javax.inject.Singleton
 
 @Module
@@ -27,4 +28,8 @@ object DatabaseModule {
     @Singleton
     fun provideSymbolTickSizeDao(database: CryptoBookDatabase): SymbolTickSizeDao =
         database.symbolTickSizeDao()
+
+    @Provides
+    @Singleton
+    fun provideWatchlistDao(database: CryptoBookDatabase): WatchlistDao = database.watchlistDao()
 }

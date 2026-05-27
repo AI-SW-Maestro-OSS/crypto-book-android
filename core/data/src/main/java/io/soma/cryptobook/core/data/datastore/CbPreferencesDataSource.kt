@@ -58,36 +58,10 @@ class CbPreferencesDataSource @Inject constructor(
                     AppThemeProto.APP_THEME_LIGHT,
                     -> AppTheme.LIGHT
                 },
-                coinSortColumn = when (it.coinSortColumn) {
-                    null,
-                    CoinSortColumnProto.COIN_SORT_COLUMN_UNSPECIFIED,
-                    CoinSortColumnProto.UNRECOGNIZED,
-                    -> CoinSortColumn.NONE
-
-                    CoinSortColumnProto.COIN_SORT_COLUMN_SYMBOL,
-                    -> CoinSortColumn.SYMBOL
-
-                    CoinSortColumnProto.COIN_SORT_COLUMN_PRICE,
-                    -> CoinSortColumn.PRICE
-
-                    CoinSortColumnProto.COIN_SORT_COLUMN_CHANGE,
-                    -> CoinSortColumn.CHANGE
-
-                    CoinSortColumnProto.COIN_SORT_COLUMN_VOLUME,
-                    -> CoinSortColumn.VOLUME
-                },
-                coinSortDirection = when (it.coinSortDirection) {
-                    null,
-                    CoinSortDirectionProto.COIN_SORT_DIRECTION_UNSPECIFIED,
-                    CoinSortDirectionProto.UNRECOGNIZED,
-                    -> CoinSortDirection.NONE
-
-                    CoinSortDirectionProto.COIN_SORT_DIRECTION_ASC,
-                    -> CoinSortDirection.ASC
-
-                    CoinSortDirectionProto.COIN_SORT_DIRECTION_DESC,
-                    -> CoinSortDirection.DESC
-                },
+                coinSortColumn = it.coinSortColumn.toCoinSortColumn(),
+                coinSortDirection = it.coinSortDirection.toCoinSortDirection(),
+                watchlistCoinSortColumn = it.watchlistCoinSortColumn.toCoinSortColumn(),
+                watchlistCoinSortDirection = it.watchlistCoinSortDirection.toCoinSortDirection(),
             )
         }
 
@@ -139,19 +113,58 @@ class CbPreferencesDataSource @Inject constructor(
     suspend fun setCoinSort(column: CoinSortColumn, direction: CoinSortDirection) {
         userPreferences.updateData {
             it.copy {
-                this.coinSortColumn = when (column) {
-                    CoinSortColumn.NONE -> CoinSortColumnProto.COIN_SORT_COLUMN_UNSPECIFIED
-                    CoinSortColumn.SYMBOL -> CoinSortColumnProto.COIN_SORT_COLUMN_SYMBOL
-                    CoinSortColumn.PRICE -> CoinSortColumnProto.COIN_SORT_COLUMN_PRICE
-                    CoinSortColumn.CHANGE -> CoinSortColumnProto.COIN_SORT_COLUMN_CHANGE
-                    CoinSortColumn.VOLUME -> CoinSortColumnProto.COIN_SORT_COLUMN_VOLUME
-                }
-                this.coinSortDirection = when (direction) {
-                    CoinSortDirection.NONE -> CoinSortDirectionProto.COIN_SORT_DIRECTION_UNSPECIFIED
-                    CoinSortDirection.ASC -> CoinSortDirectionProto.COIN_SORT_DIRECTION_ASC
-                    CoinSortDirection.DESC -> CoinSortDirectionProto.COIN_SORT_DIRECTION_DESC
-                }
+                this.coinSortColumn = column.toProto()
+                this.coinSortDirection = direction.toProto()
             }
         }
     }
+
+    suspend fun setWatchlistCoinSort(column: CoinSortColumn, direction: CoinSortDirection) {
+        userPreferences.updateData {
+            it.copy {
+                this.watchlistCoinSortColumn = column.toProto()
+                this.watchlistCoinSortDirection = direction.toProto()
+            }
+        }
+    }
+}
+
+private fun CoinSortColumnProto?.toCoinSortColumn(): CoinSortColumn = when (this) {
+    null,
+    CoinSortColumnProto.COIN_SORT_COLUMN_UNSPECIFIED,
+    CoinSortColumnProto.UNRECOGNIZED,
+    -> CoinSortColumn.NONE
+
+    CoinSortColumnProto.COIN_SORT_COLUMN_SYMBOL -> CoinSortColumn.SYMBOL
+
+    CoinSortColumnProto.COIN_SORT_COLUMN_PRICE -> CoinSortColumn.PRICE
+
+    CoinSortColumnProto.COIN_SORT_COLUMN_CHANGE -> CoinSortColumn.CHANGE
+
+    CoinSortColumnProto.COIN_SORT_COLUMN_VOLUME -> CoinSortColumn.VOLUME
+}
+
+private fun CoinSortDirectionProto?.toCoinSortDirection(): CoinSortDirection = when (this) {
+    null,
+    CoinSortDirectionProto.COIN_SORT_DIRECTION_UNSPECIFIED,
+    CoinSortDirectionProto.UNRECOGNIZED,
+    -> CoinSortDirection.NONE
+
+    CoinSortDirectionProto.COIN_SORT_DIRECTION_ASC -> CoinSortDirection.ASC
+
+    CoinSortDirectionProto.COIN_SORT_DIRECTION_DESC -> CoinSortDirection.DESC
+}
+
+private fun CoinSortColumn.toProto(): CoinSortColumnProto = when (this) {
+    CoinSortColumn.NONE -> CoinSortColumnProto.COIN_SORT_COLUMN_UNSPECIFIED
+    CoinSortColumn.SYMBOL -> CoinSortColumnProto.COIN_SORT_COLUMN_SYMBOL
+    CoinSortColumn.PRICE -> CoinSortColumnProto.COIN_SORT_COLUMN_PRICE
+    CoinSortColumn.CHANGE -> CoinSortColumnProto.COIN_SORT_COLUMN_CHANGE
+    CoinSortColumn.VOLUME -> CoinSortColumnProto.COIN_SORT_COLUMN_VOLUME
+}
+
+private fun CoinSortDirection.toProto(): CoinSortDirectionProto = when (this) {
+    CoinSortDirection.NONE -> CoinSortDirectionProto.COIN_SORT_DIRECTION_UNSPECIFIED
+    CoinSortDirection.ASC -> CoinSortDirectionProto.COIN_SORT_DIRECTION_ASC
+    CoinSortDirection.DESC -> CoinSortDirectionProto.COIN_SORT_DIRECTION_DESC
 }

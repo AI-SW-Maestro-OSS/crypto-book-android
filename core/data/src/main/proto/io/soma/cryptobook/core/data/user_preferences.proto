@@ -17,4 +17,6 @@ message UserPreferences {
   AppThemeProto app_theme = 5;
   CoinSortColumnProto coin_sort_column = 6;
   CoinSortDirectionProto coin_sort_direction = 7;
+  CoinSortColumnProto watchlist_coin_sort_column = 8;
+  CoinSortDirectionProto watchlist_coin_sort_direction = 9;
 }
