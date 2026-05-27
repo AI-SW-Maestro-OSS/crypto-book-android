@@ -6,6 +6,9 @@
     <string name="cb_top_level_diary">Diary</string>
     <string name="cb_top_level_settings">Settings</string>
 
+    <!-- Watchlist screen -->
+    <string name="cb_watchlist_empty">No coins in your watchlist yet.</string>
+
     <!-- Settings screen -->
     <string name="cb_settings_title">Settings</string>
     <string name="cb_settings_currency_unit_title">Price Currency Unit</string>

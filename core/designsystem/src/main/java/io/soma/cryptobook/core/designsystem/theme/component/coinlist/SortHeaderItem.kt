@@ -1,4 +1,4 @@
-package io.soma.cryptobook.home.presentation.component.sortheader
+package io.soma.cryptobook.core.designsystem.theme.component.coinlist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

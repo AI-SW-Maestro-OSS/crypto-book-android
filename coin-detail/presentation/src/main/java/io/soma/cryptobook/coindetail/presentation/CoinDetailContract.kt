@@ -20,6 +20,7 @@ interface CoinDetailContract {
         val volume24h: String = "",
         val openPrice: String = "",
         val tickSize: BigDecimal? = null,
+        val isWatchlisted: Boolean = false,
         val isLoading: Boolean = true,
         val errorMsg: String? = null,
         val realtimeStatusMessage: String? = null,
@@ -28,6 +29,7 @@ interface CoinDetailContract {
     sealed interface Event {
         data object OnBackClicked : Event
         data object OnScreenStarted : Event
+        data object OnFavoriteClicked : Event
     }
 
     sealed interface Effect {

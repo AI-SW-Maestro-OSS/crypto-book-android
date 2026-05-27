@@ -2,17 +2,15 @@ package io.soma.cryptobook.home.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -23,16 +21,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
+import io.soma.cryptobook.core.designsystem.theme.component.coinlist.CbCoinListSection
+import io.soma.cryptobook.core.designsystem.theme.component.coinlist.CoinListItemData
+import io.soma.cryptobook.core.designsystem.theme.component.coinlist.SortDirection
 import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
-import io.soma.cryptobook.home.presentation.component.coinlist.CoinListItemData
-import io.soma.cryptobook.home.presentation.component.coinlist.CoinListTable
-import io.soma.cryptobook.home.presentation.component.sortheader.SortDirection
-import io.soma.cryptobook.home.presentation.component.sortheader.SortHeader
+import io.soma.cryptobook.core.presentation.jank.TrackScrollJank
 import java.math.BigDecimal
 
 @Composable
@@ -52,6 +50,9 @@ internal fun HomeScreen(
     onEvent: (HomeEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lazyListState = rememberLazyListState()
+    TrackScrollJank(scrollableState = lazyListState, stateName = "home:coinList")
+
     CbScaffold(
         modifier = modifier,
         topBar = {
@@ -98,30 +99,20 @@ internal fun HomeScreen(
                 }
             }
 
-            SortHeader(
+            CbCoinListSection(
+                coins = state.coins.map { it.toCoinListItemData() },
+                isLoading = state.isLoading,
                 symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
+                volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
                 priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
                 changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
-                volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
                 onSymbolClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.SYMBOL)) },
+                onVolumeClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.VOLUME)) },
                 onPriceClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.PRICE)) },
                 onChangeClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.CHANGE)) },
-                onVolumeClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.VOLUME)) },
+                onCoinClick = { symbol -> onEvent(HomeEvent.OnCoinClicked(symbol)) },
+                lazyListState = lazyListState,
             )
-
-            // Coin List
-            Box(modifier = Modifier.fillMaxSize()) {
-                if (state.coins.isNotEmpty()) {
-                    CoinListTable(
-                        coins = state.coins.map { it.toCoinListItemData() },
-                        onCoinClick = { symbol -> onEvent(HomeEvent.OnCoinClicked(symbol)) },
-                    )
-                }
-
-                if (state.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-            }
         }
     }
 }

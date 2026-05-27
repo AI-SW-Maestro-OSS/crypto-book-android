@@ -175,6 +175,8 @@ private fun SettingsScreenPreview() {
                 appTheme = AppTheme.DARK,
                 coinSortColumn = CoinSortColumn.NONE,
                 coinSortDirection = CoinSortDirection.NONE,
+                watchlistCoinSortColumn = CoinSortColumn.NONE,
+                watchlistCoinSortDirection = CoinSortDirection.NONE,
             ),
             isLoading = false,
         ),

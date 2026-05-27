@@ -16,4 +16,5 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation3)
     implementation(libs.androidx.compose.material3.navigationSuite)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.coil.compose)
 }

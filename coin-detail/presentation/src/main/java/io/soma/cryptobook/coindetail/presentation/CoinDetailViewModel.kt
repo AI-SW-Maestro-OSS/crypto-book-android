@@ -8,6 +8,8 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveCoinDetailUseCase
+import io.soma.cryptobook.coindetail.domain.usecase.ObserveIsWatchlistedUseCase
+import io.soma.cryptobook.coindetail.domain.usecase.ToggleWatchlistUseCase
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Effect
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
@@ -27,6 +29,8 @@ class CoinDetailViewModel @AssistedInject constructor(
     @Assisted private val coinName: String,
     @ApplicationContext private val context: Context,
     private val observeCoinDetailUseCase: ObserveCoinDetailUseCase,
+    private val observeIsWatchlistedUseCase: ObserveIsWatchlistedUseCase,
+    private val toggleWatchlistUseCase: ToggleWatchlistUseCase,
     private val mapper: CoinDetailPresentationModelMapper,
     private val coinImageResolver: CoinImageResolver,
     private val messageHelper: MessageHelper,
@@ -48,12 +52,22 @@ class CoinDetailViewModel @AssistedInject constructor(
     init {
         ensureObserving()
         observeRealtimeState()
+        observeWatchlisted()
     }
 
     override fun event(event: Event) {
         when (event) {
             Event.OnBackClicked -> emitEffect(Effect.NavigateBack)
             Event.OnScreenStarted -> ensureObserving()
+            Event.OnFavoriteClicked -> viewModelScope.launch { toggleWatchlistUseCase(coinName) }
+        }
+    }
+
+    private fun observeWatchlisted() {
+        viewModelScope.launch {
+            observeIsWatchlistedUseCase(coinName).collect { isWatchlisted ->
+                updateState { state -> state.copy(isWatchlisted = isWatchlisted) }
+            }
         }
     }
 
@@ -78,7 +92,7 @@ class CoinDetailViewModel @AssistedInject constructor(
                                 imageUrl = state.imageUrl,
                                 isLoading = false,
                                 errorMsg = null,
-                            )
+                            ).copy(isWatchlisted = state.isWatchlisted)
                         }
                     }
 

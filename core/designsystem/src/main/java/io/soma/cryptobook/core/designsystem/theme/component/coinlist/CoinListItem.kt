@@ -1,4 +1,4 @@
-package io.soma.cryptobook.home.presentation.component.coinlist
+package io.soma.cryptobook.core.designsystem.theme.component.coinlist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

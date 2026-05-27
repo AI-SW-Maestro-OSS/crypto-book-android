@@ -6,6 +6,9 @@
     <string name="cb_top_level_diary">다이어리</string>
     <string name="cb_top_level_settings">설정</string>
 
+    <!-- Watchlist screen -->
+    <string name="cb_watchlist_empty">관심목록에 추가된 코인이 없습니다.</string>
+
     <!-- Settings screen -->
     <string name="cb_settings_title">설정</string>
     <string name="cb_settings_currency_unit_title">가격 통화 단위</string>

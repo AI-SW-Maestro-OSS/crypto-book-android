@@ -22,8 +22,8 @@ enum class CbTopLevelNavItem(
         navKey = HomeNavKey,
     ),
     WATCHLIST(
-        iconRes = CbDrawable.ic_watchlist,
-        iconResSelected = CbDrawable.ic_watchlist_filled,
+        iconRes = CbDrawable.ic_watchlists,
+        iconResSelected = CbDrawable.ic_watchlists_filled,
         labelRes = CryptoString.cb_top_level_watchlist,
         navKey = WatchlistNavKey,
     ),

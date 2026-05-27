@@ -1,8 +1,9 @@
-package io.soma.cryptobook.home.presentation.component.coinlist
+package io.soma.cryptobook.core.designsystem.theme.component.coinlist
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -10,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.soma.cryptobook.core.presentation.jank.TrackScrollJank
 
 /**
  * Data class for coin list item display
@@ -45,16 +45,15 @@ data class CoinListItemData(
  * @param coins List of coin data to display
  * @param onCoinClick Callback when a coin item is clicked
  * @param modifier Optional modifier
+ * @param lazyListState Hoisted scroll state so callers can observe scrolling (e.g. jank tracking)
  */
 @Composable
 fun CoinListTable(
     coins: List<CoinListItemData>,
     onCoinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val lazyListState = rememberLazyListState()
-    TrackScrollJank(scrollableState = lazyListState, stateName = "home:coinList")
-
     LazyColumn(
         state = lazyListState,
         modifier = modifier.fillMaxSize(),

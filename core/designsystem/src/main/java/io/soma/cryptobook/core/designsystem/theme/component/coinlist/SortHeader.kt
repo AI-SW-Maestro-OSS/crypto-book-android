@@ -1,4 +1,4 @@
-package io.soma.cryptobook.home.presentation.component.sortheader
+package io.soma.cryptobook.core.designsystem.theme.component.coinlist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -25,7 +25,7 @@ fun SortHeader(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,

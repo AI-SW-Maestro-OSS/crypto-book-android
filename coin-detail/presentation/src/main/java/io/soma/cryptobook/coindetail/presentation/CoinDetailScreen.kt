@@ -87,11 +87,15 @@ internal fun CoinDetailScreen(
                 ),
                 actions = {
                     CbStandardIconButton(
-                        vectorIconRes = CbDrawable.ic_favorite,
+                        vectorIconRes = if (state.isWatchlisted) {
+                            CbDrawable.ic_watchlist_filled
+                        } else {
+                            CbDrawable.ic_watchlist
+                        },
                         contentDescription = stringResource(
                             CryptoString.cb_coin_detail_favorite_cd,
                         ),
-                        onClick = { },
+                        onClick = { onEvent(Event.OnFavoriteClicked) },
                         modifier = Modifier,
                     )
                 },
