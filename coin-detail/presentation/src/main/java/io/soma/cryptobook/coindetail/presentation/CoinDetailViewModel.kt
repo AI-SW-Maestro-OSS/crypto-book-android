@@ -88,6 +88,7 @@ class CoinDetailViewModel @AssistedInject constructor(
                             mapper.toUiState(
                                 vo = result.coinDetail,
                                 candles = result.candles,
+                                orderBook = result.orderBook,
                                 imageUrl = state.imageUrl,
                                 isLoading = false,
                                 errorMsg = null,

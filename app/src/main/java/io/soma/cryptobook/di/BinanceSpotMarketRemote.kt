@@ -1,6 +1,8 @@
 package io.soma.cryptobook.di
 
+import io.soma.cryptobook.coindetail.data.model.BinanceSpotDepthDto
 import io.soma.cryptobook.coindetail.data.model.BinanceSpotTickerDto
+import io.soma.cryptobook.coindetail.data.network.BinanceSpotDepthClient
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotKlineClient
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotTickerClient
 import io.soma.cryptobook.core.network.base.BaseDataSource
@@ -22,6 +24,12 @@ interface BinanceSpotApiService {
 
     @GET("api/v3/ticker/24hr")
     suspend fun getTicker(@Query("symbol") symbol: String): Response<BinanceSpotTickerDto>
+
+    @GET("api/v3/depth")
+    suspend fun getDepth(
+        @Query("symbol") symbol: String,
+        @Query("limit") limit: Int,
+    ): Response<BinanceSpotDepthDto>
 }
 
 class DefaultBinanceSpotKlineClient @Inject constructor(
@@ -51,5 +59,14 @@ class DefaultBinanceSpotTickerClient @Inject constructor(
     BinanceSpotTickerClient {
     override suspend fun getTicker(symbol: String): BinanceSpotTickerDto = checkResponse(
         apiService.getTicker(symbol = symbol),
+    )
+}
+
+class DefaultBinanceSpotDepthClient @Inject constructor(
+    private val apiService: BinanceSpotApiService,
+) : BaseDataSource(),
+    BinanceSpotDepthClient {
+    override suspend fun getDepth(symbol: String, limit: Int): BinanceSpotDepthDto = checkResponse(
+        apiService.getDepth(symbol = symbol, limit = limit),
     )
 }

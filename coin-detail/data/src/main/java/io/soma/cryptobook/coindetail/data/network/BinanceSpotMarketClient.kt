@@ -1,5 +1,6 @@
 package io.soma.cryptobook.coindetail.data.network
 
+import io.soma.cryptobook.coindetail.data.model.BinanceSpotDepthDto
 import io.soma.cryptobook.coindetail.data.model.BinanceSpotTickerDto
 import kotlinx.serialization.json.JsonElement
 
@@ -15,4 +16,8 @@ interface BinanceSpotKlineClient {
 
 interface BinanceSpotTickerClient {
     suspend fun getTicker(symbol: String): BinanceSpotTickerDto
+}
+
+interface BinanceSpotDepthClient {
+    suspend fun getDepth(symbol: String, limit: Int): BinanceSpotDepthDto
 }

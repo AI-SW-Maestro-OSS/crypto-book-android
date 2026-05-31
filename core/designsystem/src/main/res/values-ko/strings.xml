@@ -64,6 +64,9 @@
     <string name="cb_coin_detail_metric_low_24h">24시간 최저가</string>
     <string name="cb_coin_detail_metric_volume_24h">24시간 거래량</string>
     <string name="cb_coin_detail_metric_open_price">시가</string>
+    <string name="cb_coin_detail_order_book">호가</string>
+    <string name="cb_coin_detail_bid">매수</string>
+    <string name="cb_coin_detail_ask">매도</string>
 
     <!-- Update required screen -->
     <string name="cb_update_required_title">업데이트가 필요합니다</string>

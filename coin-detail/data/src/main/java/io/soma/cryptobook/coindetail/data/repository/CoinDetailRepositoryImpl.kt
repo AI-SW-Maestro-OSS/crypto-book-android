@@ -1,16 +1,22 @@
 package io.soma.cryptobook.coindetail.data.repository
 
+import io.soma.cryptobook.coindetail.data.datasource.CoinDetailDepthSnapshotDataSource
 import io.soma.cryptobook.coindetail.data.datasource.CoinDetailKlineBackfillDataSource
 import io.soma.cryptobook.coindetail.data.datasource.CoinDetailTickerSnapshotDataSource
 import io.soma.cryptobook.coindetail.data.mapper.CoinDetailDomainModelMapper
+import io.soma.cryptobook.coindetail.data.mapper.toDepthDiff
+import io.soma.cryptobook.coindetail.data.orderbook.DepthSyncResult
+import io.soma.cryptobook.coindetail.data.orderbook.OrderBookAssembler
 import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailStreamState
+import io.soma.cryptobook.coindetail.domain.model.OrderBookVO
 import io.soma.cryptobook.coindetail.domain.repository.CoinDetailRepository
 import io.soma.cryptobook.core.data.database.ticksize.SymbolTickSizeDao
 import io.soma.cryptobook.core.data.model.CoinKlineDto
 import io.soma.cryptobook.core.data.realtime.kline.WsKlineTable
 import io.soma.cryptobook.core.data.realtime.market.MarketRealtimePayloadMapper
 import io.soma.cryptobook.core.data.realtime.ticker.WsTickerTable
+import io.soma.cryptobook.core.network.market.WsDepthEventPayload
 import io.soma.cryptobook.core.network.market.WsMarketMessage
 import io.soma.cryptobook.core.network.session.WsSessionManager
 import io.soma.cryptobook.core.network.session.WsSessionState
@@ -18,6 +24,7 @@ import io.soma.cryptobook.core.network.stream.WsStreamSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -27,6 +34,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class CoinDetailRepositoryImpl
@@ -36,6 +45,7 @@ constructor(
     private val sessionManager: WsSessionManager,
     private val tickerSnapshotDataSource: CoinDetailTickerSnapshotDataSource,
     private val klineBackfillDataSource: CoinDetailKlineBackfillDataSource,
+    private val depthSnapshotDataSource: CoinDetailDepthSnapshotDataSource,
     private val tickerTable: WsTickerTable,
     private val klineTable: WsKlineTable,
     private val tickSizeDao: SymbolTickSizeDao,
@@ -46,15 +56,55 @@ constructor(
     private companion object {
         private const val TARGET_INTERVAL = "1d"
         private const val KLINE_BACKFILL_PAGE_LIMIT = 1000
+        private const val ORDER_BOOK_SNAPSHOT_LIMIT = 1000
+        private const val ORDER_BOOK_DISPLAY_DEPTH = 32
     }
 
     override fun observeCoinDetail(symbol: String): Flow<CoinDetailStreamState> = channelFlow {
         val targetSymbol = symbol.uppercase()
         val streams = streamsFor(targetSymbol)
 
+        val orderBookAssembler = OrderBookAssembler()
+        val orderBookMutex = Mutex()
+        val orderBookState = MutableStateFlow<OrderBookVO?>(null)
+
+        suspend fun resyncOrderBook() {
+            runCatching {
+                depthSnapshotDataSource.getDepth(targetSymbol, ORDER_BOOK_SNAPSHOT_LIMIT)
+            }.onSuccess { snapshot ->
+                orderBookState.value = orderBookMutex.withLock {
+                    orderBookAssembler.onSnapshot(snapshot)
+                    orderBookAssembler.topOfBook(ORDER_BOOK_DISPLAY_DEPTH)
+                }
+            }
+        }
+
+        suspend fun handleDepthDiff(event: WsDepthEventPayload) {
+            if (!event.symbol.equals(targetSymbol, ignoreCase = true)) return
+            var needsResync = false
+            val orderBook = orderBookMutex.withLock {
+                when (orderBookAssembler.onDiff(event.toDepthDiff())) {
+                    DepthSyncResult.Applied ->
+                        orderBookAssembler.topOfBook(ORDER_BOOK_DISPLAY_DEPTH)
+
+                    DepthSyncResult.Buffered -> null
+
+                    DepthSyncResult.NeedsResync -> {
+                        needsResync = true
+                        null
+                    }
+                }
+            }
+            if (orderBook != null) orderBookState.value = orderBook
+            if (needsResync) resyncOrderBook()
+        }
+
         launch {
             wsStreamSource.subscribe(streams).collect { message ->
                 persistToRoom(targetSymbol, message)
+                if (message is WsMarketMessage.SymbolDepth) {
+                    handleDepthDiff(message.depthEvent)
+                }
             }
         }
 
@@ -65,7 +115,8 @@ constructor(
                     candles.map { it.toCoinCandleVO() }
                 },
                 tickSizeDao.observeTickSize(targetSymbol).map { it?.toBigDecimalOrNull() },
-            ) { ticker, candles, tickSize ->
+                orderBookState,
+            ) { ticker, candles, tickSize, orderBook ->
                 if (ticker == null) {
                     CoinDetailStreamState.Loading
                 } else {
@@ -75,9 +126,10 @@ constructor(
                             tickSize = tickSize,
                         ),
                         candles = candles,
+                        orderBook = orderBook,
                     )
                 }
-            }.collect { state ->
+            }.distinctUntilChanged().collect { state ->
                 send(state)
             }
         }
@@ -90,10 +142,12 @@ constructor(
                 .filter { it }
                 .collect {
                     refreshRestData(targetSymbol)
+                    resyncOrderBook()
                 }
         }
 
         refreshRestData(targetSymbol)
+        resyncOrderBook()
         awaitCancellation()
     }.flowOn(ioDispatcher)
 
@@ -117,6 +171,7 @@ constructor(
                 }
             }
 
+            is WsMarketMessage.SymbolDepth,
             is WsMarketMessage.AllMiniTickers,
             WsMarketMessage.Ignored,
             -> Unit
@@ -153,7 +208,7 @@ constructor(
 
     private fun streamsFor(symbol: String): Set<String> {
         val s = symbol.lowercase()
-        return linkedSetOf("$s@ticker", "$s@kline_$TARGET_INTERVAL")
+        return linkedSetOf("$s@ticker", "$s@kline_$TARGET_INTERVAL", "$s@depth@100ms")
     }
 
     private fun CoinKlineDto.toCoinCandleVO(): CoinCandleVO = CoinCandleVO(

@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.soma.cryptobook.coindetail.data.network.BinanceSpotDepthClient
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotKlineClient
 import io.soma.cryptobook.coindetail.data.network.BinanceSpotTickerClient
 import io.soma.cryptobook.core.data.datasource.ticksize.BinanceExchangeInfoApiService
@@ -115,6 +116,11 @@ object NetworkModule {
     fun provideBinanceSpotTickerClient(
         apiService: BinanceSpotApiService,
     ): BinanceSpotTickerClient = DefaultBinanceSpotTickerClient(apiService)
+
+    @Provides
+    @Singleton
+    fun provideBinanceSpotDepthClient(apiService: BinanceSpotApiService): BinanceSpotDepthClient =
+        DefaultBinanceSpotDepthClient(apiService)
 
     @Provides
     @Singleton

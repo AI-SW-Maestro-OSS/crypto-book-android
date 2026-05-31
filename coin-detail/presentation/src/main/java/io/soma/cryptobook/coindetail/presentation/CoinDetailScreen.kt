@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.component.CoinCandlestickChart
 import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContainer
+import io.soma.cryptobook.coindetail.presentation.component.OrderBookSection
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
@@ -130,7 +133,7 @@ internal fun CoinDetailScreen(
                 }
 
                 else -> {
-                    CoinDetailContent(state = state)
+                    CoinDetailContent(state = state, modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -147,29 +150,43 @@ private fun CoinDetailContent(state: State, modifier: Modifier = Modifier) {
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
-        modifier = modifier.padding(16.dp),
+        modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        PriceChange(
-            imageUrl = state.imageUrl,
-            price = state.currentPrice,
-            priceChangeText = state.priceChangeText,
-            priceChangeType = priceChangeType,
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
+        ) {
+            PriceChange(
+                imageUrl = state.imageUrl,
+                price = state.currentPrice,
+                priceChangeText = state.priceChangeText,
+                priceChangeType = priceChangeType,
+            )
 
-        CoinCandlestickChart(
-            candles = state.candles,
-            tickSize = state.tickSize,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp)
-                .background(Color.White),
-        )
+            CoinCandlestickChart(
+                candles = state.candles,
+                tickSize = state.tickSize,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .background(Color.White),
+            )
 
-        MetricCardGridContainer(
-            high24h = state.high24h,
-            low24h = state.low24h,
-            volume24h = state.volume24h,
-            openPrice = state.openPrice,
+            MetricCardGridContainer(
+                high24h = state.high24h,
+                low24h = state.low24h,
+                volume24h = state.volume24h,
+                openPrice = state.openPrice,
+            )
+        }
+
+        OrderBookSection(
+            tickSize = state.orderBook.tickSizeText,
+            bidPercentText = state.orderBook.bidPercentText,
+            askPercentText = state.orderBook.askPercentText,
+            bidRatio = state.orderBook.bidRatio,
+            rows = state.orderBook.rows,
+            onTickSizeClick = {},
         )
     }
 }

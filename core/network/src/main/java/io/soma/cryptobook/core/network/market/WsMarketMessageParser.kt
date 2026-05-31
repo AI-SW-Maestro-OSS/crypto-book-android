@@ -15,6 +15,7 @@ class WsMarketMessageParser @Inject constructor(private val json: Json) {
         private const val EVENT_24HR_TICKER = "24hrTicker"
         private const val EVENT_24HR_MINI_TICKER = "24hrMiniTicker"
         private const val EVENT_KLINE = "kline"
+        private const val EVENT_DEPTH = "depthUpdate"
     }
 
     fun parse(raw: String): WsMarketMessage {
@@ -77,6 +78,11 @@ class WsMarketMessageParser @Inject constructor(private val json: Json) {
             EVENT_KLINE -> {
                 val klineEvent = json.decodeFromJsonElement<WsKlineEventPayload>(element)
                 WsMarketMessage.SymbolKline(klineEvent)
+            }
+
+            EVENT_DEPTH -> {
+                val depthEvent = json.decodeFromJsonElement<WsDepthEventPayload>(element)
+                WsMarketMessage.SymbolDepth(depthEvent)
             }
 
             else -> WsMarketMessage.Ignored

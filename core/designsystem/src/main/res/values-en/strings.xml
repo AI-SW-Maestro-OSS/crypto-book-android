@@ -63,6 +63,9 @@
     <string name="cb_coin_detail_metric_low_24h">24h Low</string>
     <string name="cb_coin_detail_metric_volume_24h">24h Volume</string>
     <string name="cb_coin_detail_metric_open_price">Open Price</string>
+    <string name="cb_coin_detail_order_book">Order Book</string>
+    <string name="cb_coin_detail_bid">Bid</string>
+    <string name="cb_coin_detail_ask">Ask</string>
 
     <!-- Update required screen -->
     <string name="cb_update_required_title">Update required</string>

@@ -7,6 +7,7 @@ sealed interface WsMarketMessage {
     data class AllMiniTickers(val tickers: List<WsMiniTickerPayload>) : WsMarketMessage
     data class SymbolTicker(val ticker: WsTickerPayload) : WsMarketMessage
     data class SymbolKline(val klineEvent: WsKlineEventPayload) : WsMarketMessage
+    data class SymbolDepth(val depthEvent: WsDepthEventPayload) : WsMarketMessage
     data object Ignored : WsMarketMessage
 }
 
@@ -54,4 +55,15 @@ data class WsKlinePayload(
     @SerialName("l") val lowPrice: String,
     @SerialName("v") val volume: String,
     @SerialName("x") val isClosed: Boolean,
+)
+
+@Serializable
+data class WsDepthEventPayload(
+    @SerialName("e") val eventType: String? = null,
+    @SerialName("E") val eventTime: Long? = null,
+    @SerialName("s") val symbol: String,
+    @SerialName("U") val firstUpdateId: Long,
+    @SerialName("u") val finalUpdateId: Long,
+    @SerialName("b") val bids: List<List<String>> = emptyList(),
+    @SerialName("a") val asks: List<List<String>> = emptyList(),
 )

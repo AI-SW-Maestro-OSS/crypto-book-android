@@ -39,6 +39,7 @@ internal class WsMarketDebugLogger(
             is WsMarketMessage.AllMiniTickers -> "AllMiniTickers"
             is WsMarketMessage.SymbolTicker -> "SymbolTicker"
             is WsMarketMessage.SymbolKline -> "SymbolKline"
+            is WsMarketMessage.SymbolDepth -> "SymbolDepth"
             is WsMarketMessage.Ignored -> "Ignored"
         }
 
@@ -67,6 +68,8 @@ internal class WsMarketDebugLogger(
             "$symbol@kline_$interval"
         }
 
+        is WsMarketMessage.SymbolDepth -> "${message.depthEvent.symbol.lowercase()}@depth"
+
         is WsMarketMessage.Ignored -> "-"
     }
 
@@ -91,6 +94,12 @@ internal class WsMarketDebugLogger(
             "symbol=${event.symbol} interval=${kline.interval} " +
                 "openTime=${kline.openTime} closeTime=${kline.closeTime} " +
                 "isClosed=${kline.isClosed}"
+        }
+
+        is WsMarketMessage.SymbolDepth -> {
+            val event = message.depthEvent
+            "symbol=${event.symbol} U=${event.firstUpdateId} u=${event.finalUpdateId} " +
+                "bids=${event.bids.size} asks=${event.asks.size}"
         }
 
         is WsMarketMessage.Ignored -> "ignored"

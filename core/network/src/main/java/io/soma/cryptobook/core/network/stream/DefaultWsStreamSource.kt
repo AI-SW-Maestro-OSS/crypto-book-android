@@ -82,6 +82,11 @@ class DefaultWsStreamSource(
             "${klineEvent.symbol.lowercase()}@kline_${klineEvent.kline.interval.lowercase()}" in
                 streams
 
+        is WsMarketMessage.SymbolDepth -> {
+            val prefix = "${depthEvent.symbol.lowercase()}@depth"
+            streams.any { it.startsWith(prefix) }
+        }
+
         WsMarketMessage.Ignored -> false
     }
 
