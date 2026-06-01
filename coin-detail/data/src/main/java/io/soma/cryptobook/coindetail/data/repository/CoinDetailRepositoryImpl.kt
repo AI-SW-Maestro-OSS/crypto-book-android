@@ -208,7 +208,7 @@ constructor(
 
     private fun streamsFor(symbol: String): Set<String> {
         val s = symbol.lowercase()
-        return linkedSetOf("$s@ticker", "$s@kline_$TARGET_INTERVAL", "$s@depth@100ms")
+        return linkedSetOf("$s@ticker", "$s@kline_$TARGET_INTERVAL", "$s@depth")
     }
 
     private fun CoinKlineDto.toCoinCandleVO(): CoinCandleVO = CoinCandleVO(
