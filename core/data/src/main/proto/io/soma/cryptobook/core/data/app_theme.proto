@@ -7,4 +7,5 @@ enum AppThemeProto {
   APP_THEME_UNSPECIFIED = 0;
   APP_THEME_LIGHT = 1;
   APP_THEME_DARK = 2;
+  APP_THEME_SYSTEM = 3;
 }

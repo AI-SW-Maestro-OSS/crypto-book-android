@@ -13,12 +13,15 @@
     <string name="cb_settings_title">Settings</string>
     <string name="cb_settings_currency_unit_title">Price Currency Unit</string>
     <string name="cb_settings_currency_unit_description">Choose the currency unit for all prices.</string>
-    <string name="cb_settings_currency_dollar">Dollar</string>
-    <string name="cb_settings_currency_won">Won</string>
+    <string name="cb_settings_currency_dollar">US Dollar ($)</string>
+    <string name="cb_settings_currency_won">Korean Won (₩)</string>
     <string name="cb_settings_language_title">Language</string>
     <string name="cb_settings_language_description">Change the display language of the app.</string>
     <string name="cb_settings_language_english">English</string>
     <string name="cb_settings_language_korean">Korean</string>
+    <string name="cb_settings_language_english_native">English</string>
+    <string name="cb_settings_language_korean_native">한국어</string>
+    <string name="cb_settings_language_system">System default</string>
     <string name="cb_settings_exchange_rate_title">Exchange Rate</string>
     <string name="cb_settings_exchange_rate_updated_now">Rates updated just now</string>
     <string name="cb_settings_exchange_rate_loading">Loading…</string>
@@ -51,6 +54,7 @@
     <string name="cb_settings_theme_description">Choose the app appearance.</string>
     <string name="cb_settings_theme_light">Light</string>
     <string name="cb_settings_theme_dark">Dark</string>
+    <string name="cb_settings_theme_system">System default</string>
     <!-- Coin detail screen -->
     <string name="cb_coin_detail_back_cd">Back</string>
     <string name="cb_coin_detail_favorite_cd">Favorite</string>
@@ -66,6 +70,9 @@
     <string name="cb_coin_detail_order_book">Order Book</string>
     <string name="cb_coin_detail_bid">Bid</string>
     <string name="cb_coin_detail_ask">Ask</string>
+
+    <!-- Common -->
+    <string name="cancel">Cancel</string>
 
     <!-- Update required screen -->
     <string name="cb_update_required_title">Update required</string>

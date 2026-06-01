@@ -31,6 +31,9 @@ class CbPreferencesDataSource @Inject constructor(
                     null,
                     LanguageProto.LANGUAGE_UNSPECIFIED,
                     LanguageProto.UNRECOGNIZED,
+                    LanguageProto.LANGUAGE_SYSTEM,
+                    -> Language.SYSTEM
+
                     LanguageProto.LANGUAGE_ENGLISH,
                     -> Language.ENGLISH
 
@@ -52,6 +55,9 @@ class CbPreferencesDataSource @Inject constructor(
                     null,
                     AppThemeProto.APP_THEME_UNSPECIFIED,
                     AppThemeProto.UNRECOGNIZED,
+                    AppThemeProto.APP_THEME_SYSTEM,
+                    -> AppTheme.SYSTEM
+
                     AppThemeProto.APP_THEME_DARK,
                     -> AppTheme.DARK
 
@@ -69,6 +75,7 @@ class CbPreferencesDataSource @Inject constructor(
         userPreferences.updateData {
             it.copy {
                 this.language = when (language) {
+                    Language.SYSTEM -> LanguageProto.LANGUAGE_SYSTEM
                     Language.ENGLISH -> LanguageProto.LANGUAGE_ENGLISH
                     Language.KOREAN -> LanguageProto.LANGUAGE_KOREAN
                 }
@@ -91,6 +98,7 @@ class CbPreferencesDataSource @Inject constructor(
         userPreferences.updateData {
             it.copy {
                 this.appTheme = when (appTheme) {
+                    AppTheme.SYSTEM -> AppThemeProto.APP_THEME_SYSTEM
                     AppTheme.LIGHT -> AppThemeProto.APP_THEME_LIGHT
                     AppTheme.DARK -> AppThemeProto.APP_THEME_DARK
                 }

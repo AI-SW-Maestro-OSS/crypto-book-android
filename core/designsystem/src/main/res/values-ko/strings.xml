@@ -13,16 +13,20 @@
     <string name="cb_settings_title">설정</string>
     <string name="cb_settings_currency_unit_title">가격 통화 단위</string>
     <string name="cb_settings_currency_unit_description">모든 가격에 사용할 통화 단위를 선택하세요.</string>
-    <string name="cb_settings_currency_dollar">달러</string>
-    <string name="cb_settings_currency_won">원</string>
+    <string name="cb_settings_currency_dollar">미국 달러 ($)</string>
+    <string name="cb_settings_currency_won">대한민국 원 (₩)</string>
     <string name="cb_settings_language_title">언어</string>
     <string name="cb_settings_language_description">앱의 표시 언어를 변경하세요.</string>
     <string name="cb_settings_language_english">영어</string>
     <string name="cb_settings_language_korean">한국어</string>
+    <string name="cb_settings_language_english_native">English</string>
+    <string name="cb_settings_language_korean_native">한국어</string>
+    <string name="cb_settings_language_system">시스템 기본값</string>
     <string name="cb_settings_theme_title">테마</string>
     <string name="cb_settings_theme_description">앱의 화면 모드를 선택하세요.</string>
     <string name="cb_settings_theme_light">라이트</string>
     <string name="cb_settings_theme_dark">다크</string>
+    <string name="cb_settings_theme_system">시스템 기본값</string>
     <string name="cb_settings_exchange_rate_title">환율</string>
     <string name="cb_settings_exchange_rate_updated_now">방금 업데이트되었습니다</string>
     <string name="cb_settings_exchange_rate_loading">불러오는 중…</string>
@@ -67,6 +71,9 @@
     <string name="cb_coin_detail_order_book">호가</string>
     <string name="cb_coin_detail_bid">매수</string>
     <string name="cb_coin_detail_ask">매도</string>
+
+    <!-- Common -->
+    <string name="cancel">취소</string>
 
     <!-- Update required screen -->
     <string name="cb_update_required_title">업데이트가 필요합니다</string>

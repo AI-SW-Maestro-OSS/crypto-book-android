@@ -65,9 +65,10 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.observe { effect ->
                 when (effect) {
                     is MainContract.Effect.ApplyLocale -> {
-                        AppCompatDelegate.setApplicationLocales(
-                            LocaleListCompat.forLanguageTags(effect.localeTag),
-                        )
+                        val locales = effect.localeTag
+                            ?.let { LocaleListCompat.forLanguageTags(it) }
+                            ?: LocaleListCompat.getEmptyLocaleList()
+                        AppCompatDelegate.setApplicationLocales(locales)
                     }
 
                     is MainContract.Effect.ApplyTheme -> {

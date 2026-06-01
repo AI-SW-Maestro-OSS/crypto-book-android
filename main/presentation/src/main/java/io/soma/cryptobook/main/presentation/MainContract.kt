@@ -13,7 +13,10 @@ interface MainContract {
     }
 
     sealed interface Effect {
-        data class ApplyLocale(val localeTag: String) : Effect
+        /**
+         * [localeTag] 가 null 이면 시스템 언어를 따른다(빈 로케일 목록 적용).
+         */
+        data class ApplyLocale(val localeTag: String?) : Effect
         data class ApplyTheme(val nightMode: Int) : Effect
     }
 }

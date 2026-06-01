@@ -25,8 +25,10 @@ import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
 import io.soma.cryptobook.core.presentation.mvi.observe
+import io.soma.cryptobook.settings.presentation.component.CryptoSettingCard
+import io.soma.cryptobook.settings.presentation.component.CryptoSettingDivider
+import io.soma.cryptobook.settings.presentation.component.CryptoSettingSelectionRow
 import io.soma.cryptobook.settings.presentation.component.ExchangeRateCard
-import io.soma.cryptobook.settings.presentation.component.SettingsOptionCard
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Locale
@@ -66,10 +68,14 @@ internal fun SettingsScreen(
     onEvent: (SettingsContract.Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val currentLanguage = state.userData?.language ?: Language.ENGLISH
+    val currentLanguage = state.userData?.language ?: Language.SYSTEM
     val currentCurrency = state.userData?.currencyUnit ?: CurrencyUnit.DOLLAR
-    val currentAppTheme = state.userData?.appTheme ?: AppTheme.DARK
+    val currentAppTheme = state.userData?.appTheme ?: AppTheme.SYSTEM
     val exchangeRate = state.userData?.usdKrwExchangeRate
+
+    val themeOptions = listOf(AppTheme.SYSTEM, AppTheme.LIGHT, AppTheme.DARK)
+    val currencyOptions = listOf(CurrencyUnit.DOLLAR, CurrencyUnit.WON)
+    val languageOptions = listOf(Language.SYSTEM, Language.ENGLISH, Language.KOREAN)
 
     Column(
         modifier = modifier
@@ -78,68 +84,55 @@ internal fun SettingsScreen(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // App Theme
-        SettingsOptionCard(
-            title = stringResource(CryptoString.cb_settings_theme_title),
-            description = stringResource(CryptoString.cb_settings_theme_description),
-            options = listOf(
-                stringResource(CryptoString.cb_settings_theme_light),
-                stringResource(CryptoString.cb_settings_theme_dark),
-            ),
-            selectedIndex = when (currentAppTheme) {
-                AppTheme.LIGHT -> 0
-                AppTheme.DARK -> 1
-            },
-            onOptionSelected = { index ->
-                val appTheme = when (index) {
-                    0 -> AppTheme.LIGHT
-                    else -> AppTheme.DARK
-                }
-                onEvent(SettingsContract.Event.SetAppTheme(appTheme))
-            },
-        )
+        CryptoSettingCard {
+            // App Theme
+            CryptoSettingSelectionRow(
+                title = stringResource(CryptoString.cb_settings_theme_title),
+                dialogTitle = stringResource(CryptoString.cb_settings_theme_title),
+                options = listOf(
+                    stringResource(CryptoString.cb_settings_theme_system),
+                    stringResource(CryptoString.cb_settings_theme_light),
+                    stringResource(CryptoString.cb_settings_theme_dark),
+                ),
+                selectedIndex = themeOptions.indexOf(currentAppTheme),
+                onOptionSelected = { index ->
+                    onEvent(SettingsContract.Event.SetAppTheme(themeOptions[index]))
+                },
+            )
 
-        // Price Currency Unit
-        SettingsOptionCard(
-            title = stringResource(CryptoString.cb_settings_currency_unit_title),
-            description = stringResource(CryptoString.cb_settings_currency_unit_description),
-            options = listOf(
-                stringResource(CryptoString.cb_settings_currency_dollar),
-                stringResource(CryptoString.cb_settings_currency_won),
-            ),
-            selectedIndex = when (currentCurrency) {
-                CurrencyUnit.DOLLAR -> 0
-                CurrencyUnit.WON -> 1
-            },
-            onOptionSelected = { index ->
-                val currency = when (index) {
-                    0 -> CurrencyUnit.DOLLAR
-                    else -> CurrencyUnit.WON
-                }
-                onEvent(SettingsContract.Event.SetCurrencyUnit(currency))
-            },
-        )
+            CryptoSettingDivider()
 
-        // Language
-        SettingsOptionCard(
-            title = stringResource(CryptoString.cb_settings_language_title),
-            description = stringResource(CryptoString.cb_settings_language_description),
-            options = listOf(
-                stringResource(CryptoString.cb_settings_language_english),
-                stringResource(CryptoString.cb_settings_language_korean),
-            ),
-            selectedIndex = when (currentLanguage) {
-                Language.ENGLISH -> 0
-                Language.KOREAN -> 1
-            },
-            onOptionSelected = { index ->
-                val language = when (index) {
-                    0 -> Language.ENGLISH
-                    else -> Language.KOREAN
-                }
-                onEvent(SettingsContract.Event.SetLanguage(language))
-            },
-        )
+            // Price Currency Unit
+            CryptoSettingSelectionRow(
+                title = stringResource(CryptoString.cb_settings_currency_unit_title),
+                dialogTitle = stringResource(CryptoString.cb_settings_currency_unit_title),
+                options = listOf(
+                    stringResource(CryptoString.cb_settings_currency_dollar),
+                    stringResource(CryptoString.cb_settings_currency_won),
+                ),
+                selectedIndex = currencyOptions.indexOf(currentCurrency),
+                onOptionSelected = { index ->
+                    onEvent(SettingsContract.Event.SetCurrencyUnit(currencyOptions[index]))
+                },
+            )
+
+            CryptoSettingDivider()
+
+            // Language
+            CryptoSettingSelectionRow(
+                title = stringResource(CryptoString.cb_settings_language_title),
+                dialogTitle = stringResource(CryptoString.cb_settings_language_title),
+                options = listOf(
+                    stringResource(CryptoString.cb_settings_language_system),
+                    stringResource(CryptoString.cb_settings_language_english_native),
+                    stringResource(CryptoString.cb_settings_language_korean_native),
+                ),
+                selectedIndex = languageOptions.indexOf(currentLanguage),
+                onOptionSelected = { index ->
+                    onEvent(SettingsContract.Event.SetLanguage(languageOptions[index]))
+                },
+            )
+        }
 
         // Exchange Rate
         ExchangeRateCard(
@@ -174,7 +167,7 @@ private fun SettingsScreenPreview() {
                 language = Language.KOREAN,
                 currencyUnit = CurrencyUnit.DOLLAR,
                 usdKrwExchangeRate = BigDecimal("1450"),
-                appTheme = AppTheme.DARK,
+                appTheme = AppTheme.SYSTEM,
                 coinSortColumn = CoinSortColumn.NONE,
                 coinSortDirection = CoinSortDirection.NONE,
                 watchlistCoinSortColumn = CoinSortColumn.NONE,

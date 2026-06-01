@@ -32,6 +32,7 @@ data class CbColorScheme(
     @Immutable
     data class StrokeColors(
         val border: Color,
+        val divider: Color,
     )
 
     @Immutable
@@ -42,11 +43,13 @@ data class CbColorScheme(
 
     @Immutable
     data class FilledButtonColors(
+        val background: Color,
         val foregroundDisabled: Color,
     )
 
     @Immutable
     data class OutlineButtonColors(
+        val foreground: Color,
         val foregroundDisabled: Color,
     )
 

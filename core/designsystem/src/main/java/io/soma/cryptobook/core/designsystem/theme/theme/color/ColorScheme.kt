@@ -19,12 +19,15 @@ val darkCbColorScheme: CbColorScheme = CbColorScheme(
         secondary = Color(0xFF0d59f2)
     ),
     filledButton = CbColorScheme.FilledButtonColors(
+        background = Color(0xFF0D59F2),
         foregroundDisabled = Color(color = 0xFF657185)
     ),
     stroke = CbColorScheme.StrokeColors(
-        border = Color(0xFF0d59f2)
+        border = Color(0xFF0d59f2),
+        divider = Color(0xFF383838)
     ),
     outlineButton = CbColorScheme.OutlineButtonColors(
+        foreground = Color(0xFF0D59F2),
         foregroundDisabled = Color(0xFFf3f4f6)
     ),
     toggleButton = CbColorScheme.ToggleButtonColors(
@@ -57,12 +60,15 @@ val lightCbColorScheme: CbColorScheme = CbColorScheme(
         secondary = Color(0xFF0d59f2)
     ),
     filledButton = CbColorScheme.FilledButtonColors(
+        background = Color(0xFF0d59f2),
         foregroundDisabled = Color(color = 0xFF9CA3AF)
     ),
     stroke = CbColorScheme.StrokeColors(
-        border = Color(0xFF0d59f2)
+        border = Color(0xFF0d59f2),
+        divider = Color(0xFFE5E7EB)
     ),
     outlineButton = CbColorScheme.OutlineButtonColors(
+        foreground = Color(0xFF0D59F2),
         foregroundDisabled = Color(0xFF1A1A1A)
     ),
     toggleButton = CbColorScheme.ToggleButtonColors(

@@ -38,7 +38,8 @@ class MainViewModel @Inject constructor(
             .map { it.language }
             .distinctUntilChanged()
             .onEach { language ->
-                emitEffect(MainContract.Effect.ApplyLocale(localeTag = language.localeTag))
+                val localeTag = if (language == Language.SYSTEM) null else language.localeTag
+                emitEffect(MainContract.Effect.ApplyLocale(localeTag = localeTag))
             }
             .launchIn(viewModelScope)
     }
