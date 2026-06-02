@@ -1,8 +1,8 @@
 package io.soma.cryptobook.main.presentation.navigation
 
 import androidx.navigation3.runtime.NavKey
+import io.soma.cryptobook.core.designsystem.component.navigation.model.NavigationItem
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.component.navigation.model.NavigationItem
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.diary.presentation.navigation.DiaryNavKey
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey

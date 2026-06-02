@@ -24,8 +24,8 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.soma.cryptobook.coindetail.presentation.navigation.CoinDetailNavKey
 import io.soma.cryptobook.coindetail.presentation.navigation.coinDetailEntry
-import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
-import io.soma.cryptobook.core.designsystem.theme.component.scaffold.model.ScaffoldNavigationData
+import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.component.scaffold.model.ScaffoldNavigationData
 import io.soma.cryptobook.core.presentation.jank.TrackDisposableJank
 import io.soma.cryptobook.diary.presentation.navigation.diaryEntry
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey

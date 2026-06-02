@@ -35,11 +35,11 @@ import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContai
 import io.soma.cryptobook.coindetail.presentation.component.OrderBookSection
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
+import io.soma.cryptobook.core.designsystem.component.appbar.CbMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.component.appbar.NavigationIcon
+import io.soma.cryptobook.core.designsystem.component.button.CbStandardIconButton
+import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
-import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIcon
-import io.soma.cryptobook.core.designsystem.theme.component.button.CbStandardIconButton
-import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.presentation.mvi.observe

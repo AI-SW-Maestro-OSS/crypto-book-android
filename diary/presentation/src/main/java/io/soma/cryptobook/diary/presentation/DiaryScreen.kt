@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import io.soma.cryptobook.core.designsystem.component.appbar.CbMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbMediumTopAppBar
-import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
 import io.soma.cryptobook.core.presentation.mvi.observeWithoutEffect
 

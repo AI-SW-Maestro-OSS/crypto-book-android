@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import io.soma.cryptobook.core.designsystem.theme.component.dialog.CryptoSelectionDialog
-import io.soma.cryptobook.core.designsystem.theme.component.dialog.row.CryptoSelectionRow
+import io.soma.cryptobook.core.designsystem.component.dialog.CryptoSelectionDialog
+import io.soma.cryptobook.core.designsystem.component.dialog.row.CryptoSelectionRow
 import io.soma.cryptobook.core.designsystem.util.asText
 
 /**

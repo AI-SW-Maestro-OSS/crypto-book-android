@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import io.soma.cryptobook.core.designsystem.theme.component.appbar.CbSearchTopAppBar
-import io.soma.cryptobook.core.designsystem.theme.component.appbar.NavigationIcon
-import io.soma.cryptobook.core.designsystem.theme.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.component.appbar.CbSearchTopAppBar
+import io.soma.cryptobook.core.designsystem.component.appbar.NavigationIcon
+import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
 import io.soma.cryptobook.core.presentation.mvi.observe
 import io.soma.cryptobook.search.presentation.SearchContract.Effect
