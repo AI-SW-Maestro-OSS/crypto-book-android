@@ -23,14 +23,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 internal const val ORDER_BOOK_ROW_COUNT = 32
 private const val DEPTH_BAR_ALPHA = 0.12f
@@ -86,7 +83,7 @@ fun OrderBookSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(CbTheme.colorScheme.background.primary),
+            .background(CryptoTheme.colorScheme.background.primary),
     ) {
         OrderBookHeader(tickSize = tickSize, onTickSizeClick = onTickSizeClick)
         OrderBookPressureBar(
@@ -117,12 +114,9 @@ private fun OrderBookHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(CryptoString.cb_coin_detail_order_book),
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
-            lineHeight = 27.sp,
-            color = CbTheme.colorScheme.text.primary,
+            text = stringResource(CryptoString.crypto_coin_detail_order_book),
+            style = CryptoTheme.typography.headlineSmall,
+            color = CryptoTheme.colorScheme.text.primary,
         )
         TickSizeSelector(tickSize = tickSize, onClick = onTickSizeClick)
     }
@@ -137,7 +131,7 @@ private fun TickSizeSelector(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(CbTheme.colorScheme.background.tertiary)
+            .background(CryptoTheme.colorScheme.background.tertiary)
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -145,16 +139,13 @@ private fun TickSizeSelector(
     ) {
         Text(
             text = tickSize,
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            lineHeight = 21.sp,
-            color = CbTheme.colorScheme.text.primary,
+            style = CryptoTheme.typography.bodySmall,
+            color = CryptoTheme.colorScheme.text.primary,
         )
         Icon(
-            painter = painterResource(CbDrawable.ic_sort_desc),
+            painter = painterResource(CryptoDrawable.ic_sort_desc),
             contentDescription = null,
-            tint = CbTheme.colorScheme.text.primary,
+            tint = CryptoTheme.colorScheme.text.primary,
             modifier = Modifier.size(14.dp),
         )
     }
@@ -178,19 +169,13 @@ private fun OrderBookPressureBar(
         ) {
             Text(
                 text = bidPercentText,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-                color = CbTheme.colorScheme.price.up,
+                style = CryptoTheme.typography.bodySmall,
+                color = CryptoTheme.colorScheme.price.up,
             )
             Text(
                 text = askPercentText,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-                color = CbTheme.colorScheme.price.down,
+                style = CryptoTheme.typography.bodySmall,
+                color = CryptoTheme.colorScheme.price.down,
             )
         }
         val safeBidRatio = bidRatio.coerceIn(0f, 1f)
@@ -207,7 +192,7 @@ private fun OrderBookPressureBar(
                     modifier = Modifier
                         .weight(safeBidRatio)
                         .fillMaxHeight()
-                        .background(CbTheme.colorScheme.price.up),
+                        .background(CryptoTheme.colorScheme.price.up),
                 )
             }
             if (safeAskRatio > 0f) {
@@ -215,7 +200,7 @@ private fun OrderBookPressureBar(
                     modifier = Modifier
                         .weight(safeAskRatio)
                         .fillMaxHeight()
-                        .background(CbTheme.colorScheme.price.down),
+                        .background(CryptoTheme.colorScheme.price.down),
                 )
             }
         }
@@ -227,27 +212,21 @@ private fun OrderBookColumnHeader(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(CbTheme.colorScheme.background.tertiary)
+            .background(CryptoTheme.colorScheme.background.tertiary)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(CryptoString.cb_coin_detail_bid),
+            text = stringResource(CryptoString.crypto_coin_detail_bid),
             modifier = Modifier.weight(1f),
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.Normal,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            color = CbTheme.colorScheme.text.secondary,
+            style = CryptoTheme.typography.labelSmall,
+            color = CryptoTheme.colorScheme.text.secondary,
         )
         Text(
-            text = stringResource(CryptoString.cb_coin_detail_ask),
+            text = stringResource(CryptoString.crypto_coin_detail_ask),
             modifier = Modifier.weight(1f),
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.Normal,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            color = CbTheme.colorScheme.text.secondary,
+            style = CryptoTheme.typography.labelSmall,
+            color = CryptoTheme.colorScheme.text.secondary,
         )
     }
 }
@@ -257,7 +236,7 @@ private fun OrderBookList(rows: List<OrderBookRowUiModel>, modifier: Modifier = 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(CbTheme.colorScheme.background.primary),
+            .background(CryptoTheme.colorScheme.background.primary),
     ) {
         rows.forEach { row ->
             OrderBookRow(row = row)
@@ -291,10 +270,10 @@ private fun OrderBookCell(
     modifier: Modifier = Modifier,
 ) {
     val priceColor = when (side) {
-        OrderBookSide.Bid -> CbTheme.colorScheme.price.up
-        OrderBookSide.Ask -> CbTheme.colorScheme.price.down
+        OrderBookSide.Bid -> CryptoTheme.colorScheme.price.up
+        OrderBookSide.Ask -> CryptoTheme.colorScheme.price.down
     }
-    val quantityColor = CbTheme.colorScheme.text.secondary
+    val quantityColor = CryptoTheme.colorScheme.text.secondary
 
     Box(modifier = modifier.height(24.dp)) {
         if (entry != null) {
@@ -337,10 +316,7 @@ private fun OrderBookCellText(text: String, color: Color, modifier: Modifier = M
     Text(
         text = text,
         modifier = modifier,
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
+        style = CryptoTheme.typography.bodySmall,
         color = color,
     )
 }

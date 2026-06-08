@@ -2,84 +2,92 @@ package io.soma.cryptobook.core.designsystem.theme.theme.color
 
 import androidx.compose.ui.graphics.Color
 
-val darkCbColorScheme: CbColorScheme = CbColorScheme(
-    text = CbColorScheme.TextColors(
+val darkCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
+    text = CryptoColorScheme.TextColors(
         primary = Color(0xFFF3F4F6),
         secondary = Color(0xFFBDC1CA),
         interaction = Color(0xFF0d59f2)
     ),
-    background = CbColorScheme.BackgroundColors(
+    background = CryptoColorScheme.BackgroundColors(
         primary = Color(0xFF1A1A1A),
         secondary = Color(0xFF1A1A1A),
         tertiary = Color(0xFF1E2128),
         selected = Color(0xFF262A33)
     ),
-    icon = CbColorScheme.IconColors(
+    icon = CryptoColorScheme.IconColors(
         primary = Color(0xFFF3F4F6),
         secondary = Color(0xFF0d59f2)
     ),
-    filledButton = CbColorScheme.FilledButtonColors(
+    filledButton = CryptoColorScheme.FilledButtonColors(
         background = Color(0xFF0D59F2),
+        foreground = Color(0xFFFFFFFF),
         foregroundDisabled = Color(color = 0xFF657185)
     ),
-    stroke = CbColorScheme.StrokeColors(
+    stroke = CryptoColorScheme.StrokeColors(
         border = Color(0xFF0d59f2),
         divider = Color(0xFF383838)
     ),
-    outlineButton = CbColorScheme.OutlineButtonColors(
+    outlineButton = CryptoColorScheme.OutlineButtonColors(
         foreground = Color(0xFF0D59F2),
         foregroundDisabled = Color(0xFFf3f4f6)
     ),
-    toggleButton = CbColorScheme.ToggleButtonColors(
+    toggleButton = CryptoColorScheme.ToggleButtonColors(
         backgroundOn = Color(0xFF0D59F2),
         backgroundOff = Color(0xFF262A33),
         foregroundOn = Color(0xFFFFFFFF),
         foregroundOff = Color(0xFFF3F4F6)
     ),
-    price = CbColorScheme.PriceColors(
+    price = CryptoColorScheme.PriceColors(
         up = Color(0xFF22C55E),
         down = Color(0xFFE11919),
         flat = Color(0xFFFAFAFA)
+    ),
+    status = CryptoColorScheme.StatusColors(
+        error = Color(color = 0xFFFF4E63)
     )
 )
 
-val lightCbColorScheme: CbColorScheme = CbColorScheme(
-    text = CbColorScheme.TextColors(
+val lightCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
+    text = CryptoColorScheme.TextColors(
         primary = Color(0xFF1A1A1A),
         secondary = Color(0xFF9CA3AF),
         interaction = Color(0xFF0d59f2)
     ),
-    background = CbColorScheme.BackgroundColors(
+    background = CryptoColorScheme.BackgroundColors(
         primary = Color(0xFFFFFFFF),
         secondary = Color(0xFFFFFFFF),
         tertiary = Color(0xFFF3F4F6),
         selected = Color(0xFFE5E7EB)
     ),
-    icon = CbColorScheme.IconColors(
+    icon = CryptoColorScheme.IconColors(
         primary = Color(0xFF1A1A1A),
         secondary = Color(0xFF0d59f2)
     ),
-    filledButton = CbColorScheme.FilledButtonColors(
+    filledButton = CryptoColorScheme.FilledButtonColors(
         background = Color(0xFF0d59f2),
+        foreground = Color(0xFFFFFFFF),
         foregroundDisabled = Color(color = 0xFF9CA3AF)
     ),
-    stroke = CbColorScheme.StrokeColors(
+    stroke = CryptoColorScheme.StrokeColors(
         border = Color(0xFF0d59f2),
         divider = Color(0xFFE5E7EB)
     ),
-    outlineButton = CbColorScheme.OutlineButtonColors(
+    outlineButton = CryptoColorScheme.OutlineButtonColors(
         foreground = Color(0xFF0D59F2),
         foregroundDisabled = Color(0xFF1A1A1A)
     ),
-    toggleButton = CbColorScheme.ToggleButtonColors(
+    toggleButton = CryptoColorScheme.ToggleButtonColors(
         backgroundOn = Color(0xFF0D59F2),
         backgroundOff = Color(0xFFE5E7EB),
         foregroundOn = Color(0xFFFFFFFF),
         foregroundOff = Color(0xFF1A1A1A)
     ),
-    price = CbColorScheme.PriceColors(
+    price = CryptoColorScheme.PriceColors(
         up = Color(0xFF22C55E),
         down = Color(0xFFE11919),
         flat = Color(0xFFFAFAFA)
+    ),
+    status = CryptoColorScheme.StatusColors(
+        error = Color(color = 0xFFCB263A)
     )
 )

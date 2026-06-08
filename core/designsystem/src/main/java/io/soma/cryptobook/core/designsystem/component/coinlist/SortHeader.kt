@@ -32,22 +32,22 @@ fun SortHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SortHeaderItem(
-            label = stringResource(CryptoString.cb_home_sort_symbol),
+            label = stringResource(CryptoString.crypto_home_sort_symbol),
             sortDirection = symbolSort,
             onClick = onSymbolClick,
         )
         SortHeaderItem(
-            label = stringResource(CryptoString.cb_home_sort_volume),
+            label = stringResource(CryptoString.crypto_home_sort_volume),
             sortDirection = volumeSort,
             onClick = onVolumeClick,
         )
         SortHeaderItem(
-            label = stringResource(CryptoString.cb_home_sort_price),
+            label = stringResource(CryptoString.crypto_home_sort_price),
             sortDirection = priceSort,
             onClick = onPriceClick,
         )
         SortHeaderItem(
-            label = stringResource(CryptoString.cb_home_sort_change_24h),
+            label = stringResource(CryptoString.crypto_home_sort_change_24h),
             sortDirection = changeSort,
             onClick = onChangeClick,
         )

@@ -19,44 +19,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 /**
- * Coin list item component
- *
- * Figma element name: Table (PriceRow variant)
- * Figma element type: Instance
- * Figma node-id: 177:529
- *
- * Displays:
- * - Avatar: 40x40dp rounded placeholder (TODO: 실제 코인 이미지)
- * - Symbol: BTCUSDT (16px, SemiBold)
- * - Name: Bitcoin (12px, Regular, secondary color)
- * - Price: $68500.52 (16px, Bold, right-aligned)
- * - Change %: +1.75% (12px, Bold, color by state)
- *
- * Dependencies: None (leaf component)
- *
- * Layout:
- * - Width: fillMaxWidth
- * - Padding: horizontal 15dp, vertical 9dp
- * - Left: Avatar + Text info (11dp gap between avatar and text)
- * - Right: Price + Change % (end-aligned)
- *
- * Price change colors:
- * - Up: #22C55E (green)
- * - Down: #E11919 (red)
- * - Flat: #FAFAFA (white)
- *
  * @param symbol Coin symbol (e.g., "BTCUSDT")
  * @param name Coin name (e.g., "Bitcoin")
  * @param imageUrl Coin image URL
@@ -76,9 +46,9 @@ fun CoinListItem(
     modifier: Modifier = Modifier,
 ) {
     val changeColor = when {
-        changePercent > 0 -> CbTheme.colorScheme.price.up
-        changePercent < 0 -> CbTheme.colorScheme.price.down
-        else -> CbTheme.colorScheme.price.flat
+        changePercent > 0 -> CryptoTheme.colorScheme.price.up
+        changePercent < 0 -> CryptoTheme.colorScheme.price.down
+        else -> CryptoTheme.colorScheme.price.flat
     }
 
     val changeText = when {
@@ -89,7 +59,7 @@ fun CoinListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(CbTheme.colorScheme.background.secondary)
+            .background(CryptoTheme.colorScheme.background.secondary)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -106,7 +76,7 @@ fun CoinListItem(
                 error = painterResource(R.drawable.ic_coin_placeholder),
                 fallback = painterResource(R.drawable.ic_coin_placeholder),
                 contentDescription = stringResource(
-                    CryptoString.cb_home_coin_icon_cd_format,
+                    CryptoString.crypto_home_coin_icon_cd_format,
                     name,
                 ),
                 contentScale = ContentScale.Crop,
@@ -121,19 +91,13 @@ fun CoinListItem(
             Column {
                 Text(
                     text = symbol,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    lineHeight = 24.sp,
-                    color = CbTheme.colorScheme.text.primary,
+                    style = CryptoTheme.typography.titleMedium,
+                    color = CryptoTheme.colorScheme.text.primary,
                 )
                 Text(
                     text = name,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    color = CbTheme.colorScheme.text.secondary,
+                    style = CryptoTheme.typography.bodySmall,
+                    color = CryptoTheme.colorScheme.text.secondary,
                 )
             }
         }
@@ -144,21 +108,13 @@ fun CoinListItem(
         ) {
             Text(
                 text = price,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                lineHeight = 24.sp,
-                color = CbTheme.colorScheme.text.primary,
-                textAlign = TextAlign.End,
+                style = CryptoTheme.typography.labelMedium,
+                color = CryptoTheme.colorScheme.text.primary,
             )
             Text(
                 text = changeText,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
+                style = CryptoTheme.typography.labelMedium,
                 color = changeColor,
-                textAlign = TextAlign.End,
             )
         }
     }

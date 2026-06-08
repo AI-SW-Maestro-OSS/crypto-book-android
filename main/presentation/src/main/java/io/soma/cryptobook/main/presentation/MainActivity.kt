@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.metrics.performance.JankStats
 import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.presentation.mvi.observe
 import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
 
             val uiState by splashViewModel.uiState.collectAsStateWithLifecycle()
 
-            CbTheme {
+            CryptoTheme {
                 when {
                     uiState.shouldKeepSplashScreen() -> {}
 

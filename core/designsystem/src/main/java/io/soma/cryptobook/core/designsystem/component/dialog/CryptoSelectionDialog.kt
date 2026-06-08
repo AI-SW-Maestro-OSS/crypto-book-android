@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import io.soma.cryptobook.core.designsystem.component.button.CryptoTextButton
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @Composable
 fun CryptoSelectionDialog(
@@ -29,7 +29,7 @@ fun CryptoSelectionDialog(
         Column(
             modifier = Modifier
                 .background(
-                    color = CbTheme.colorScheme.background.primary,
+                    color = CryptoTheme.colorScheme.background.primary,
                     shape = RoundedCornerShape(size = 28.dp)
                 ),
             horizontalAlignment = Alignment.End,
@@ -39,8 +39,8 @@ fun CryptoSelectionDialog(
                     .padding(24.dp)
                     .fillMaxWidth(),
                 text = title,
-                color = CbTheme.colorScheme.text.primary,
-                style = CbTheme.typography.headlineSmall
+                color = CryptoTheme.colorScheme.text.primary,
+                style = CryptoTheme.typography.headlineSmall
             )
             Column(
                 modifier = Modifier

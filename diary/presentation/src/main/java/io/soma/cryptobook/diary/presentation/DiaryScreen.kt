@@ -8,21 +8,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import io.soma.cryptobook.core.designsystem.component.appbar.CbMediumTopAppBar
-import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.component.appbar.CryptoMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.presentation.mvi.observeWithoutEffect
 
 @Composable
 fun DiaryRoute(modifier: Modifier = Modifier, viewModel: DiaryViewModel = hiltViewModel()) {
     val (state, dispatch) = viewModel.observeWithoutEffect()
 
-    CbScaffold(
+    CryptoScaffold(
         modifier = modifier,
         topBar = {
-            CbMediumTopAppBar(
-                title = stringResource(CryptoString.cb_top_level_diary),
+            CryptoMediumTopAppBar(
+                title = stringResource(CryptoString.crypto_top_level_diary),
             )
         },
     ) {
@@ -42,7 +42,7 @@ internal fun DiaryScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(CbTheme.colorScheme.background.secondary),
+            .background(CryptoTheme.colorScheme.background.secondary),
     )
 }
 

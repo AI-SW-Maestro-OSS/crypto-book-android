@@ -20,13 +20,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.soma.cryptobook.core.designsystem.component.appbar.CbMediumTopAppBar
-import io.soma.cryptobook.core.designsystem.component.coinlist.CbCoinListSection
+import io.soma.cryptobook.core.designsystem.component.appbar.CryptoMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.component.coinlist.CoinListItemData
+import io.soma.cryptobook.core.designsystem.component.coinlist.CryptoCoinListSection
 import io.soma.cryptobook.core.designsystem.component.coinlist.SortDirection
-import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
@@ -53,18 +53,18 @@ internal fun WatchlistScreen(
     val lazyListState = rememberLazyListState()
     TrackScrollJank(scrollableState = lazyListState, stateName = "watchlist:coinList")
 
-    CbScaffold(
+    CryptoScaffold(
         modifier = modifier,
         topBar = {
-            CbMediumTopAppBar(
-                title = stringResource(CryptoString.cb_top_level_watchlist),
+            CryptoMediumTopAppBar(
+                title = stringResource(CryptoString.crypto_top_level_watchlist),
             )
         },
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(CbTheme.colorScheme.background.secondary),
+                .background(CryptoTheme.colorScheme.background.secondary),
         ) {
             state.realtimeStatusMessage?.let { msg ->
                 Row(
@@ -90,7 +90,7 @@ internal fun WatchlistScreen(
                 }
             }
 
-            CbCoinListSection(
+            CryptoCoinListSection(
                 coins = state.coins.map { it.toCoinListItemData() },
                 isLoading = state.isLoading,
                 symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
@@ -116,8 +116,8 @@ private fun WatchlistEmpty(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = stringResource(CryptoString.cb_watchlist_empty),
-            color = CbTheme.colorScheme.text.secondary,
+            text = stringResource(CryptoString.crypto_watchlist_empty),
+            color = CryptoTheme.colorScheme.text.secondary,
         )
     }
 }
@@ -152,7 +152,7 @@ private fun WatchlistScreenPreview() {
     WatchlistScreen(
         state = WatchlistUiState(coins = sampleCoins),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
+        modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
@@ -162,6 +162,6 @@ private fun WatchlistScreenEmptyPreview() {
     WatchlistScreen(
         state = WatchlistUiState(isLoading = false),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
+        modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }

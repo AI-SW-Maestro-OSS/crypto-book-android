@@ -14,13 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 /**
  * Metric card grid container displaying 2×2 grid of metrics
@@ -65,12 +62,12 @@ fun MetricCardGridContainer(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MetricCard(
-                label = stringResource(CryptoString.cb_coin_detail_metric_high_24h),
+                label = stringResource(CryptoString.crypto_coin_detail_metric_high_24h),
                 value = high24h,
                 modifier = Modifier.weight(1f),
             )
             MetricCard(
-                label = stringResource(CryptoString.cb_coin_detail_metric_low_24h),
+                label = stringResource(CryptoString.crypto_coin_detail_metric_low_24h),
                 value = low24h,
                 modifier = Modifier.weight(1f),
             )
@@ -82,12 +79,12 @@ fun MetricCardGridContainer(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MetricCard(
-                label = stringResource(CryptoString.cb_coin_detail_metric_volume_24h),
+                label = stringResource(CryptoString.crypto_coin_detail_metric_volume_24h),
                 value = volume24h,
                 modifier = Modifier.weight(1f),
             )
             MetricCard(
-                label = stringResource(CryptoString.cb_coin_detail_metric_open_price),
+                label = stringResource(CryptoString.crypto_coin_detail_metric_open_price),
                 value = openPrice,
                 modifier = Modifier.weight(1f),
             )
@@ -97,21 +94,6 @@ fun MetricCardGridContainer(
 
 /**
  * Metric card component displaying a label and value
- *
- * Figma element name: Stats/MetricCard
- * Figma element type: Component
- * Figma node-id: 177:678
- *
- * Displays:
- * - Label text (14sp Regular, #BDC1CA)
- * - Value text (16sp Medium, #F3F4F6)
- *
- * Dependencies: None (leaf component)
- *
- * Layout:
- * - Column with 5dp gap
- * - Container: 175x72dp, background #1E2128, rounded 10dp
- * - Content padding: 16dp horizontal, 13dp vertical
  *
  * @param label Label text (e.g., "24h High", "24h Low", "Volume")
  * @param value Value text (e.g., "$73,800.00", "100M USDT")
@@ -124,7 +106,7 @@ fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
             .width(175.dp)
             .height(72.dp)
             .background(
-                color = CbTheme.colorScheme.background.tertiary,
+                color = CryptoTheme.colorScheme.background.tertiary,
                 shape = RoundedCornerShape(10.dp),
             )
             .padding(horizontal = 16.dp, vertical = 13.dp),
@@ -134,53 +116,20 @@ fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
         // Label
         Text(
             text = label,
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
-            color = CbTheme.colorScheme.text.secondary,
+            style = CryptoTheme.typography.labelLargeRegular,
+            color = CryptoTheme.colorScheme.text.secondary,
         )
 
         // Value
         Text(
             text = value,
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            color = CbTheme.colorScheme.text.primary,
+            style = CryptoTheme.typography.titleMedium,
+            color = CryptoTheme.colorScheme.text.primary,
         )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
-@Composable
-private fun MetricCard24hHighPreview() {
-    MetricCard(
-        label = stringResource(CryptoString.cb_coin_detail_metric_high_24h),
-        value = "$73,800.00",
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
-@Composable
-private fun MetricCard24hLowPreview() {
-    MetricCard(
-        label = stringResource(CryptoString.cb_coin_detail_metric_low_24h),
-        value = "$68,200.00",
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
-@Composable
-private fun MetricCardVolumePreview() {
-    MetricCard(
-        label = stringResource(CryptoString.cb_coin_detail_metric_volume_24h),
-        value = "100M USDT",
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Preview(showBackground = true)
 @Composable
 private fun MetricCardGridContainerPreview() {
     MetricCardGridContainer(

@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.soma.cryptobook.core.designsystem.component.radio.CryptoRadioButton
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.designsystem.util.Text
 
 /**
@@ -47,8 +47,8 @@ fun CryptoSelectionRow(
         )
         Text(
             text = text(),
-            color = CbTheme.colorScheme.text.primary,
-            style = CbTheme.typography.bodyLarge,
+            color = CryptoTheme.colorScheme.text.primary,
+            style = CryptoTheme.typography.bodyLarge,
             modifier = Modifier
         )
     }

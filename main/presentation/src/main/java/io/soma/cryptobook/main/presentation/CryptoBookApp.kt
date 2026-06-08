@@ -24,7 +24,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.soma.cryptobook.coindetail.presentation.navigation.CoinDetailNavKey
 import io.soma.cryptobook.coindetail.presentation.navigation.coinDetailEntry
-import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
 import io.soma.cryptobook.core.designsystem.component.scaffold.model.ScaffoldNavigationData
 import io.soma.cryptobook.core.presentation.jank.TrackDisposableJank
 import io.soma.cryptobook.diary.presentation.navigation.diaryEntry
@@ -32,8 +32,8 @@ import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
 import io.soma.cryptobook.home.presentation.navigation.homeEntry
 import io.soma.cryptobook.main.presentation.message.MessageCommand
 import io.soma.cryptobook.main.presentation.message.MessageCommandSource
-import io.soma.cryptobook.main.presentation.navigation.CbNavigator
-import io.soma.cryptobook.main.presentation.navigation.CbTopLevelNavItem
+import io.soma.cryptobook.main.presentation.navigation.CryptoNavigator
+import io.soma.cryptobook.main.presentation.navigation.CryptoTopLevelNavItem
 import io.soma.cryptobook.main.presentation.navigation.LinkRouter
 import io.soma.cryptobook.main.presentation.navigation.NavCommand
 import io.soma.cryptobook.main.presentation.navigation.NavCommandSource
@@ -55,13 +55,13 @@ fun CryptoBookApp(
     // navigation
     val navigationState = rememberNavigationState(
         startKey = HomeNavKey,
-        topLevelKeys = CbTopLevelNavItem.entries.map { it.navKey }.toSet(),
+        topLevelKeys = CryptoTopLevelNavItem.entries.map { it.navKey }.toSet(),
     )
     if (appLinkKey !is HomeNavKey) {
         navigationState.backStack.add(appLinkKey)
     }
     NavigationTrackingSideEffect(navigationState)
-    val navigator = remember { CbNavigator(navigationState) }
+    val navigator = remember { CryptoNavigator(navigationState) }
 
     // message (global loading + toast only; snackbar is handled per-screen)
     var isLoading by remember { mutableStateOf(false) }
@@ -106,20 +106,20 @@ fun CryptoBookApp(
         }
     }
 
-    val selectedNavItem = CbTopLevelNavItem.entries
+    val selectedNavItem = CryptoTopLevelNavItem.entries
         .find { it.navKey == navigationState.currentTopKey }
     val navigationData = selectedNavItem?.let { selected ->
         ScaffoldNavigationData(
             onNavigationClick = { item ->
-                if (item is CbTopLevelNavItem) navigator.navigateTo(item.navKey)
+                if (item is CryptoTopLevelNavItem) navigator.navigateTo(item.navKey)
             },
-            navigationItems = CbTopLevelNavItem.entries.toImmutableList(),
+            navigationItems = CryptoTopLevelNavItem.entries.toImmutableList(),
             selectedNavigationItem = selected,
         )
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        CbScaffold(
+        CryptoScaffold(
             navigationData = navigationData,
             contentWindowInsets = WindowInsets(0),
         ) {

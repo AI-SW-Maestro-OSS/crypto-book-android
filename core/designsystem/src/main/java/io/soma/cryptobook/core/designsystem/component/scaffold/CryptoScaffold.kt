@@ -32,25 +32,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import io.soma.cryptobook.core.designsystem.component.navigation.CbBottomAppBar
-import io.soma.cryptobook.core.designsystem.component.navigation.CbNavigationRail
-import io.soma.cryptobook.core.designsystem.component.scaffold.model.CbPullToRefreshState
+import io.soma.cryptobook.core.designsystem.component.navigation.CryptoBottomAppBar
+import io.soma.cryptobook.core.designsystem.component.navigation.CryptoNavigationRail
+import io.soma.cryptobook.core.designsystem.component.scaffold.model.CryptoPullToRefreshState
 import io.soma.cryptobook.core.designsystem.component.scaffold.model.ScaffoldNavigationData
-import io.soma.cryptobook.core.designsystem.component.scaffold.model.rememberCbPullToRefreshState
+import io.soma.cryptobook.core.designsystem.component.scaffold.model.rememberCryptoPullToRefreshState
 import io.soma.cryptobook.core.designsystem.theme.model.WindowSize
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.designsystem.theme.util.rememberWindowSize
 
 @Composable
-fun CbScaffold(
+fun CryptoScaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = { },
     overlay: @Composable () -> Unit = { },
     snackbarHost: @Composable () -> Unit = { },
     navigationData: ScaffoldNavigationData? = null,
-    pullToRefreshState: CbPullToRefreshState = rememberCbPullToRefreshState(),
-    containerColor: Color = CbTheme.colorScheme.background.primary,
-    contentColor: Color = CbTheme.colorScheme.text.primary,
+    pullToRefreshState: CryptoPullToRefreshState = rememberCryptoPullToRefreshState(),
+    containerColor: Color = CryptoTheme.colorScheme.background.primary,
+    contentColor: Color = CryptoTheme.colorScheme.text.primary,
     contentWindowInsets: WindowInsets = ScaffoldDefaults
         .contentWindowInsets
         .union(WindowInsets.displayCutout)
@@ -126,8 +126,8 @@ fun CbScaffold(
                                 modifier = Modifier.align(Alignment.TopCenter),
                                 isRefreshing = pullToRefreshState.isRefreshing,
                                 state = internalPullToRefreshState,
-                                containerColor = CbTheme.colorScheme.background.secondary,
-                                color = CbTheme.colorScheme.icon.secondary
+                                containerColor = CryptoTheme.colorScheme.background.secondary,
+                                color = CryptoTheme.colorScheme.icon.secondary
                             )
                         }
                     }
@@ -145,7 +145,7 @@ private fun ScaffoldBottomAppBar(
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         var appBarHeightPx by remember { mutableIntStateOf(0) }
-        CbBottomAppBar(
+        CryptoBottomAppBar(
             navigationItems = navigationData.navigationItems,
             selectedItem = navigationData.selectedNavigationItem,
             onClick = navigationData.onNavigationClick,
@@ -167,7 +167,7 @@ private fun ScaffoldNavigationRail(
             .zIndex(zIndex = 1f),
     ) {
         var appBarWidthPx by remember { mutableIntStateOf(0) }
-        CbNavigationRail(
+        CryptoNavigationRail(
             navigationItems = navigationData.navigationItems,
             selectedItem = navigationData.selectedNavigationItem,
             onClick = navigationData.onNavigationClick,

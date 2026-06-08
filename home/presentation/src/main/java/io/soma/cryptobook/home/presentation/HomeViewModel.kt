@@ -123,16 +123,16 @@ class HomeViewModel @Inject constructor(
         MarketRealtimeState.Inactive,
         -> null
 
-        MarketRealtimeState.Recovering -> CryptoString.cb_realtime_recovering.asText()
+        MarketRealtimeState.Recovering -> CryptoString.crypto_realtime_recovering.asText()
 
-        is MarketRealtimeState.Failed -> CryptoString.cb_realtime_disconnected.asText()
+        is MarketRealtimeState.Failed -> CryptoString.crypto_realtime_disconnected.asText()
     }
 
     private fun CoinPriceError.toText(): Text = when (this) {
-        CoinPriceError.Network -> CryptoString.cb_error_network.asText()
-        CoinPriceError.RateLimited -> CryptoString.cb_error_rate_limited.asText()
-        CoinPriceError.Server -> CryptoString.cb_error_server.asText()
-        CoinPriceError.UnexpectedResponse -> CryptoString.cb_error_unexpected_response.asText()
-        is CoinPriceError.Unknown -> CryptoString.cb_error_unknown.asText()
+        CoinPriceError.Network -> CryptoString.crypto_error_network.asText()
+        CoinPriceError.RateLimited -> CryptoString.crypto_error_rate_limited.asText()
+        CoinPriceError.Server -> CryptoString.crypto_error_server.asText()
+        CoinPriceError.UnexpectedResponse -> CryptoString.crypto_error_unexpected_response.asText()
+        is CoinPriceError.Unknown -> CryptoString.crypto_error_unknown.asText()
     }
 }

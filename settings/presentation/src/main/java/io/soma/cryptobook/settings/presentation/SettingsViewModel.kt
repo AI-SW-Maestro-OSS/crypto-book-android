@@ -90,8 +90,8 @@ class SettingsViewModel @Inject constructor(
     private fun showSnackbarMessage() {
         emitEffect(
             SettingsContract.Effect.ShowSnackbar(
-                message = CryptoString.cb_settings_test_snackbar_message.asText(),
-                actionLabel = CryptoString.cb_settings_test_snackbar_action.asText(),
+                message = CryptoString.crypto_settings_test_snackbar_message.asText(),
+                actionLabel = CryptoString.crypto_settings_test_snackbar_action.asText(),
             ),
         )
     }

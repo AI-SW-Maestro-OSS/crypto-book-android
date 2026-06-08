@@ -7,17 +7,17 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
-import io.soma.cryptobook.core.designsystem.theme.theme.color.CbColorScheme
-import io.soma.cryptobook.core.designsystem.theme.theme.color.darkCbColorScheme
-import io.soma.cryptobook.core.designsystem.theme.theme.color.lightCbColorScheme
+import io.soma.cryptobook.core.designsystem.theme.theme.color.CryptoColorScheme
+import io.soma.cryptobook.core.designsystem.theme.theme.color.darkCryptoColorScheme
+import io.soma.cryptobook.core.designsystem.theme.theme.color.lightCryptoColorScheme
 import io.soma.cryptobook.core.designsystem.theme.theme.type.CryptoTypography
 import io.soma.cryptobook.core.designsystem.theme.theme.type.cryptoTypography
 
-object CbTheme {
-    val colorScheme: CbColorScheme
+object CryptoTheme {
+    val colorScheme: CryptoColorScheme
         @Composable
         @ReadOnlyComposable
-        get() = LocalCbColorScheme.current
+        get() = LocalCryptoColorScheme.current
 
     val typography: CryptoTypography
         @Composable
@@ -26,22 +26,17 @@ object CbTheme {
 }
 
 @Composable
-fun CbTheme(
+fun CryptoTheme(
     content: @Composable () -> Unit,
 ) {
-    val cbColorScheme = if (isSystemInDarkTheme()) {
-        darkCbColorScheme
+    val cryptoColorScheme = if (isSystemInDarkTheme()) {
+        darkCryptoColorScheme
     } else {
-        lightCbColorScheme
+        lightCryptoColorScheme
     }
 
-    val defaultBackgroundTheme = BackgroundTheme(
-        color = cbColorScheme.background.primary
-    )
-
     CompositionLocalProvider(
-        LocalBackgroundTheme provides defaultBackgroundTheme,
-        LocalCbColorScheme provides cbColorScheme,
+        LocalCryptoColorScheme provides cryptoColorScheme,
         LocalCryptoTypography provides cryptoTypography
     ) {
         MaterialTheme(
@@ -50,8 +45,8 @@ fun CbTheme(
     }
 }
 
-val LocalCbColorScheme: ProvidableCompositionLocal<CbColorScheme> =
-    compositionLocalOf { darkCbColorScheme }
+val LocalCryptoColorScheme: ProvidableCompositionLocal<CryptoColorScheme> =
+    compositionLocalOf { darkCryptoColorScheme }
 
 val LocalCryptoTypography: ProvidableCompositionLocal<CryptoTypography> =
     compositionLocalOf { cryptoTypography }

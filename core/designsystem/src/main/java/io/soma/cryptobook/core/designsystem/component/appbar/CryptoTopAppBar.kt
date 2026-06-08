@@ -13,20 +13,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.unit.sp
-import io.soma.cryptobook.core.designsystem.R
-import io.soma.cryptobook.core.designsystem.component.appbar.color.cbTopAppBarColors
-import io.soma.cryptobook.core.designsystem.component.button.CbStandardIconButton
+import io.soma.cryptobook.core.designsystem.component.appbar.color.cryptoTopAppBarColors
+import io.soma.cryptobook.core.designsystem.component.button.CryptoStandardIconButton
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CbMediumTopAppBar(
+fun CryptoMediumTopAppBar(
     title: String,
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets
@@ -36,10 +29,10 @@ fun CbMediumTopAppBar(
 ) {
     CenterAlignedTopAppBar(
         windowInsets = windowInsets,
-        colors = cbTopAppBarColors(),
+        colors = cryptoTopAppBarColors(),
         navigationIcon = {
             navigationIcon?.let {
-                CbStandardIconButton(
+                CryptoStandardIconButton(
                     painter = it.navigationIcon,
                     contentDescription = it.navigationIconContentDescription,
                     onClick = it.onNavigationIconClick,
@@ -50,18 +43,7 @@ fun CbMediumTopAppBar(
         title = {
             Text(
                 text = title,
-                style = TextStyle(
-                    fontSize = 19.sp,
-                    lineHeight = 28.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_semibold)),
-                    fontWeight = FontWeight.W600,
-                    letterSpacing = 0.sp,
-                    lineHeightStyle = LineHeightStyle(
-                        alignment = LineHeightStyle.Alignment.Center,
-                        trim = LineHeightStyle.Trim.None,
-                    ),
-                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                )
+                style = CryptoTheme.typography.titleLarge,
             )
         },
         modifier = modifier,

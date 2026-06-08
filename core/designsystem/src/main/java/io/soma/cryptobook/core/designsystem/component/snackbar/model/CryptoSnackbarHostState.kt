@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Stable
-data class CbSnackbarHostState(
+data class CryptoSnackbarHostState(
     val snackbarHostState: SnackbarHostState,
     val scope: CoroutineScope,
 ) {
@@ -37,9 +37,9 @@ data class CbSnackbarHostState(
 }
 
 @Composable
-fun rememberCbSnackbarHostState(
+fun rememberCryptoSnackbarHostState(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scope: CoroutineScope = rememberCoroutineScope(),
-): CbSnackbarHostState = remember {
-    CbSnackbarHostState(snackbarHostState = snackbarHostState, scope = scope)
+): CryptoSnackbarHostState = remember {
+    CryptoSnackbarHostState(snackbarHostState = snackbarHostState, scope = scope)
 }

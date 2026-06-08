@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 /**
  * Rounded grouped container for settings rows.
@@ -28,7 +28,7 @@ fun CryptoSettingCard(modifier: Modifier = Modifier, content: @Composable Column
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
-            .background(CbTheme.colorScheme.background.tertiary),
+            .background(CryptoTheme.colorScheme.background.tertiary),
         content = content,
     )
 }
@@ -41,7 +41,7 @@ fun CryptoSettingDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
         modifier = modifier,
         thickness = 1.dp,
-        color = CbTheme.colorScheme.stroke.divider,
+        color = CryptoTheme.colorScheme.stroke.divider,
     )
 }
 

@@ -3,7 +3,7 @@ package io.soma.cryptobook.core.data.repository
 import io.soma.cryptobook.core.data.database.ticksize.SymbolTickSizeDao
 import io.soma.cryptobook.core.data.database.ticksize.SymbolTickSizeEntity
 import io.soma.cryptobook.core.data.datasource.ticksize.TickSizeRemoteDataSource
-import io.soma.cryptobook.core.data.datastore.CbPreferencesDataSource
+import io.soma.cryptobook.core.data.datastore.CryptoPreferencesDataSource
 import io.soma.cryptobook.core.domain.repository.TickSizeRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
@@ -13,7 +13,7 @@ import javax.inject.Inject
 class TickSizeRepositoryImpl @Inject constructor(
     private val remoteDataSource: TickSizeRemoteDataSource,
     private val tickSizeDao: SymbolTickSizeDao,
-    private val preferencesDataSource: CbPreferencesDataSource,
+    private val preferencesDataSource: CryptoPreferencesDataSource,
     private val ioDispatcher: CoroutineDispatcher,
 ) : TickSizeRepository {
     override suspend fun refreshTickSizesIfRequired(nowMillis: Long) = withContext(ioDispatcher) {

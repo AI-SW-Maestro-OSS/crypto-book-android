@@ -22,11 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.soma.cryptobook.core.designsystem.component.navigation.model.NavigationItem
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-fun CbNavigationRail(
+fun CryptoNavigationRail(
     navigationItems: ImmutableList<NavigationItem>,
     selectedItem: NavigationItem?,
     onClick: (NavigationItem) -> Unit,
@@ -36,7 +36,7 @@ fun CbNavigationRail(
 ) {
     val density = LocalDensity.current
     Surface(
-        color = CbTheme.colorScheme.background.secondary,
+        color = CryptoTheme.colorScheme.background.secondary,
         contentColor = Color.Unspecified,
         modifier = modifier
     ) {
@@ -54,7 +54,7 @@ fun CbNavigationRail(
             )
         ) {
             navigationItems.forEach { navigationItem ->
-                CbNavigationRailItem(
+                CryptoNavigationRailItem(
                     labelRes = navigationItem.labelRes,
                     selectedIconRes = navigationItem.iconResSelected,
                     unselectedIconRes = navigationItem.iconRes,

@@ -8,19 +8,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import io.soma.cryptobook.core.designsystem.component.button.color.cbStandardIconButtonColors
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.component.button.color.cryptoStandardIconButtonColors
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @Composable
-fun CbStandardIconButton(
+fun CryptoStandardIconButton(
     @DrawableRes vectorIconRes: Int,
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
-    contentColor: Color = CbTheme.colorScheme.icon.primary,
+    contentColor: Color = CryptoTheme.colorScheme.icon.primary,
 ) {
-    CbStandardIconButton(
+    CryptoStandardIconButton(
         painter = painterResource(vectorIconRes),
         contentDescription = contentDescription,
         onClick = onClick,
@@ -31,18 +31,18 @@ fun CbStandardIconButton(
 }
 
 @Composable
-fun CbStandardIconButton(
+fun CryptoStandardIconButton(
     painter: Painter,
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
-    contentColor: Color = CbTheme.colorScheme.icon.primary,
+    contentColor: Color = CryptoTheme.colorScheme.icon.primary,
 ) {
     IconButton(
         modifier = modifier,
         onClick = onClick,
-        colors = cbStandardIconButtonColors(contentColor = contentColor),
+        colors = cryptoStandardIconButtonColors(contentColor = contentColor),
         enabled = isEnabled,
     ) {
         Icon(

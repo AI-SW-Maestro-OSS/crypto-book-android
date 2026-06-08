@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
  * @param emptyContent Shown when [coins] is empty and not loading.
  */
 @Composable
-fun CbCoinListSection(
+fun CryptoCoinListSection(
     coins: List<CoinListItemData>,
     isLoading: Boolean,
     symbolSort: SortDirection,
@@ -69,14 +69,14 @@ fun CbCoinListSection(
 
 @Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
-private fun CbCoinListSectionPreview() {
+private fun CryptoCoinListSectionPreview() {
     val sampleCoins = listOf(
         CoinListItemData("BTCUSDT", "Bitcoin", "", "$68500.52", 2.35),
         CoinListItemData("ETHUSDT", "Ethereum", "", "$3500.25", -1.75),
         CoinListItemData("SOLUSDT", "Solana", "", "$145.30", 5.20),
     )
 
-    CbCoinListSection(
+    CryptoCoinListSection(
         coins = sampleCoins,
         isLoading = false,
         symbolSort = SortDirection.None,

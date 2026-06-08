@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,12 +34,13 @@ import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContai
 import io.soma.cryptobook.coindetail.presentation.component.OrderBookSection
 import io.soma.cryptobook.coindetail.presentation.component.PriceChange
 import io.soma.cryptobook.coindetail.presentation.component.PriceChangeType
-import io.soma.cryptobook.core.designsystem.component.appbar.CbMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.component.appbar.CryptoMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.component.appbar.NavigationIcon
-import io.soma.cryptobook.core.designsystem.component.button.CbStandardIconButton
-import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.component.button.CryptoStandardIconButton
+import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
+import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.presentation.mvi.observe
 
@@ -79,27 +79,27 @@ internal fun CoinDetailScreen(
     onEvent: (Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CbScaffold(
+    CryptoScaffold(
         modifier = modifier,
         topBar = {
-            CbMediumTopAppBar(
+            CryptoMediumTopAppBar(
                 title = state.symbol,
                 navigationIcon = NavigationIcon(
-                    navigationIcon = painterResource(id = CbDrawable.ic_arrow_back),
+                    navigationIcon = painterResource(id = CryptoDrawable.ic_arrow_back),
                     navigationIconContentDescription = stringResource(
-                        CryptoString.cb_coin_detail_back_cd,
+                        CryptoString.crypto_coin_detail_back_cd,
                     ),
                     onNavigationIconClick = { onEvent(Event.OnBackClicked) },
                 ),
                 actions = {
-                    CbStandardIconButton(
+                    CryptoStandardIconButton(
                         vectorIconRes = if (state.isWatchlisted) {
-                            CbDrawable.ic_watchlist_filled
+                            CryptoDrawable.ic_watchlist_filled
                         } else {
-                            CbDrawable.ic_watchlist
+                            CryptoDrawable.ic_watchlist
                         },
                         contentDescription = stringResource(
-                            CryptoString.cb_coin_detail_favorite_cd,
+                            CryptoString.crypto_coin_detail_favorite_cd,
                         ),
                         onClick = { onEvent(Event.OnFavoriteClicked) },
                         modifier = Modifier,
@@ -130,7 +130,7 @@ internal fun CoinDetailScreen(
                 state.errorMsg != null -> {
                     Text(
                         text = state.errorMsg(),
-                        color = MaterialTheme.colorScheme.error,
+                        color = CryptoTheme.colorScheme.status.error,
                     )
                 }
 
@@ -231,7 +231,7 @@ private fun CoinDetailScreenErrorPreview() {
     CoinDetailScreen(
         state = State(
             isLoading = false,
-            errorMsg = CryptoString.cb_coin_detail_connection_error_state.asText(),
+            errorMsg = CryptoString.crypto_coin_detail_connection_error_state.asText(),
         ),
         onEvent = {},
     )
@@ -243,7 +243,7 @@ private fun CoinDetailScreenRealtimeWarningPreview() {
     CoinDetailScreen(
         state = State(
             isLoading = false,
-            realtimeStatusMessage = CryptoString.cb_realtime_recovering.asText(),
+            realtimeStatusMessage = CryptoString.crypto_realtime_recovering.asText(),
         ),
         onEvent = {},
     )

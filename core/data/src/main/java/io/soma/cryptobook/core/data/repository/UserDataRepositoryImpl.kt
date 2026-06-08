@@ -1,6 +1,6 @@
 package io.soma.cryptobook.core.data.repository
 
-import io.soma.cryptobook.core.data.datastore.CbPreferencesDataSource
+import io.soma.cryptobook.core.data.datastore.CryptoPreferencesDataSource
 import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
@@ -12,35 +12,35 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserDataRepositoryImpl @Inject constructor(
-    private val cbPreferencesDataSource: CbPreferencesDataSource,
+    private val cryptoPreferencesDataSource: CryptoPreferencesDataSource,
 ) : UserDataRepository {
     override val userData: Flow<UserData> =
-        cbPreferencesDataSource.userData
+        cryptoPreferencesDataSource.userData
 
     override suspend fun setLanguage(language: Language) {
-        cbPreferencesDataSource.setLanguage(language)
+        cryptoPreferencesDataSource.setLanguage(language)
     }
 
     override suspend fun setPriceCurrency(currencyUnit: CurrencyUnit) {
-        cbPreferencesDataSource.setCurrencyUnit(currencyUnit)
+        cryptoPreferencesDataSource.setCurrencyUnit(currencyUnit)
     }
 
     override suspend fun setUsdKrwExchangeRate(usdKrwExchangeRate: Long) {
-        cbPreferencesDataSource.setUsdKrwExchangeRate(usdKrwExchangeRate)
+        cryptoPreferencesDataSource.setUsdKrwExchangeRate(usdKrwExchangeRate)
     }
 
     override suspend fun setAppTheme(appTheme: AppTheme) {
-        cbPreferencesDataSource.setAppTheme(appTheme)
+        cryptoPreferencesDataSource.setAppTheme(appTheme)
     }
 
     override suspend fun setCoinSort(column: CoinSortColumn, direction: CoinSortDirection) {
-        cbPreferencesDataSource.setCoinSort(column, direction)
+        cryptoPreferencesDataSource.setCoinSort(column, direction)
     }
 
     override suspend fun setWatchlistCoinSort(
         column: CoinSortColumn,
         direction: CoinSortDirection,
     ) {
-        cbPreferencesDataSource.setWatchlistCoinSort(column, direction)
+        cryptoPreferencesDataSource.setWatchlistCoinSort(column, direction)
     }
 }

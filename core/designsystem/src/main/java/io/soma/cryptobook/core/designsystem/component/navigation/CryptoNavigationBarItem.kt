@@ -3,18 +3,20 @@ package io.soma.cryptobook.core.designsystem.component.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import io.soma.cryptobook.core.designsystem.component.navigation.color.cbNavigationRailItemColors
+import io.soma.cryptobook.core.designsystem.component.navigation.color.cryptoNavigationBarItemColors
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @Composable
-fun CbNavigationRailItem(
+fun RowScope.CryptoNavigationBarItem(
     @StringRes labelRes: Int,
     @DrawableRes selectedIconRes: Int,
     @DrawableRes unselectedIconRes: Int,
@@ -22,7 +24,7 @@ fun CbNavigationRailItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavigationRailItem(
+    NavigationBarItem(
         icon = {
             Box() {
                 Icon(
@@ -30,6 +32,11 @@ fun CbNavigationRailItem(
                         id = if (isSelected) selectedIconRes else unselectedIconRes,
                     ),
                     contentDescription = null,
+                    tint = if (isSelected) {
+                        CryptoTheme.colorScheme.icon.secondary
+                    } else {
+                        CryptoTheme.colorScheme.icon.primary
+                    }
                 )
             }
         },
@@ -39,12 +46,12 @@ fun CbNavigationRailItem(
                 text = label,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier,
+                modifier = Modifier
             )
         },
         selected = isSelected,
         onClick = onClick,
+        colors = cryptoNavigationBarItemColors(),
         modifier = modifier,
-        colors = cbNavigationRailItemColors(),
     )
 }

@@ -101,12 +101,12 @@ class CoinDetailViewModel @AssistedInject constructor(
                             state.copy(
                                 isLoading = false,
                                 errorMsg = CryptoString
-                                    .cb_coin_detail_connection_error_state
+                                    .crypto_coin_detail_connection_error_state
                                     .asText(),
                             )
                         }
                         messageHelper.showToast(
-                            CryptoString.cb_coin_detail_connection_error_toast.asText(),
+                            CryptoString.crypto_coin_detail_connection_error_toast.asText(),
                         )
                     }
                 }
@@ -130,8 +130,8 @@ class CoinDetailViewModel @AssistedInject constructor(
         MarketRealtimeState.Inactive,
         -> null
 
-        MarketRealtimeState.Recovering -> CryptoString.cb_realtime_recovering.asText()
+        MarketRealtimeState.Recovering -> CryptoString.crypto_realtime_recovering.asText()
 
-        is MarketRealtimeState.Failed -> CryptoString.cb_realtime_disconnected.asText()
+        is MarketRealtimeState.Failed -> CryptoString.crypto_realtime_disconnected.asText()
     }
 }

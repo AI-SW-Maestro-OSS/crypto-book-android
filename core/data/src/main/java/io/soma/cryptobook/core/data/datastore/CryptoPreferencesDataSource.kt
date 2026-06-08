@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 import javax.inject.Inject
 
-class CbPreferencesDataSource @Inject constructor(
+class CryptoPreferencesDataSource @Inject constructor(
     private val userPreferences: DataStore<UserPreferences>,
 ) {
     val lastTickSizeCheckedAtMillis = userPreferences.data

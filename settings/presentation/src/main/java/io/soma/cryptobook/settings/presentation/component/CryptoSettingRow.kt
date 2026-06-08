@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import io.soma.cryptobook.core.designsystem.R
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 /**
  * Tappable settings row: a bold title on the left, the current value and a chevron
@@ -46,20 +46,20 @@ fun CryptoSettingRow(
     ) {
         Text(
             text = title,
-            style = CbTheme.typography.bodyLarge,
-            color = CbTheme.colorScheme.text.primary,
+            style = CryptoTheme.typography.bodyLarge,
+            color = CryptoTheme.colorScheme.text.primary,
             modifier = Modifier.weight(1f),
         )
         Text(
             text = value,
-            style = CbTheme.typography.bodyMedium,
-            color = CbTheme.colorScheme.text.secondary,
+            style = CryptoTheme.typography.bodyMedium,
+            color = CryptoTheme.colorScheme.text.secondary,
         )
         Icon(
             modifier = Modifier.size(20.dp),
             painter = painterResource(id = R.drawable.ic_chevron_right),
             contentDescription = null,
-            tint = CbTheme.colorScheme.text.secondary,
+            tint = CryptoTheme.colorScheme.text.secondary,
         )
     }
 }

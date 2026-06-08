@@ -1,82 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Top-level navigation -->
-    <string name="cb_top_level_home">Home</string>
-    <string name="cb_top_level_watchlist">Watchlist</string>
-    <string name="cb_top_level_diary">Diary</string>
-    <string name="cb_top_level_settings">Settings</string>
+    <string name="crypto_top_level_home">Home</string>
+    <string name="crypto_top_level_watchlist">Watchlist</string>
+    <string name="crypto_top_level_diary">Diary</string>
+    <string name="crypto_top_level_settings">Settings</string>
 
     <!-- Watchlist screen -->
-    <string name="cb_watchlist_empty">No coins in your watchlist yet.</string>
+    <string name="crypto_watchlist_empty">No coins in your watchlist yet.</string>
 
     <!-- Settings screen -->
-    <string name="cb_settings_title">Settings</string>
-    <string name="cb_settings_currency_unit_title">Price Currency Unit</string>
-    <string name="cb_settings_currency_unit_description">Choose the currency unit for all prices.</string>
-    <string name="cb_settings_currency_dollar">US Dollar ($)</string>
-    <string name="cb_settings_currency_won">Korean Won (₩)</string>
-    <string name="cb_settings_language_title">Language</string>
-    <string name="cb_settings_language_description">Change the display language of the app.</string>
-    <string name="cb_settings_language_english">English</string>
-    <string name="cb_settings_language_korean">Korean</string>
-    <string name="cb_settings_language_english_native">English</string>
-    <string name="cb_settings_language_korean_native">한국어</string>
-    <string name="cb_settings_language_system">System default</string>
-    <string name="cb_settings_theme_title">Theme</string>
-    <string name="cb_settings_theme_description">Choose the app appearance.</string>
-    <string name="cb_settings_theme_light">Light</string>
-    <string name="cb_settings_theme_dark">Dark</string>
-    <string name="cb_settings_theme_system">System default</string>
-    <string name="cb_settings_exchange_rate_title">Exchange Rate</string>
-    <string name="cb_settings_exchange_rate_updated_now">Rates updated just now</string>
-    <string name="cb_settings_exchange_rate_loading">Loading…</string>
-    <string name="cb_settings_exchange_rate_format">1 USD = %1$s WON</string>
-    <string name="cb_settings_exchange_rate_refresh_cd">Refresh exchange rate</string>
-    <string name="cb_settings_test_snackbar_message">This is a test snackbar message</string>
-    <string name="cb_settings_test_snackbar_action">OK</string>
+    <string name="crypto_settings_title">Settings</string>
+    <string name="crypto_settings_currency_unit_title">Price Currency Unit</string>
+    <string name="crypto_settings_currency_dollar">US Dollar ($)</string>
+    <string name="crypto_settings_currency_won">Korean Won (₩)</string>
+    <string name="crypto_settings_language_title">Language</string>
+    <string name="crypto_settings_language_english_native">English</string>
+    <string name="crypto_settings_language_korean_native">한국어</string>
+    <string name="crypto_settings_language_system">System default</string>
+    <string name="crypto_settings_theme_title">Theme</string>
+    <string name="crypto_settings_theme_description">Choose the app appearance.</string>
+    <string name="crypto_settings_theme_light">Light</string>
+    <string name="crypto_settings_theme_dark">Dark</string>
+    <string name="crypto_settings_theme_system">System default</string>
+    <string name="crypto_settings_exchange_rate_title">Exchange Rate</string>
+    <string name="crypto_settings_exchange_rate_updated_now">Rates updated just now</string>
+    <string name="crypto_settings_exchange_rate_loading">Loading…</string>
+    <string name="crypto_settings_exchange_rate_format">1 USD = %1$s WON</string>
+    <string name="crypto_settings_exchange_rate_refresh_cd">Refresh exchange rate</string>
+    <string name="crypto_settings_test_snackbar_message">This is a test snackbar message</string>
+    <string name="crypto_settings_test_snackbar_action">OK</string>
 
     <!-- Realtime status (shared by Home & Coin detail) -->
-    <string name="cb_realtime_recovering">Reconnecting realtime…</string>
-    <string name="cb_realtime_disconnected">Realtime data connection lost</string>
+    <string name="crypto_realtime_recovering">Reconnecting realtime…</string>
+    <string name="crypto_realtime_disconnected">Realtime data connection lost</string>
 
     <!-- Coin price errors (shared) -->
-    <string name="cb_error_network">Please check your network connection</string>
-    <string name="cb_error_rate_limited">Too many requests. Please try again shortly.</string>
-    <string name="cb_error_server">Failed to load price information</string>
-    <string name="cb_error_unexpected_response">Invalid price information response</string>
-    <string name="cb_error_unknown">An unknown error occurred</string>
+    <string name="crypto_error_network">Please check your network connection</string>
+    <string name="crypto_error_rate_limited">Too many requests. Please try again shortly.</string>
+    <string name="crypto_error_server">Failed to load price information</string>
+    <string name="crypto_error_unexpected_response">Invalid price information response</string>
+    <string name="crypto_error_unknown">An unknown error occurred</string>
 
     <!-- Home screen -->
-    <string name="cb_home_search_hint">Search</string>
-    <string name="cb_home_search_icon_cd">Search</string>
-    <string name="cb_home_sort_symbol">Symbol</string>
-    <string name="cb_home_sort_price">Price ($)</string>
-    <string name="cb_home_sort_change_24h">24h Change %</string>
-    <string name="cb_home_sort_volume">Volume</string>
-    <string name="cb_home_sort_icon_cd_format">Sort %1$s</string>
-    <string name="cb_home_coin_icon_cd_format">%1$s coin icon</string>
+    <string name="crypto_home_search_hint">Search</string>
+    <string name="crypto_home_search_icon_cd">Search</string>
+    <string name="crypto_home_sort_symbol">Symbol</string>
+    <string name="crypto_home_sort_price">Price ($)</string>
+    <string name="crypto_home_sort_change_24h">24h Change %</string>
+    <string name="crypto_home_sort_volume">Volume</string>
+    <string name="crypto_home_sort_icon_cd_format">Sort %1$s</string>
+    <string name="crypto_home_coin_icon_cd_format">%1$s coin icon</string>
 
     <!-- Coin detail screen -->
-    <string name="cb_coin_detail_back_cd">Back</string>
-    <string name="cb_coin_detail_favorite_cd">Favorite</string>
-    <string name="cb_coin_detail_search_cd">Search</string>
-    <string name="cb_coin_detail_coin_icon_cd">Coin icon</string>
-    <string name="cb_coin_detail_chart_loading">Loading chart…</string>
-    <string name="cb_coin_detail_connection_error_state">Connection error</string>
-    <string name="cb_coin_detail_connection_error_toast">A connection error occurred</string>
-    <string name="cb_coin_detail_metric_high_24h">24h High</string>
-    <string name="cb_coin_detail_metric_low_24h">24h Low</string>
-    <string name="cb_coin_detail_metric_volume_24h">24h Volume</string>
-    <string name="cb_coin_detail_metric_open_price">Open Price</string>
-    <string name="cb_coin_detail_order_book">Order Book</string>
-    <string name="cb_coin_detail_bid">Bid</string>
-    <string name="cb_coin_detail_ask">Ask</string>
+    <string name="crypto_coin_detail_back_cd">Back</string>
+    <string name="crypto_coin_detail_favorite_cd">Favorite</string>
+    <string name="crypto_coin_detail_search_cd">Search</string>
+    <string name="crypto_coin_detail_coin_icon_cd">Coin icon</string>
+    <string name="crypto_coin_detail_chart_loading">Loading chart…</string>
+    <string name="crypto_coin_detail_connection_error_state">Connection error</string>
+    <string name="crypto_coin_detail_connection_error_toast">A connection error occurred</string>
+    <string name="crypto_coin_detail_metric_high_24h">24h High</string>
+    <string name="crypto_coin_detail_metric_low_24h">24h Low</string>
+    <string name="crypto_coin_detail_metric_volume_24h">24h Volume</string>
+    <string name="crypto_coin_detail_metric_open_price">Open Price</string>
+    <string name="crypto_coin_detail_order_book">Order Book</string>
+    <string name="crypto_coin_detail_bid">Bid</string>
+    <string name="crypto_coin_detail_ask">Ask</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>
 
     <!-- Update required screen -->
-    <string name="cb_update_required_title">Update required</string>
-    <string name="cb_update_required_message">A new version is available.\nPlease update the app.</string>
-    <string name="cb_update_required_button">Update</string>
+    <string name="crypto_update_required_title">Update required</string>
+    <string name="crypto_update_required_message">A new version is available.\nPlease update the app.</string>
+    <string name="crypto_update_required_button">Update</string>
 </resources>

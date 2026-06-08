@@ -17,15 +17,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.soma.cryptobook.core.designsystem.component.appbar.CbMediumTopAppBar
-import io.soma.cryptobook.core.designsystem.component.button.CbStandardIconButton
-import io.soma.cryptobook.core.designsystem.component.coinlist.CbCoinListSection
+import io.soma.cryptobook.core.designsystem.component.appbar.CryptoMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.component.button.CryptoStandardIconButton
 import io.soma.cryptobook.core.designsystem.component.coinlist.CoinListItemData
+import io.soma.cryptobook.core.designsystem.component.coinlist.CryptoCoinListSection
 import io.soma.cryptobook.core.designsystem.component.coinlist.SortDirection
-import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
+import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
@@ -53,14 +53,14 @@ internal fun HomeScreen(
     val lazyListState = rememberLazyListState()
     TrackScrollJank(scrollableState = lazyListState, stateName = "home:coinList")
 
-    CbScaffold(
+    CryptoScaffold(
         modifier = modifier,
         topBar = {
-            CbMediumTopAppBar(
+            CryptoMediumTopAppBar(
                 title = "Crypto-Book-Android",
                 actions = {
-                    CbStandardIconButton(
-                        vectorIconRes = CbDrawable.ic_search,
+                    CryptoStandardIconButton(
+                        vectorIconRes = CryptoDrawable.ic_search,
                         contentDescription = "search",
                         onClick = { onEvent(HomeEvent.SearchIconClick) },
                         modifier = Modifier,
@@ -72,7 +72,7 @@ internal fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(CbTheme.colorScheme.background.secondary),
+                .background(CryptoTheme.colorScheme.background.secondary),
         ) {
             state.realtimeStatusMessage?.let { msg ->
                 Row(
@@ -99,7 +99,7 @@ internal fun HomeScreen(
                 }
             }
 
-            CbCoinListSection(
+            CryptoCoinListSection(
                 coins = state.coins.map { it.toCoinListItemData() },
                 isLoading = state.isLoading,
                 symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
@@ -154,7 +154,7 @@ private fun HomeScreenPreview() {
     HomeScreen(
         state = HomeUiState(coins = sampleCoins),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
+        modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
@@ -164,7 +164,7 @@ private fun HomeScreenLoadingPreview() {
     HomeScreen(
         state = HomeUiState(isLoading = true),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
+        modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
@@ -172,9 +172,9 @@ private fun HomeScreenLoadingPreview() {
 @Composable
 private fun HomeScreenErrorPreview() {
     HomeScreen(
-        state = HomeUiState(errorMsg = CryptoString.cb_error_network.asText()),
+        state = HomeUiState(errorMsg = CryptoString.crypto_error_network.asText()),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
+        modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
@@ -183,9 +183,9 @@ private fun HomeScreenErrorPreview() {
 private fun HomeScreenRealtimeWarningPreview() {
     HomeScreen(
         state = HomeUiState(
-            realtimeStatusMessage = CryptoString.cb_realtime_recovering.asText(),
+            realtimeStatusMessage = CryptoString.crypto_realtime_recovering.asText(),
         ),
         onEvent = {},
-        modifier = Modifier.background(CbTheme.colorScheme.background.primary),
+        modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }

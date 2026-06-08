@@ -5,7 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import io.soma.cryptobook.navigation.NavigationState
 
 @Stable
-class CbNavigator(val state: NavigationState) {
+class CryptoNavigator(val state: NavigationState) {
     fun navigateTo(key: NavKey) {
         when (key) {
             in state.topLevelKeys -> goToTopLevel(key)

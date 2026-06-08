@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 @Immutable
-data class CbColorScheme(
+data class CryptoColorScheme(
     val text: TextColors,
     val background: BackgroundColors,
     val icon: IconColors,
@@ -13,6 +13,7 @@ data class CbColorScheme(
     val stroke: StrokeColors,
     val toggleButton: ToggleButtonColors,
     val price: PriceColors,
+    val status: StatusColors,
 ) {
     @Immutable
     data class TextColors(
@@ -44,6 +45,7 @@ data class CbColorScheme(
     @Immutable
     data class FilledButtonColors(
         val background: Color,
+        val foreground: Color,
         val foregroundDisabled: Color,
     )
 
@@ -66,5 +68,10 @@ data class CbColorScheme(
         val up: Color,
         val down: Color,
         val flat: Color,
+    )
+
+    @Immutable
+    data class StatusColors(
+        val error: Color,
     )
 }

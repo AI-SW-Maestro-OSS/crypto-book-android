@@ -5,11 +5,11 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @Composable
-fun cbTextFieldColors(
-    textColor: Color = CbTheme.colorScheme.text.primary,
+fun cryptoTextFieldColors(
+    textColor: Color = CryptoTheme.colorScheme.text.primary,
 ): TextFieldColors = TextFieldDefaults.colors(
     focusedTextColor = textColor,
     unfocusedTextColor = textColor,
@@ -17,18 +17,18 @@ fun cbTextFieldColors(
     focusedContainerColor = Color.Transparent,
     unfocusedContainerColor = Color.Transparent,
 
-    cursorColor = CbTheme.colorScheme.text.interaction,
+    cursorColor = CryptoTheme.colorScheme.text.interaction,
     selectionColors = TextSelectionColors(
-        handleColor = CbTheme.colorScheme.stroke.border,
-        backgroundColor = CbTheme.colorScheme.stroke.border.copy(alpha = 0.4f)
+        handleColor = CryptoTheme.colorScheme.stroke.border,
+        backgroundColor = CryptoTheme.colorScheme.stroke.border.copy(alpha = 0.4f)
     ),
 
     focusedIndicatorColor = Color.Transparent,
     unfocusedIndicatorColor = Color.Transparent,
 
-    focusedTrailingIconColor = CbTheme.colorScheme.icon.primary,
-    unfocusedTrailingIconColor = CbTheme.colorScheme.icon.primary,
+    focusedTrailingIconColor = CryptoTheme.colorScheme.icon.primary,
+    unfocusedTrailingIconColor = CryptoTheme.colorScheme.icon.primary,
 
-    focusedPlaceholderColor = CbTheme.colorScheme.text.secondary,
-    unfocusedPlaceholderColor = CbTheme.colorScheme.text.secondary,
+    focusedPlaceholderColor = CryptoTheme.colorScheme.text.secondary,
+    unfocusedPlaceholderColor = CryptoTheme.colorScheme.text.secondary,
 )

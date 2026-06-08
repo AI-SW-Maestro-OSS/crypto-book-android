@@ -12,12 +12,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import io.soma.cryptobook.core.designsystem.component.appbar.CbMediumTopAppBar
-import io.soma.cryptobook.core.designsystem.component.scaffold.CbScaffold
-import io.soma.cryptobook.core.designsystem.component.snackbar.CbSnackbarHost
-import io.soma.cryptobook.core.designsystem.component.snackbar.model.rememberCbSnackbarHostState
+import io.soma.cryptobook.core.designsystem.component.appbar.CryptoMediumTopAppBar
+import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
+import io.soma.cryptobook.core.designsystem.component.snackbar.CryptoSnackbarHost
+import io.soma.cryptobook.core.designsystem.component.snackbar.model.rememberCryptoSnackbarHostState
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
@@ -35,7 +35,7 @@ import java.util.Locale
 
 @Composable
 fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
-    val snackbarHostState = rememberCbSnackbarHostState()
+    val snackbarHostState = rememberCryptoSnackbarHostState()
     val resources = LocalContext.current.resources
     val (state, dispatch) = viewModel.observe { effect ->
         when (effect) {
@@ -46,14 +46,14 @@ fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = 
         }
     }
 
-    CbScaffold(
+    CryptoScaffold(
         modifier = modifier,
         topBar = {
-            CbMediumTopAppBar(
+            CryptoMediumTopAppBar(
                 title = "Settings",
             )
         },
-        snackbarHost = { CbSnackbarHost(snackbarHostState) },
+        snackbarHost = { CryptoSnackbarHost(snackbarHostState) },
     ) {
         SettingsScreen(
             state = state.value,
@@ -80,19 +80,19 @@ internal fun SettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(CbTheme.colorScheme.background.secondary)
+            .background(CryptoTheme.colorScheme.background.secondary)
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         CryptoSettingCard {
             // App Theme
             CryptoSettingSelectionRow(
-                title = stringResource(CryptoString.cb_settings_theme_title),
-                dialogTitle = stringResource(CryptoString.cb_settings_theme_title),
+                title = stringResource(CryptoString.crypto_settings_theme_title),
+                dialogTitle = stringResource(CryptoString.crypto_settings_theme_title),
                 options = listOf(
-                    stringResource(CryptoString.cb_settings_theme_system),
-                    stringResource(CryptoString.cb_settings_theme_light),
-                    stringResource(CryptoString.cb_settings_theme_dark),
+                    stringResource(CryptoString.crypto_settings_theme_system),
+                    stringResource(CryptoString.crypto_settings_theme_light),
+                    stringResource(CryptoString.crypto_settings_theme_dark),
                 ),
                 selectedIndex = themeOptions.indexOf(currentAppTheme),
                 onOptionSelected = { index ->
@@ -104,11 +104,11 @@ internal fun SettingsScreen(
 
             // Price Currency Unit
             CryptoSettingSelectionRow(
-                title = stringResource(CryptoString.cb_settings_currency_unit_title),
-                dialogTitle = stringResource(CryptoString.cb_settings_currency_unit_title),
+                title = stringResource(CryptoString.crypto_settings_currency_unit_title),
+                dialogTitle = stringResource(CryptoString.crypto_settings_currency_unit_title),
                 options = listOf(
-                    stringResource(CryptoString.cb_settings_currency_dollar),
-                    stringResource(CryptoString.cb_settings_currency_won),
+                    stringResource(CryptoString.crypto_settings_currency_dollar),
+                    stringResource(CryptoString.crypto_settings_currency_won),
                 ),
                 selectedIndex = currencyOptions.indexOf(currentCurrency),
                 onOptionSelected = { index ->
@@ -120,12 +120,12 @@ internal fun SettingsScreen(
 
             // Language
             CryptoSettingSelectionRow(
-                title = stringResource(CryptoString.cb_settings_language_title),
-                dialogTitle = stringResource(CryptoString.cb_settings_language_title),
+                title = stringResource(CryptoString.crypto_settings_language_title),
+                dialogTitle = stringResource(CryptoString.crypto_settings_language_title),
                 options = listOf(
-                    stringResource(CryptoString.cb_settings_language_system),
-                    stringResource(CryptoString.cb_settings_language_english_native),
-                    stringResource(CryptoString.cb_settings_language_korean_native),
+                    stringResource(CryptoString.crypto_settings_language_system),
+                    stringResource(CryptoString.crypto_settings_language_english_native),
+                    stringResource(CryptoString.crypto_settings_language_korean_native),
                 ),
                 selectedIndex = languageOptions.indexOf(currentLanguage),
                 onOptionSelected = { index ->
@@ -136,10 +136,10 @@ internal fun SettingsScreen(
 
         // Exchange Rate
         ExchangeRateCard(
-            title = stringResource(CryptoString.cb_settings_exchange_rate_title),
+            title = stringResource(CryptoString.crypto_settings_exchange_rate_title),
             rateText = formatExchangeRate(exchangeRate),
             updateTimeText = stringResource(
-                CryptoString.cb_settings_exchange_rate_updated_now,
+                CryptoString.crypto_settings_exchange_rate_updated_now,
             ),
             onRefreshClick = {
                 // TODO: Add refresh event
@@ -150,10 +150,10 @@ internal fun SettingsScreen(
 
 @Composable
 private fun formatExchangeRate(rate: BigDecimal?): String {
-    if (rate == null) return stringResource(CryptoString.cb_settings_exchange_rate_loading)
+    if (rate == null) return stringResource(CryptoString.crypto_settings_exchange_rate_loading)
     val numberFormat = NumberFormat.getNumberInstance(Locale.US)
     return stringResource(
-        CryptoString.cb_settings_exchange_rate_format,
+        CryptoString.crypto_settings_exchange_rate_format,
         numberFormat.format(rate),
     )
 }

@@ -14,8 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 /**
  * Sort direction state
@@ -39,31 +39,31 @@ fun SortHeaderItem(
     ) {
         Text(
             text = label,
-            style = CbTheme.typography.labelMedium,
-            color = CbTheme.colorScheme.text.primary,
+            style = CryptoTheme.typography.labelMedium,
+            color = CryptoTheme.colorScheme.text.primary,
         )
         Box(modifier = Modifier.size(16.dp)) {
             // 베이스: 양쪽 화살표, 항상 표시 (흐리게)
             Icon(
-                painter = painterResource(CbDrawable.ic_sort_none),
+                painter = painterResource(CryptoDrawable.ic_sort_none),
                 contentDescription = stringResource(
-                    CryptoString.cb_home_sort_icon_cd_format,
+                    CryptoString.crypto_home_sort_icon_cd_format,
                     label,
                 ),
-                tint = CbTheme.colorScheme.background.selected, // dimmed 기본색
+                tint = CryptoTheme.colorScheme.background.selected, // dimmed 기본색
                 modifier = Modifier.matchParentSize(),
             )
             // 오버레이: 활성 방향만 강조
             val overlayRes = when (sortDirection) {
-                SortDirection.Asc -> CbDrawable.ic_sort_asc
-                SortDirection.Desc -> CbDrawable.ic_sort_desc
+                SortDirection.Asc -> CryptoDrawable.ic_sort_asc
+                SortDirection.Desc -> CryptoDrawable.ic_sort_desc
                 SortDirection.None -> null
             }
             overlayRes?.let {
                 Icon(
                     painter = painterResource(it),
                     contentDescription = null,
-                    tint = CbTheme.colorScheme.text.primary,
+                    tint = CryptoTheme.colorScheme.text.primary,
                     modifier = Modifier.matchParentSize(),
                 )
             }
@@ -75,7 +75,7 @@ fun SortHeaderItem(
 @Composable
 private fun SortHeaderItemAscPreview() {
     SortHeaderItem(
-        label = stringResource(CryptoString.cb_home_sort_symbol),
+        label = stringResource(CryptoString.crypto_home_sort_symbol),
         sortDirection = SortDirection.Asc,
         onClick = {},
     )
@@ -85,7 +85,7 @@ private fun SortHeaderItemAscPreview() {
 @Composable
 private fun SortHeaderItemDescPreview() {
     SortHeaderItem(
-        label = stringResource(CryptoString.cb_home_sort_symbol),
+        label = stringResource(CryptoString.crypto_home_sort_symbol),
         sortDirection = SortDirection.Desc,
         onClick = {},
     )
@@ -95,7 +95,7 @@ private fun SortHeaderItemDescPreview() {
 @Composable
 private fun SortHeaderItemNonePreview() {
     SortHeaderItem(
-        label = stringResource(CryptoString.cb_home_sort_symbol),
+        label = stringResource(CryptoString.crypto_home_sort_symbol),
         sortDirection = SortDirection.None,
         onClick = {},
     )

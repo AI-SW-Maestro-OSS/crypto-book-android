@@ -16,14 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 /**
  * Exchange rate card component
@@ -54,7 +51,7 @@ fun ExchangeRateCard(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = CbTheme.colorScheme.background.tertiary,
+                color = CryptoTheme.colorScheme.background.tertiary,
                 shape = RoundedCornerShape(10.dp),
             )
             .padding(16.dp),
@@ -66,35 +63,26 @@ fun ExchangeRateCard(
         ) {
             Text(
                 text = title,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                lineHeight = 24.sp,
-                color = CbTheme.colorScheme.text.primary,
+                style = CryptoTheme.typography.titleMedium,
+                color = CryptoTheme.colorScheme.text.primary,
             )
             Text(
                 text = rateText,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                lineHeight = 32.sp,
-                color = CbTheme.colorScheme.text.primary,
+                style = CryptoTheme.typography.headlineMedium,
+                color = CryptoTheme.colorScheme.text.primary,
             )
             Text(
                 text = updateTimeText,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-                color = CbTheme.colorScheme.text.secondary,
+                style = CryptoTheme.typography.bodySmall,
+                color = CryptoTheme.colorScheme.text.secondary,
             )
         }
         Icon(
             painter = painterResource(id = R.drawable.ic_refresh),
             contentDescription = stringResource(
-                CryptoString.cb_settings_exchange_rate_refresh_cd,
+                CryptoString.crypto_settings_exchange_rate_refresh_cd,
             ),
-            tint = CbTheme.colorScheme.text.primary,
+            tint = CryptoTheme.colorScheme.text.primary,
             modifier = Modifier
                 .size(32.dp)
                 .clickable { onRefreshClick() },
@@ -106,9 +94,9 @@ fun ExchangeRateCard(
 @Composable
 private fun ExchangeRateCardPreview() {
     ExchangeRateCard(
-        title = stringResource(CryptoString.cb_settings_exchange_rate_title),
-        rateText = stringResource(CryptoString.cb_settings_exchange_rate_format, "1,450"),
-        updateTimeText = stringResource(CryptoString.cb_settings_exchange_rate_updated_now),
+        title = stringResource(CryptoString.crypto_settings_exchange_rate_title),
+        rateText = stringResource(CryptoString.crypto_settings_exchange_rate_format, "1,450"),
+        updateTimeText = stringResource(CryptoString.crypto_settings_exchange_rate_updated_now),
         onRefreshClick = {},
     )
 }

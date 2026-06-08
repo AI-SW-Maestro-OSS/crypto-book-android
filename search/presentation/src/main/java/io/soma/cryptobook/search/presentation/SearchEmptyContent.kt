@@ -8,16 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import io.soma.cryptobook.core.designsystem.theme.resource.CbFont
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @Composable
 fun SearchEmptyContent(
@@ -36,18 +29,7 @@ fun SearchEmptyContent(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 text = it,
-                style = TextStyle(
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp,
-                    fontFamily = FontFamily(Font(CbFont.pretendard_regular)),
-                    fontWeight = FontWeight.W400,
-                    letterSpacing = 0.sp,
-                    lineHeightStyle = LineHeightStyle(
-                        alignment = LineHeightStyle.Alignment.Center,
-                        trim = LineHeightStyle.Trim.None,
-                    ),
-                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                ),
+                style = CryptoTheme.typography.bodyMedium,
             )
         }
     }

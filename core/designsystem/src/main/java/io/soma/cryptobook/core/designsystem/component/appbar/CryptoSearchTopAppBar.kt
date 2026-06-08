@@ -18,23 +18,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.unit.sp
-import io.soma.cryptobook.core.designsystem.R
-import io.soma.cryptobook.core.designsystem.component.appbar.color.cbTopAppBarColors
-import io.soma.cryptobook.core.designsystem.component.button.CbStandardIconButton
-import io.soma.cryptobook.core.designsystem.component.field.color.cbTextFieldColors
-import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
+import io.soma.cryptobook.core.designsystem.component.appbar.color.cryptoTopAppBarColors
+import io.soma.cryptobook.core.designsystem.component.button.CryptoStandardIconButton
+import io.soma.cryptobook.core.designsystem.component.field.color.cryptoTextFieldColors
+import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CbSearchTopAppBar(
+fun CryptoSearchTopAppBar(
     searchTerm: String,
     placeholder: String,
     onSearchTermChange: (String) -> Unit,
@@ -49,10 +42,10 @@ fun CbSearchTopAppBar(
     TopAppBar(
         modifier = modifier,
         windowInsets = windowInsets,
-        colors = cbTopAppBarColors(),
+        colors = cryptoTopAppBarColors(),
         navigationIcon = {
             navigationIcon?.let {
-                CbStandardIconButton(
+                CryptoStandardIconButton(
                     painter = it.navigationIcon,
                     contentDescription = it.navigationIconContentDescription,
                     onClick = it.onNavigationIconClick,
@@ -62,26 +55,15 @@ fun CbSearchTopAppBar(
         },
         title = {
             TextField(
-                colors = cbTextFieldColors(),
-                textStyle = TextStyle(
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontWeight = FontWeight.W400,
-                    letterSpacing = 0.sp,
-                    lineHeightStyle = LineHeightStyle(
-                        alignment = LineHeightStyle.Alignment.Center,
-                        trim = LineHeightStyle.Trim.None,
-                    ),
-                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                ),
+                colors = cryptoTextFieldColors(),
+                textStyle = CryptoTheme.typography.bodyLarge,
                 placeholder = { Text(text = placeholder) },
                 value = searchTerm,
                 singleLine = true,
                 onValueChange = onSearchTermChange,
                 trailingIcon = {
-                    CbStandardIconButton(
-                        vectorIconRes = CbDrawable.ic_close,
+                    CryptoStandardIconButton(
+                        vectorIconRes = CryptoDrawable.ic_close,
                         contentDescription = clearIconContentDescription,
                         onClick = { onSearchTermChange("") }
                     )

@@ -111,7 +111,7 @@ fun CoinCandlestickChart(
                     .padding(horizontal = CHART_CANDLE_SPACING),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(stringResource(CryptoString.cb_coin_detail_chart_loading))
+                Text(stringResource(CryptoString.crypto_coin_detail_chart_loading))
             }
         },
     )

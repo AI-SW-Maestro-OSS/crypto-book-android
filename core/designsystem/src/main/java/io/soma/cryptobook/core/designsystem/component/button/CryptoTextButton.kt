@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.soma.cryptobook.core.designsystem.component.button.color.cryptoTextButtonColors
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.designsystem.theme.util.throttledClick
 
 @Composable
@@ -16,7 +16,7 @@ fun CryptoTextButton(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    contentColor: Color = CbTheme.colorScheme.outlineButton.foreground,
+    contentColor: Color = CryptoTheme.colorScheme.outlineButton.foreground,
 ) {
     TextButton(
         modifier = modifier,
@@ -29,7 +29,7 @@ fun CryptoTextButton(
     ) {
         Text(
             text = label,
-            style = CbTheme.typography.labelLarge,
+            style = CryptoTheme.typography.labelLarge,
             modifier = Modifier
         )
     }

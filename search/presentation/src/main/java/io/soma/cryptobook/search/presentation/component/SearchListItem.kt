@@ -14,15 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.resource.CbDrawable
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @Composable
 fun SearchListItem(
@@ -35,7 +32,7 @@ fun SearchListItem(
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 48.dp)
-            .background(color = CbTheme.colorScheme.background.secondary)
+            .background(color = CryptoTheme.colorScheme.background.secondary)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -43,9 +40,9 @@ fun SearchListItem(
     ) {
         AsyncImage(
             model = imageUrl,
-            placeholder = painterResource(CbDrawable.ic_coin_placeholder),
-            error = painterResource(CbDrawable.ic_coin_placeholder),
-            fallback = painterResource(CbDrawable.ic_coin_placeholder),
+            placeholder = painterResource(CryptoDrawable.ic_coin_placeholder),
+            error = painterResource(CryptoDrawable.ic_coin_placeholder),
+            fallback = painterResource(CryptoDrawable.ic_coin_placeholder),
             contentDescription = "$symbol coin icon",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -54,11 +51,8 @@ fun SearchListItem(
 
         Text(
             text = symbol,
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            color = CbTheme.colorScheme.text.primary,
+            style = CryptoTheme.typography.titleMedium,
+            color = CryptoTheme.colorScheme.text.primary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

@@ -14,16 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import io.soma.cryptobook.core.designsystem.R
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.theme.fontFamily
-import io.soma.cryptobook.core.designsystem.theme.theme.CbTheme
+import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 /**
  * Price change type for color variation
@@ -72,15 +69,15 @@ fun PriceChange(
     modifier: Modifier = Modifier,
 ) {
     val changeColor = when (priceChangeType) {
-        PriceChangeType.Up -> CbTheme.colorScheme.price.up
-        PriceChangeType.Down -> CbTheme.colorScheme.price.down
-        PriceChangeType.Flat -> CbTheme.colorScheme.price.flat
+        PriceChangeType.Up -> CryptoTheme.colorScheme.price.up
+        PriceChangeType.Down -> CryptoTheme.colorScheme.price.down
+        PriceChangeType.Flat -> CryptoTheme.colorScheme.price.flat
     }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(CbTheme.colorScheme.background.primary),
+            .background(CryptoTheme.colorScheme.background.primary),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -90,7 +87,7 @@ fun PriceChange(
             placeholder = painterResource(R.drawable.ic_coin_placeholder),
             error = painterResource(R.drawable.ic_coin_placeholder),
             fallback = painterResource(R.drawable.ic_coin_placeholder),
-            contentDescription = stringResource(CryptoString.cb_coin_detail_coin_icon_cd),
+            contentDescription = stringResource(CryptoString.crypto_coin_detail_coin_icon_cd),
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape),
@@ -105,11 +102,8 @@ fun PriceChange(
             Text(
                 text = price,
                 modifier = Modifier.fillMaxWidth(),
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 36.sp,
-                lineHeight = 40.sp,
-                color = CbTheme.colorScheme.text.primary,
+                style = CryptoTheme.typography.displaySmall,
+                color = CryptoTheme.colorScheme.text.primary,
                 textAlign = TextAlign.Start,
             )
 
@@ -117,10 +111,7 @@ fun PriceChange(
             Text(
                 text = priceChangeText,
                 modifier = Modifier.fillMaxWidth(),
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                lineHeight = 28.sp,
+                style = CryptoTheme.typography.headlineSmall,
                 color = changeColor,
                 textAlign = TextAlign.Start,
             )
