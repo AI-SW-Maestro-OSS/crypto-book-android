@@ -1,8 +1,10 @@
 # AI Agent Guide for CryptoBook Android
 
-This file defines requirements for AI coding agents and automated systems contributing to this repository.
+This file defines requirements for AI coding agents and automated systems contributing to this
+repository.
 
-AI-generated or AI-assisted contributions are acceptable only if they comply with these rules and meet the same
+AI-generated or AI-assisted contributions are acceptable only if they comply with these rules and
+meet the same
 standards as human-written contributions.
 
 ## Applicability
@@ -29,9 +31,9 @@ Before making changes, agents MUST:
 
 - Confirm that requirements are clear and consistent with project rules
 - If requirements are incomplete, ambiguous, or conflicting:
-  - **Do NOT guess**
-  - Document assumptions
-  - Request clarification before proceeding
+    - **Do NOT guess**
+    - Document assumptions
+    - Request clarification before proceeding
 
 ### 2. Research Context
 
@@ -74,15 +76,6 @@ Agents MUST NOT:
 - Hardcode secrets, credentials, API keys, or tokens
 
 All external input MUST be treated as untrusted. Validate and sanitize user input.
-
-## Build and Verification Requirements
-
-Before proposing changes, agents MUST run the narrowest relevant Gradle tasks and ensure they pass.
-
-### Code Quality
-
-- `./gradlew spotlessCheck`
-- `./gradlew spotlessApply` (to fix formatting issues)
 
 ## Commit Requirements
 
