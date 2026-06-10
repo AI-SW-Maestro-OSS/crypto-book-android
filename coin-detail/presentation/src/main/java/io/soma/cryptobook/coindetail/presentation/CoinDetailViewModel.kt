@@ -5,6 +5,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.helpingstar.kandle.data.Candle
+import io.github.helpingstar.kandle.data.FinancialChartModelProducer
+import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveCoinDetailUseCase
 import io.soma.cryptobook.coindetail.domain.usecase.ObserveIsWatchlistedUseCase
 import io.soma.cryptobook.coindetail.domain.usecase.ToggleWatchlistUseCase
@@ -13,6 +16,7 @@ import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.mapper.CoinDetailPresentationModelMapper
+import io.soma.cryptobook.coindetail.presentation.mapper.toChartSeries
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.util.Text
 import io.soma.cryptobook.core.designsystem.util.asText
@@ -41,7 +45,10 @@ class CoinDetailViewModel @AssistedInject constructor(
     ),
 ),
     ViewModel {
+    override val chartProducer = FinancialChartModelProducer()
+
     private var observeJob: Job? = null
+    private var lastChartCandles: List<Candle> = emptyList()
 
     @AssistedFactory
     interface Factory {
@@ -84,10 +91,10 @@ class CoinDetailViewModel @AssistedInject constructor(
                     }
 
                     is ObserveCoinDetailUseCase.Result.Success -> {
+                        feedChart(result.candles)
                         updateState { state ->
                             mapper.toUiState(
                                 vo = result.coinDetail,
-                                candles = result.candles,
                                 orderBook = result.orderBook,
                                 imageUrl = state.imageUrl,
                                 isLoading = false,
@@ -111,6 +118,50 @@ class CoinDetailViewModel @AssistedInject constructor(
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Feeds the candle stream into [chartProducer] (vico/Kandle best practice, §Q13). The data layer
+     * re-emits the full list on every tick, so this diffs the tail: a forming-bar update or single
+     * append goes through the O(1) incremental path; a backfill/replace re-seeds the whole series.
+     */
+    private suspend fun feedChart(rawCandles: List<CoinCandleVO>) {
+        val series = rawCandles.toChartSeries()
+        val chartCandles = series.candles
+        val chartVolumes = series.volumes
+        if (chartCandles.isEmpty()) return
+
+        if (isFullReload(lastChartCandles, chartCandles)) {
+            chartProducer.runTransaction {
+                price { candles(chartCandles) }
+                volume(chartVolumes)
+            }
+        } else {
+            if (chartCandles.size == lastChartCandles.size + 1) {
+                // A new bar opened: finalize the previously-forming bar before appending the new one.
+                val finalized = chartCandles.size - 2
+                chartProducer.updateCandle(chartCandles[finalized])
+                chartProducer.updateVolume(chartVolumes[finalized])
+            }
+            chartProducer.updateCandle(chartCandles.last())
+            chartProducer.updateVolume(chartVolumes.last())
+        }
+        lastChartCandles = chartCandles
+    }
+
+    /**
+     * True when [current] can't be expressed as a tail update on [previous] — a backfill/replace
+     * rather than a forming-bar tick or single append. O(1): only head/tail timestamps are compared
+     * (the historical prefix is stable between ticks).
+     */
+    private fun isFullReload(previous: List<Candle>, current: List<Candle>): Boolean {
+        if (previous.isEmpty()) return true
+        if (current.first().timestamp != previous.first().timestamp) return true
+        return when (current.size) {
+            previous.size -> current.last().timestamp != previous.last().timestamp
+            previous.size + 1 -> current[previous.size - 1].timestamp != previous.last().timestamp
+            else -> true
         }
     }
 

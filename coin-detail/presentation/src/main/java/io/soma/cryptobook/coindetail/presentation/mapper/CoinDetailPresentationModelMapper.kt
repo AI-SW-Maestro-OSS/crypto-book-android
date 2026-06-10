@@ -1,10 +1,8 @@
 package io.soma.cryptobook.coindetail.presentation.mapper
 
-import io.soma.cryptobook.coindetail.domain.model.CoinCandleVO
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.model.OrderBookLevelVO
 import io.soma.cryptobook.coindetail.domain.model.OrderBookVO
-import io.soma.cryptobook.coindetail.presentation.CandleUiModel
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract
 import io.soma.cryptobook.coindetail.presentation.OrderBookUiModel
 import io.soma.cryptobook.coindetail.presentation.component.ORDER_BOOK_ROW_COUNT
@@ -32,7 +30,6 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
      */
     fun toUiState(
         vo: CoinDetailVO,
-        candles: List<CoinCandleVO>,
         orderBook: OrderBookVO?,
         imageUrl: String,
         isLoading: Boolean = false,
@@ -43,7 +40,6 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
         currentPrice = formatPrice(vo.currentPrice, vo.tickSize),
         priceChangeText = formatPriceChange(vo.priceChange, vo.priceChangePercent, vo.tickSize),
         priceChangePercent = vo.priceChangePercent,
-        candles = candles.map { it.toUiModel() },
         high24h = formatPrice(vo.high24h, vo.tickSize),
         low24h = formatPrice(vo.low24h, vo.tickSize),
         volume24h = formatVolume(vo.volume24h),
@@ -107,15 +103,6 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
 
         return "$priceSign$$priceChangeFormatted ($percentSign$percentFormatted%)"
     }
-
-    private fun CoinCandleVO.toUiModel(): CandleUiModel = CandleUiModel(
-        openTime = openTime,
-        closeTime = closeTime,
-        open = open,
-        close = close,
-        high = high,
-        low = low,
-    )
 
     private fun toOrderBookUiModel(
         orderBook: OrderBookVO?,

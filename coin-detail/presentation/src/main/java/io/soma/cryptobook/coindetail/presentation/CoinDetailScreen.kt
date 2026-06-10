@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import io.github.helpingstar.kandle.data.FinancialChartModelProducer
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Effect
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
 import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
@@ -68,6 +70,7 @@ fun CoinDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel
 
     CoinDetailScreen(
         state = state.value,
+        chartProducer = viewModel.chartProducer,
         onEvent = dispatch,
         modifier = modifier,
     )
@@ -76,6 +79,7 @@ fun CoinDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel
 @Composable
 internal fun CoinDetailScreen(
     state: State,
+    chartProducer: FinancialChartModelProducer,
     onEvent: (Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -135,7 +139,11 @@ internal fun CoinDetailScreen(
                 }
 
                 else -> {
-                    CoinDetailContent(state = state, modifier = Modifier.weight(1f))
+                    CoinDetailContent(
+                        state = state,
+                        chartProducer = chartProducer,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
         }
@@ -143,7 +151,11 @@ internal fun CoinDetailScreen(
 }
 
 @Composable
-private fun CoinDetailContent(state: State, modifier: Modifier = Modifier) {
+private fun CoinDetailContent(
+    state: State,
+    chartProducer: FinancialChartModelProducer,
+    modifier: Modifier = Modifier,
+) {
     val priceChangeType = when {
         state.priceChangePercent > 0 -> PriceChangeType.Up
         state.priceChangePercent < 0 -> PriceChangeType.Down
@@ -166,7 +178,7 @@ private fun CoinDetailContent(state: State, modifier: Modifier = Modifier) {
             )
 
             CoinCandlestickChart(
-                candles = state.candles,
+                producer = chartProducer,
                 tickSize = state.tickSize,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -212,6 +224,7 @@ private fun CoinDetailScreenPreview() {
             openPrice = "$71,660.34",
             isLoading = false,
         ),
+        chartProducer = remember { FinancialChartModelProducer() },
         onEvent = {},
     )
 }
@@ -221,6 +234,7 @@ private fun CoinDetailScreenPreview() {
 private fun CoinDetailScreenLoadingPreview() {
     CoinDetailScreen(
         state = State(isLoading = true),
+        chartProducer = remember { FinancialChartModelProducer() },
         onEvent = {},
     )
 }
@@ -233,6 +247,7 @@ private fun CoinDetailScreenErrorPreview() {
             isLoading = false,
             errorMsg = CryptoString.crypto_coin_detail_connection_error_state.asText(),
         ),
+        chartProducer = remember { FinancialChartModelProducer() },
         onEvent = {},
     )
 }
@@ -245,6 +260,7 @@ private fun CoinDetailScreenRealtimeWarningPreview() {
             isLoading = false,
             realtimeStatusMessage = CryptoString.crypto_realtime_recovering.asText(),
         ),
+        chartProducer = remember { FinancialChartModelProducer() },
         onEvent = {},
     )
 }

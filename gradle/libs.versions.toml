@@ -34,7 +34,7 @@ navigation3 = "1.0.0"
 spotless = "8.5.1"
 materialVersion = "1.14.0"
 uiGraphics = "1.11.2"
-vico = "3.1.0"
+kandle = "0.1.0"
 androidxMetrics = "1.0.0-beta01"
 
 [libraries]
@@ -90,8 +90,8 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
-vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
-vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+kandle-core = { group = "io.github.helpingstar.kandle", name = "core", version.ref = "kandle" }
+kandle-material3 = { group = "io.github.helpingstar.kandle", name = "material3", version.ref = "kandle" }
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "navigation3" }
 androidx-lifecycle-viewmodel-navigation3 = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "navigation3" }

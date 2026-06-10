@@ -1,5 +1,6 @@
 package io.soma.cryptobook.coindetail.presentation
 
+import io.github.helpingstar.kandle.data.FinancialChartModelProducer
 import io.soma.cryptobook.coindetail.presentation.component.ORDER_BOOK_ROW_COUNT
 import io.soma.cryptobook.coindetail.presentation.component.OrderBookRowUiModel
 import io.soma.cryptobook.core.designsystem.util.Text
@@ -9,7 +10,14 @@ import java.math.BigDecimal
 
 interface CoinDetailContract {
 
-    interface ViewModel : UnidirectionalViewModel<State, Event, Effect>
+    interface ViewModel : UnidirectionalViewModel<State, Event, Effect> {
+        /**
+         * Chart data pipe (vico/Kandle best practice, §Q13): the producer is held by the ViewModel
+         * so it survives configuration changes and is fed incrementally off the candle stream.
+         * Deliberately outside the [State] flow — chart series use a conflated, async channel.
+         */
+        val chartProducer: FinancialChartModelProducer
+    }
 
     data class State(
         val symbol: String = "",
@@ -17,7 +25,6 @@ interface CoinDetailContract {
         val currentPrice: String = "",
         val priceChangeText: String = "",
         val priceChangePercent: Double = 0.0,
-        val candles: List<CandleUiModel> = emptyList(),
         val high24h: String = "",
         val low24h: String = "",
         val volume24h: String = "",
@@ -40,15 +47,6 @@ interface CoinDetailContract {
         data object NavigateBack : Effect
     }
 }
-
-data class CandleUiModel(
-    val openTime: Long,
-    val closeTime: Long,
-    val open: Double,
-    val close: Double,
-    val high: Double,
-    val low: Double,
-)
 
 data class OrderBookUiModel(
     val rows: List<OrderBookRowUiModel>,

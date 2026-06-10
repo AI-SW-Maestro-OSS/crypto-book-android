@@ -2,117 +2,64 @@ package io.soma.cryptobook.coindetail.presentation.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.patrykandpatrick.vico.compose.cartesian.AutoScrollCondition
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.Scroll
-import com.patrykandpatrick.vico.compose.cartesian.Zoom
-import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.compose.cartesian.data.candlestickSeries
-import com.patrykandpatrick.vico.compose.cartesian.layer.CandlestickCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.absoluteRelative
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberCandlestickCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
-import io.soma.cryptobook.coindetail.presentation.CandleUiModel
+import io.github.helpingstar.kandle.FinancialChart
+import io.github.helpingstar.kandle.data.FinancialChartModelProducer
+import io.github.helpingstar.kandle.format.PriceFormatter
+import io.github.helpingstar.kandle.format.TimeFormatter
+import io.github.helpingstar.kandle.material3.MaterialChartDefaults
+import io.github.helpingstar.kandle.state.rememberFinancialChartState
+import io.github.helpingstar.kandle.theme.CandleColorConvention
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
+import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import java.math.BigDecimal
 
-private const val START_AXIS_LABEL_COUNT = 5
+// Bar spacing at zoom = 1.0; tuned so a typical phone width shows ~24 candles initially.
+private const val DEFAULT_BAR_SPACING_DP = 14f
 
+private const val PRICE_PANEL_WEIGHT = 0.7f
+private const val VOLUME_PANEL_WEIGHT = 0.3f
+
+/**
+ * Price + volume candlestick chart backed by Kandle. The [producer] is owned and fed incrementally
+ * by [io.soma.cryptobook.coindetail.presentation.CoinDetailViewModel] (vico/Kandle best practice),
+ * so it survives configuration changes; this composable only renders it.
+ *
+ * The latest bar stays flush right with new-bar auto-follow on (Kandle defaults), the Y axis
+ * auto-fits the visible range, and long-press shows the built-in OHLCV crosshair/tooltip. Prices are
+ * formatted with the symbol's tick size; the X axis adapts its precision to the visible range.
+ */
 @Composable
 fun CoinCandlestickChart(
-    candles: List<CandleUiModel>,
+    producer: FinancialChartModelProducer,
     tickSize: BigDecimal?,
     modifier: Modifier = Modifier,
 ) {
-    val modelProducer = remember { CartesianChartModelProducer() }
-    val scrollState = rememberVicoScrollState(
-        initialScroll = Scroll.Absolute.End,
-        autoScroll = Scroll.Absolute.End,
-        autoScrollCondition = AutoScrollCondition.OnModelGrowth,
-    )
-    val zoomState = rememberVicoZoomState(
-        initialZoom = remember {
-            Zoom.max(Zoom.x(INITIAL_VISIBLE_CANDLES), Zoom.Content)
-        },
-    )
-    val renderState = rememberCoinCandlestickChartRenderState(
-        candles = candles,
-        tickSize = tickSize,
-        scrollState = scrollState,
-        zoomState = zoomState,
-    )
-    val rangeProvider = remember { VisiblePriceRangeProvider() }
-    val chart = rememberCartesianChart(
-        rememberCandlestickCartesianLayer(
-            candleProvider = CandlestickCartesianLayer.CandleProvider.absoluteRelative(),
-            candleSpacing = CHART_CANDLE_SPACING,
-            scaleCandleWicks = true,
-            rangeProvider = rangeProvider,
-        ),
-        startAxis = VerticalAxis.rememberStart(
-            valueFormatter = renderState.startAxisFormatter,
-            itemPlacer = remember {
-                VerticalAxis.ItemPlacer.count(count = { START_AXIS_LABEL_COUNT })
-            },
-        ),
-        bottomAxis = HorizontalAxis.rememberBottom(
-            valueFormatter = renderState.bottomAxisFormatter,
-            itemPlacer = remember {
-                HorizontalAxis.ItemPlacer.aligned(spacing = { BOTTOM_AXIS_LABEL_STEP })
-            },
-        ),
-    )
-
-    LaunchedEffect(renderState.modelInput) {
-        modelProducer.runTransaction {
-            renderState.modelInput.visiblePriceRange?.let { range ->
-                extras { extraStore ->
-                    extraStore[VisibleMinYKey] = range.min
-                    extraStore[VisibleMaxYKey] = range.max
-                }
-            }
-
-            if (renderState.modelInput.chartCandles.isNotEmpty()) {
-                candlestickSeries(
-                    x = renderState.modelInput.xValues,
-                    opening = renderState.modelInput.openingValues,
-                    closing = renderState.modelInput.closingValues,
-                    low = renderState.modelInput.lowValues,
-                    high = renderState.modelInput.highValues,
-                )
-            }
-        }
+    val state = rememberFinancialChartState(defaultBarSpacingDp = DEFAULT_BAR_SPACING_DP)
+    val priceFormatter = remember(tickSize) {
+        PriceFormatter.custom { value -> TickSizePriceFormatter.format(value, tickSize) }
     }
+    val timeFormatter = remember { TimeFormatter.adaptive() }
 
-    CartesianChartHost(
-        chart = chart,
-        modelProducer = modelProducer,
+    FinancialChart(
+        modelProducer = producer,
         modifier = modifier,
-        scrollState = scrollState,
-        zoomState = zoomState,
-        animationSpec = null,
-        animateIn = false,
-        placeholder = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = CHART_CANDLE_SPACING),
-                contentAlignment = Alignment.Center,
-            ) {
+        state = state,
+        theme = MaterialChartDefaults.theme(colorConvention = CandleColorConvention.Western),
+        priceFormatter = priceFormatter,
+        timeFormatter = timeFormatter,
+        emptyContent = {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(stringResource(CryptoString.crypto_coin_detail_chart_loading))
             }
         },
-    )
+    ) {
+        priceLayer(heightWeight = PRICE_PANEL_WEIGHT)
+        volumeLayer(heightWeight = VOLUME_PANEL_WEIGHT)
+    }
 }
