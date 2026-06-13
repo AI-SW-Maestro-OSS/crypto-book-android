@@ -13,12 +13,14 @@ data class CryptoColorScheme(
     val stroke: StrokeColors,
     val toggleButton: ToggleButtonColors,
     val price: PriceColors,
+    val changeBadge: ChangeBadgeColors,
     val status: StatusColors,
 ) {
     @Immutable
     data class TextColors(
         val primary: Color,
         val secondary: Color,
+        val tertiary: Color,
         val interaction: Color,
     )
 
@@ -40,6 +42,7 @@ data class CryptoColorScheme(
     data class IconColors(
         val primary: Color,
         val secondary: Color,
+        val placeholderBackground: Color,
     )
 
     @Immutable
@@ -68,6 +71,14 @@ data class CryptoColorScheme(
         val up: Color,
         val down: Color,
         val flat: Color,
+    )
+
+    @Immutable
+    data class ChangeBadgeColors(
+        val backgroundUp: Color,
+        val backgroundDown: Color,
+        val backgroundFlat: Color,
+        val foreground: Color,
     )
 
     @Immutable

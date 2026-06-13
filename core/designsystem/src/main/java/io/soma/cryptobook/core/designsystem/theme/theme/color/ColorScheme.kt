@@ -6,6 +6,7 @@ val darkCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
     text = CryptoColorScheme.TextColors(
         primary = Color(0xFFF3F4F6),
         secondary = Color(0xFFBDC1CA),
+        tertiary = Color(0xFF6B7280),
         interaction = Color(0xFF0d59f2)
     ),
     background = CryptoColorScheme.BackgroundColors(
@@ -16,7 +17,8 @@ val darkCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
     ),
     icon = CryptoColorScheme.IconColors(
         primary = Color(0xFFF3F4F6),
-        secondary = Color(0xFF0d59f2)
+        secondary = Color(0xFF0d59f2),
+        placeholderBackground = Color(0xFF2A2A2A)
     ),
     filledButton = CryptoColorScheme.FilledButtonColors(
         background = Color(0xFF0D59F2),
@@ -42,6 +44,12 @@ val darkCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
         down = Color(0xFFE11919),
         flat = Color(0xFFFAFAFA)
     ),
+    changeBadge = CryptoColorScheme.ChangeBadgeColors(
+        backgroundUp = Color(0xFF22C55E),
+        backgroundDown = Color(0xFFDC2626),
+        backgroundFlat = Color(0xFF4B5563),
+        foreground = Color(0xFFFFFFFF)
+    ),
     status = CryptoColorScheme.StatusColors(
         error = Color(color = 0xFFFF4E63)
     )
@@ -51,6 +59,7 @@ val lightCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
     text = CryptoColorScheme.TextColors(
         primary = Color(0xFF1A1A1A),
         secondary = Color(0xFF9CA3AF),
+        tertiary = Color(0xFF6B7280),
         interaction = Color(0xFF0d59f2)
     ),
     background = CryptoColorScheme.BackgroundColors(
@@ -61,7 +70,8 @@ val lightCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
     ),
     icon = CryptoColorScheme.IconColors(
         primary = Color(0xFF1A1A1A),
-        secondary = Color(0xFF0d59f2)
+        secondary = Color(0xFF0d59f2),
+        placeholderBackground = Color(0xFFF3F4F6)
     ),
     filledButton = CryptoColorScheme.FilledButtonColors(
         background = Color(0xFF0d59f2),
@@ -86,6 +96,12 @@ val lightCryptoColorScheme: CryptoColorScheme = CryptoColorScheme(
         up = Color(0xFF22C55E),
         down = Color(0xFFE11919),
         flat = Color(0xFFFAFAFA)
+    ),
+    changeBadge = CryptoColorScheme.ChangeBadgeColors(
+        backgroundUp = Color(0xFF22C55E),
+        backgroundDown = Color(0xFFDC2626),
+        backgroundFlat = Color(0xFF4B5563),
+        foreground = Color(0xFFFFFFFF)
     ),
     status = CryptoColorScheme.StatusColors(
         error = Color(color = 0xFFCB263A)
