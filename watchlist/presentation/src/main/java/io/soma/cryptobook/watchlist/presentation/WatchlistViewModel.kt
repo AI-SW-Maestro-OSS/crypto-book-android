@@ -13,6 +13,7 @@ import io.soma.cryptobook.core.domain.model.next
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.domain.outcome.handle
+import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveSortedCoinListUseCase
@@ -22,6 +23,7 @@ import io.soma.cryptobook.watchlist.domain.usecase.ObserveWatchlistSortUseCase
 import io.soma.cryptobook.watchlist.domain.usecase.ObserveWatchlistUseCase
 import io.soma.cryptobook.watchlist.domain.usecase.SetWatchlistSortUseCase
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,6 +33,7 @@ class WatchlistViewModel @Inject constructor(
     private val observeWatchlistSortUseCase: ObserveWatchlistSortUseCase,
     private val setWatchlistSortUseCase: SetWatchlistSortUseCase,
     private val observeSortedCoinListUseCase: ObserveSortedCoinListUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
     private val coinImageResolver: CoinImageResolver,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
@@ -60,10 +63,14 @@ class WatchlistViewModel @Inject constructor(
         observeJob?.cancel()
         reduce { copy(isLoading = true) }
         observeJob = viewModelScope.launch {
-            observeSortedCoinListUseCase(
-                prices = observeWatchlistUseCase(),
-                sort = observeWatchlistSortUseCase(),
-            ).collect { outcome ->
+            combine(
+                observeSortedCoinListUseCase(
+                    prices = observeWatchlistUseCase(),
+                    sort = observeWatchlistSortUseCase(),
+                ),
+                getUserDataUseCase(),
+                ::Pair,
+            ).collect { (outcome, userData) ->
                 outcome.handle(
                     onSuccess = { coins ->
                         reduce {
@@ -73,6 +80,7 @@ class WatchlistViewModel @Inject constructor(
                                 coins = coins.map {
                                     it.toCoinItem(coinImageResolver.getImageUrl(it.symbol))
                                 },
+                                usdKrwExchangeRate = userData.usdKrwExchangeRate,
                             )
                         }
                     },

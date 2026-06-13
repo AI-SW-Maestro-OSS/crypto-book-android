@@ -29,7 +29,10 @@ import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
+import io.soma.cryptobook.core.presentation.format.KrwPriceFormatter
+import io.soma.cryptobook.core.presentation.format.SymbolFormatter
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
+import io.soma.cryptobook.core.presentation.format.VolumeFormatter
 import io.soma.cryptobook.core.presentation.jank.TrackScrollJank
 import java.math.BigDecimal
 
@@ -91,7 +94,7 @@ internal fun WatchlistScreen(
             }
 
             CryptoCoinListSection(
-                coins = state.coins.map { it.toCoinListItemData() },
+                coins = state.coins.map { it.toCoinListItemData(state.usdKrwExchangeRate) },
                 isLoading = state.isLoading,
                 symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
                 volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
@@ -133,24 +136,33 @@ private fun WatchlistUiState.sortDirectionFor(column: CoinSortColumn): SortDirec
         }
     }
 
-private fun CoinItem.toCoinListItemData() = CoinListItemData(
-    symbol = symbol,
-    name = symbol.removeSuffix("USDT"),
-    imageUrl = imageUrl,
-    price = TickSizePriceFormatter.formatUsd(price, tickSize),
-    changePercent = priceChangePercentage24h,
-)
+private fun CoinItem.toCoinListItemData(usdKrwExchangeRate: BigDecimal): CoinListItemData {
+    val symbolParts = SymbolFormatter.split(symbol)
+    val secondaryPrice = usdKrwExchangeRate
+        .takeIf { it.signum() > 0 }
+        ?.let { KrwPriceFormatter.format(price.multiply(it)) }
+    return CoinListItemData(
+        symbol = symbol,
+        baseSymbol = symbolParts.base,
+        quoteSymbol = symbolParts.quote,
+        imageUrl = imageUrl,
+        price = TickSizePriceFormatter.format(price, tickSize),
+        secondaryPrice = secondaryPrice,
+        volume = VolumeFormatter.format(quoteVolume),
+        changePercent = priceChangePercentage24h,
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
 private fun WatchlistScreenPreview() {
     val sampleCoins = listOf(
-        CoinItem("BTCUSDT", "", BigDecimal("68500.52"), 2.35),
-        CoinItem("ETHUSDT", "", BigDecimal("3500.25"), -1.75),
+        CoinItem("BTCUSDT", "", BigDecimal("68500.52"), 2.35, quoteVolume = BigDecimal("1240000000")),
+        CoinItem("ETHUSDT", "", BigDecimal("3500.25"), -1.75, quoteVolume = BigDecimal("850400000")),
     )
 
     WatchlistScreen(
-        state = WatchlistUiState(coins = sampleCoins),
+        state = WatchlistUiState(coins = sampleCoins, usdKrwExchangeRate = BigDecimal("1350")),
         onEvent = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )

@@ -29,7 +29,10 @@ import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.domain.model.CoinSortColumn
 import io.soma.cryptobook.core.domain.model.CoinSortDirection
+import io.soma.cryptobook.core.presentation.format.KrwPriceFormatter
+import io.soma.cryptobook.core.presentation.format.SymbolFormatter
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
+import io.soma.cryptobook.core.presentation.format.VolumeFormatter
 import io.soma.cryptobook.core.presentation.jank.TrackScrollJank
 import java.math.BigDecimal
 
@@ -100,7 +103,7 @@ internal fun HomeScreen(
             }
 
             CryptoCoinListSection(
-                coins = state.coins.map { it.toCoinListItemData() },
+                coins = state.coins.map { it.toCoinListItemData(state.usdKrwExchangeRate) },
                 isLoading = state.isLoading,
                 symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
                 volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
@@ -129,30 +132,40 @@ private fun HomeUiState.sortDirectionFor(column: CoinSortColumn): SortDirection 
     }
 
 /**
- * Convert CoinItem to CoinListItemData
- * TODO: API에서 name 받아오기
+ * Convert CoinItem to CoinListItemData.
+ *
+ * @param usdKrwExchangeRate KRW per USD; when not positive the secondary price is hidden.
  */
-private fun CoinItem.toCoinListItemData() = CoinListItemData(
-    symbol = symbol,
-    name = symbol.removeSuffix("USDT"),
-    imageUrl = imageUrl,
-    price = TickSizePriceFormatter.formatUsd(price, tickSize),
-    changePercent = priceChangePercentage24h,
-)
+private fun CoinItem.toCoinListItemData(usdKrwExchangeRate: BigDecimal): CoinListItemData {
+    val symbolParts = SymbolFormatter.split(symbol)
+    val secondaryPrice = usdKrwExchangeRate
+        .takeIf { it.signum() > 0 }
+        ?.let { KrwPriceFormatter.format(price.multiply(it)) }
+    return CoinListItemData(
+        symbol = symbol,
+        baseSymbol = symbolParts.base,
+        quoteSymbol = symbolParts.quote,
+        imageUrl = imageUrl,
+        price = TickSizePriceFormatter.format(price, tickSize),
+        secondaryPrice = secondaryPrice,
+        volume = VolumeFormatter.format(quoteVolume),
+        changePercent = priceChangePercentage24h,
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
     val sampleCoins = listOf(
-        CoinItem("BTCUSDT", "", BigDecimal("68500.52"), 2.35),
-        CoinItem("ETHUSDT", "", BigDecimal("3500.25"), -1.75),
-        CoinItem("BNBUSDT", "", BigDecimal("580.10"), 0.0),
-        CoinItem("SOLUSDT", "", BigDecimal("145.30"), 5.20),
-        CoinItem("XRPUSDT", "", BigDecimal("0.52"), -0.85),
+        CoinItem("BTCUSDT", "", BigDecimal("68500.52"), 2.35, quoteVolume = BigDecimal("1240000000")),
+        CoinItem("ETHUSDT", "", BigDecimal("3500.25"), -1.75, quoteVolume = BigDecimal("850400000")),
+        CoinItem("BNBUSDT", "", BigDecimal("580.10"), 0.0, quoteVolume = BigDecimal("120700000")),
+        CoinItem("SOLUSDT", "", BigDecimal("145.30"), 5.20, quoteVolume = BigDecimal("67800000")),
+        CoinItem("XRPUSDT", "", BigDecimal("0.52"), -0.85, quoteVolume = BigDecimal("45300000")),
     )
 
     HomeScreen(
-        state = HomeUiState(coins = sampleCoins),
+        state = HomeUiState(coins = sampleCoins, usdKrwExchangeRate = BigDecimal("1350")),
         onEvent = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )

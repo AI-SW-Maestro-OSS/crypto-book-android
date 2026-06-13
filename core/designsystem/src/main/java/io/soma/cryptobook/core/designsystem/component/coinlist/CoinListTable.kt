@@ -14,12 +14,24 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Data class for coin list item display
+ *
+ * @param symbol Full market symbol used as list key and click identifier (e.g. "BTCUSDT")
+ * @param baseSymbol Base asset symbol (e.g. "BTC")
+ * @param quoteSymbol Quote asset symbol (e.g. "USDT"); empty when unknown
+ * @param imageUrl Coin image URL
+ * @param price Formatted primary price string (e.g. "0.8934")
+ * @param secondaryPrice Formatted secondary price string (e.g. "₩1,198.5"); null hides the line
+ * @param volume Formatted trading volume string (e.g. "67.8M")
+ * @param changePercent 24h change percentage value
  */
 data class CoinListItemData(
     val symbol: String,
-    val name: String,
+    val baseSymbol: String,
+    val quoteSymbol: String,
     val imageUrl: String,
     val price: String,
+    val secondaryPrice: String?,
+    val volume: String,
     val changePercent: Double,
 )
 
@@ -65,10 +77,12 @@ fun CoinListTable(
             key = { it.symbol },
         ) { coin ->
             CoinListItem(
-                symbol = coin.symbol,
-                name = coin.name,
+                baseSymbol = coin.baseSymbol,
+                quoteSymbol = coin.quoteSymbol,
                 imageUrl = coin.imageUrl,
                 price = coin.price,
+                secondaryPrice = coin.secondaryPrice,
+                volume = coin.volume,
                 changePercent = coin.changePercent,
                 onClick = { onCoinClick(coin.symbol) },
             )
@@ -80,11 +94,11 @@ fun CoinListTable(
 @Composable
 private fun CoinListTablePreview() {
     val sampleCoins = listOf(
-        CoinListItemData("BTCUSDT", "Bitcoin", "", "$68500.52", 0.0),
-        CoinListItemData("ETHUSDT", "Ethereum", "", "$3500.25", 1.75),
-        CoinListItemData("BNBUSDT", "BNB", "", "$580.10", -1.75),
-        CoinListItemData("SOLUSDT", "Solana", "", "$145.30", 0.0),
-        CoinListItemData("XRPUSDT", "XRP", "", "$0.52", 2.50),
+        CoinListItemData("BTCUSDT", "BTC", "USDT", "", "68,500.52", "₩91,910,000", "1.2B", 0.0),
+        CoinListItemData("ETHUSDT", "ETH", "USDT", "", "3,500.25", "₩4,696,000", "850.4M", 1.75),
+        CoinListItemData("BNBUSDT", "BNB", "USDT", "", "580.10", "₩778,000", "120.7M", -1.75),
+        CoinListItemData("SOLUSDT", "SOL", "USDT", "", "145.30", "₩194,900", "67.8M", 0.0),
+        CoinListItemData("XRPUSDT", "XRP", "USDT", "", "0.5234", "₩702.1", "45.3M", 2.50),
     )
 
     CoinListTable(

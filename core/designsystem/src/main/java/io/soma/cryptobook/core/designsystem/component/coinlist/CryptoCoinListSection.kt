@@ -71,9 +71,9 @@ fun CryptoCoinListSection(
 @Composable
 private fun CryptoCoinListSectionPreview() {
     val sampleCoins = listOf(
-        CoinListItemData("BTCUSDT", "Bitcoin", "", "$68500.52", 2.35),
-        CoinListItemData("ETHUSDT", "Ethereum", "", "$3500.25", -1.75),
-        CoinListItemData("SOLUSDT", "Solana", "", "$145.30", 5.20),
+        CoinListItemData("BTCUSDT", "BTC", "USDT", "", "68,500.52", "₩91,910,000", "1.2B", 2.35),
+        CoinListItemData("ETHUSDT", "ETH", "USDT", "", "3,500.25", "₩4,696,000", "850.4M", -1.75),
+        CoinListItemData("SOLUSDT", "SOL", "USDT", "", "145.30", "₩194,900", "67.8M", 5.20),
     )
 
     CryptoCoinListSection(

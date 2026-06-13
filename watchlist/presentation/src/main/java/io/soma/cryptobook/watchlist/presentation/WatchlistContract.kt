@@ -16,6 +16,7 @@ data class WatchlistUiState(
     val realtimeStatusMessage: Text? = null,
     val sortColumn: CoinSortColumn = CoinSortColumn.NONE,
     val sortDirection: CoinSortDirection = CoinSortDirection.NONE,
+    val usdKrwExchangeRate: BigDecimal = BigDecimal.ZERO,
 ) : UiState
 
 data class CoinItem(
@@ -24,6 +25,7 @@ data class CoinItem(
     val price: BigDecimal,
     val priceChangePercentage24h: Double,
     val tickSize: BigDecimal? = null,
+    val quoteVolume: BigDecimal = BigDecimal.ZERO,
 )
 
 sealed interface WatchlistEvent : Event {
@@ -40,4 +42,5 @@ fun CoinPriceVO.toCoinItem(imageUrl: String) = CoinItem(
     price = price,
     priceChangePercentage24h = priceChangePercentage24h,
     tickSize = tickSize,
+    quoteVolume = quoteVolume,
 )

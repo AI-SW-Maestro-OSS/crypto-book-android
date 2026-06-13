@@ -13,6 +13,7 @@ import io.soma.cryptobook.core.domain.model.next
 import io.soma.cryptobook.core.domain.navigation.AppPage
 import io.soma.cryptobook.core.domain.navigation.NavigationHelper
 import io.soma.cryptobook.core.domain.outcome.handle
+import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
 import io.soma.cryptobook.core.domain.usecase.MarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveMarketRealtimeState
 import io.soma.cryptobook.core.domain.usecase.ObserveSortedCoinListUseCase
@@ -22,6 +23,7 @@ import io.soma.cryptobook.home.domain.usecase.ObserveCoinListUseCase
 import io.soma.cryptobook.home.domain.usecase.ObserveCoinSortUseCase
 import io.soma.cryptobook.home.domain.usecase.SetCoinSortUseCase
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,6 +33,7 @@ class HomeViewModel @Inject constructor(
     private val observeCoinSortUseCase: ObserveCoinSortUseCase,
     private val setCoinSortUseCase: SetCoinSortUseCase,
     private val observeSortedCoinListUseCase: ObserveSortedCoinListUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
     private val coinImageResolver: CoinImageResolver,
     private val navigationHelper: NavigationHelper,
     private val messageHelper: MessageHelper,
@@ -64,10 +67,14 @@ class HomeViewModel @Inject constructor(
         observeJob?.cancel()
         reduce { copy(isLoading = true) }
         observeJob = viewModelScope.launch {
-            observeSortedCoinListUseCase(
-                prices = observeCoinListUseCase(),
-                sort = observeCoinSortUseCase(),
-            ).collect { outcome ->
+            combine(
+                observeSortedCoinListUseCase(
+                    prices = observeCoinListUseCase(),
+                    sort = observeCoinSortUseCase(),
+                ),
+                getUserDataUseCase(),
+                ::Pair,
+            ).collect { (outcome, userData) ->
                 outcome.handle(
                     onSuccess = { coins ->
                         reduce {
@@ -77,6 +84,7 @@ class HomeViewModel @Inject constructor(
                                 coins = coins.map {
                                     it.toCoinItem(coinImageResolver.getImageUrl(it.symbol))
                                 },
+                                usdKrwExchangeRate = userData.usdKrwExchangeRate,
                             )
                         }
                     },
