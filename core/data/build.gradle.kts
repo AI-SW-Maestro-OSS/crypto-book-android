@@ -16,6 +16,8 @@ android {
     }
 
     defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+
         val properties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
