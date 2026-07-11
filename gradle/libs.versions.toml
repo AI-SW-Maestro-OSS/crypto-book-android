@@ -34,7 +34,7 @@ navigation3 = "1.0.0"
 spotless = "8.5.1"
 materialVersion = "1.14.0"
 uiGraphics = "1.11.2"
-kandle = "0.1.0"
+kandle = "0.1.1"
 androidxMetrics = "1.0.0-beta01"
 
 [libraries]
