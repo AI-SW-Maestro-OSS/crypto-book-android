@@ -4,19 +4,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.component.appbar.CryptoMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
-import io.soma.cryptobook.core.presentation.mvi.observeWithoutEffect
 
+/**
+ * The Diary screen.
+ */
 @Composable
-fun DiaryRoute(modifier: Modifier = Modifier, viewModel: DiaryViewModel = hiltViewModel()) {
-    val (state, dispatch) = viewModel.observeWithoutEffect()
+fun DiaryScreen(modifier: Modifier = Modifier, viewModel: DiaryViewModel = hiltViewModel()) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
 
     CryptoScaffold(
         modifier = modifier,
@@ -26,19 +30,12 @@ fun DiaryRoute(modifier: Modifier = Modifier, viewModel: DiaryViewModel = hiltVi
             )
         },
     ) {
-        DiaryScreen(
-            state = state.value,
-            onEvent = dispatch,
-        )
+        DiaryScreenContent(state = state)
     }
 }
 
 @Composable
-internal fun DiaryScreen(
-    state: DiaryContract.State,
-    onEvent: (DiaryContract.Event) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun DiaryScreenContent(state: DiaryState, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -48,9 +45,6 @@ internal fun DiaryScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun DiaryScreenPreview() {
-    DiaryScreen(
-        state = DiaryContract.State(),
-        onEvent = {},
-    )
+private fun DiaryScreenContentPreview() {
+    DiaryScreenContent(state = DiaryState())
 }

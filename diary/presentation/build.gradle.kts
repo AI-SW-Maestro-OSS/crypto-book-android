@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(projects.core.presentation)
     implementation(projects.core.designsystem)
+    implementation(projects.core.ui)
 
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
