@@ -1,5 +1,6 @@
 package io.soma.cryptobook.watchlist.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,23 +36,50 @@ import io.soma.cryptobook.core.presentation.format.SymbolFormatter
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import io.soma.cryptobook.core.presentation.format.VolumeFormatter
 import io.soma.cryptobook.core.presentation.jank.TrackScrollJank
+import io.soma.cryptobook.core.ui.EventsEffect
 import java.math.BigDecimal
 
+/**
+ * The Watchlist screen.
+ */
 @Composable
-fun WatchlistRoute(modifier: Modifier = Modifier, viewModel: WatchlistViewModel = hiltViewModel()) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+fun WatchlistScreen(
+    onNavigateToCoinDetail: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WatchlistViewModel = hiltViewModel(),
+) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    WatchlistScreen(
-        state = uiState,
-        onEvent = viewModel::handleEvent,
+    EventsEffect(viewModel = viewModel) { event ->
+        when (event) {
+            is WatchlistEvent.NavigateToCoinDetail -> onNavigateToCoinDetail(event.symbol)
+
+            is WatchlistEvent.ShowToast -> {
+                Toast
+                    .makeText(
+                        context,
+                        event.text.toString(context.resources),
+                        Toast.LENGTH_SHORT,
+                    )
+                    .show()
+            }
+        }
+    }
+
+    WatchlistScreenContent(
+        state = state,
+        onCoinClick = { symbol -> viewModel.trySendAction(WatchlistAction.CoinClick(symbol)) },
+        onSortClick = { column -> viewModel.trySendAction(WatchlistAction.SortClick(column)) },
         modifier = modifier,
     )
 }
 
 @Composable
-internal fun WatchlistScreen(
-    state: WatchlistUiState,
-    onEvent: (WatchlistEvent) -> Unit,
+internal fun WatchlistScreenContent(
+    state: WatchlistState,
+    onCoinClick: (String) -> Unit,
+    onSortClick: (CoinSortColumn) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
@@ -100,11 +129,11 @@ internal fun WatchlistScreen(
                 volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
                 priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
                 changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
-                onSymbolClick = { onEvent(WatchlistEvent.OnSortClick(CoinSortColumn.SYMBOL)) },
-                onVolumeClick = { onEvent(WatchlistEvent.OnSortClick(CoinSortColumn.VOLUME)) },
-                onPriceClick = { onEvent(WatchlistEvent.OnSortClick(CoinSortColumn.PRICE)) },
-                onChangeClick = { onEvent(WatchlistEvent.OnSortClick(CoinSortColumn.CHANGE)) },
-                onCoinClick = { symbol -> onEvent(WatchlistEvent.OnCoinClicked(symbol)) },
+                onSymbolClick = { onSortClick(CoinSortColumn.SYMBOL) },
+                onVolumeClick = { onSortClick(CoinSortColumn.VOLUME) },
+                onPriceClick = { onSortClick(CoinSortColumn.PRICE) },
+                onChangeClick = { onSortClick(CoinSortColumn.CHANGE) },
+                onCoinClick = onCoinClick,
                 lazyListState = lazyListState,
                 emptyContent = { WatchlistEmpty() },
             )
@@ -125,7 +154,7 @@ private fun WatchlistEmpty(modifier: Modifier = Modifier) {
     }
 }
 
-private fun WatchlistUiState.sortDirectionFor(column: CoinSortColumn): SortDirection =
+private fun WatchlistState.sortDirectionFor(column: CoinSortColumn): SortDirection =
     if (sortColumn != column) {
         SortDirection.None
     } else {
@@ -155,25 +184,39 @@ private fun CoinItem.toCoinListItemData(usdKrwExchangeRate: BigDecimal): CoinLis
 
 @Preview(showBackground = true)
 @Composable
-private fun WatchlistScreenPreview() {
+private fun WatchlistScreenContentPreview() {
     val sampleCoins = listOf(
-        CoinItem("BTCUSDT", "", BigDecimal("68500.52"), 2.35, quoteVolume = BigDecimal("1240000000")),
-        CoinItem("ETHUSDT", "", BigDecimal("3500.25"), -1.75, quoteVolume = BigDecimal("850400000")),
+        CoinItem(
+            symbol = "BTCUSDT",
+            imageUrl = "",
+            price = BigDecimal("68500.52"),
+            priceChangePercentage24h = 2.35,
+            quoteVolume = BigDecimal("1240000000"),
+        ),
+        CoinItem(
+            symbol = "ETHUSDT",
+            imageUrl = "",
+            price = BigDecimal("3500.25"),
+            priceChangePercentage24h = -1.75,
+            quoteVolume = BigDecimal("850400000"),
+        ),
     )
 
-    WatchlistScreen(
-        state = WatchlistUiState(coins = sampleCoins, usdKrwExchangeRate = BigDecimal("1350")),
-        onEvent = {},
+    WatchlistScreenContent(
+        state = WatchlistState(coins = sampleCoins, usdKrwExchangeRate = BigDecimal("1350")),
+        onCoinClick = {},
+        onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun WatchlistScreenEmptyPreview() {
-    WatchlistScreen(
-        state = WatchlistUiState(isLoading = false),
-        onEvent = {},
+private fun WatchlistScreenContentEmptyPreview() {
+    WatchlistScreenContent(
+        state = WatchlistState(isLoading = false),
+        onCoinClick = {},
+        onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }

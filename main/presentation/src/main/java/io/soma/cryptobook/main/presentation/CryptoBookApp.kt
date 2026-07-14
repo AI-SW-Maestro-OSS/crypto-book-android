@@ -140,7 +140,11 @@ fun CryptoBookApp(
                         },
                         onNavigateToSearch = { navigator.navigateTo(SearchNavKey) },
                     )
-                    watchlistEntry()
+                    watchlistEntry(
+                        onNavigateToCoinDetail = { symbol ->
+                            navigator.navigateTo(CoinDetailNavKey(symbol))
+                        },
+                    )
                     diaryEntry()
                     coinDetailEntry(navigator::goBack)
                     searchEntry(
