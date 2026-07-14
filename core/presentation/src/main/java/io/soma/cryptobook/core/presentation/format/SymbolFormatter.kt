@@ -20,7 +20,4 @@ object SymbolFormatter {
     }
 }
 
-data class SymbolParts(
-    val base: String,
-    val quote: String,
-)
+data class SymbolParts(val base: String, val quote: String)

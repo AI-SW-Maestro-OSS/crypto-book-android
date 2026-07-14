@@ -1,6 +1,5 @@
 package io.soma.cryptobook.main.presentation
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -13,15 +12,9 @@ import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.metrics.performance.JankStats
-import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
-import io.soma.cryptobook.core.domain.navigation.NavigationHelper
-import io.soma.cryptobook.core.presentation.mvi.observe
-import io.soma.cryptobook.home.presentation.navigation.HomeNavKey
-import io.soma.cryptobook.main.presentation.message.MessageCommandSource
-import io.soma.cryptobook.main.presentation.navigation.LinkRouter
-import io.soma.cryptobook.main.presentation.navigation.NavCommandSource
+import io.soma.cryptobook.core.ui.EventsEffect
 import io.soma.cryptobook.main.presentation.util.toLanguage
 import io.soma.cryptobook.splash.presentation.SplashViewModel
 import io.soma.cryptobook.splash.presentation.UpdateRequiredScreen
@@ -32,18 +25,6 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var lazyStats: dagger.Lazy<JankStats>
-
-    @Inject
-    lateinit var linkRouter: LinkRouter
-
-    @Inject
-    lateinit var navSource: NavCommandSource
-
-    @Inject
-    lateinit var messageSource: MessageCommandSource
-
-    @Inject
-    lateinit var navigationHelper: NavigationHelper
 
     private val splashViewModel: SplashViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
@@ -58,21 +39,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val appLinkKey: NavKey =
-            intent?.dataString?.let { linkRouter.resolve(it) } ?: HomeNavKey
-
         setContent {
-            mainViewModel.observe { effect ->
-                when (effect) {
-                    is MainContract.Effect.ApplyLocale -> {
-                        val locales = effect.localeTag
+            EventsEffect(viewModel = mainViewModel) { event ->
+                when (event) {
+                    is MainEvent.ApplyLocale -> {
+                        val locales = event.localeTag
                             ?.let { LocaleListCompat.forLanguageTags(it) }
                             ?: LocaleListCompat.getEmptyLocaleList()
                         AppCompatDelegate.setApplicationLocales(locales)
                     }
 
-                    is MainContract.Effect.ApplyTheme -> {
-                        AppCompatDelegate.setDefaultNightMode(effect.nightMode)
+                    is MainEvent.ApplyTheme -> {
+                        AppCompatDelegate.setDefaultNightMode(event.nightMode)
                     }
                 }
             }
@@ -88,22 +66,10 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     else -> {
-                        CryptoBookApp(
-                            navSource = navSource,
-                            messageSource = messageSource,
-                            linkRouter = linkRouter,
-                            appLinkKey = appLinkKey,
-                        )
+                        CryptoBookApp()
                     }
                 }
             }
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        intent.dataString?.let { link ->
-            navigationHelper.deepLink(link)
         }
     }
 
@@ -118,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         val systemLocale = locales.get(0) ?: return
         val language = systemLocale.toLanguage() ?: return
 
-        mainViewModel.event(MainContract.Event.OnSystemLocaleDetected(language))
+        mainViewModel.trySendAction(MainAction.SystemLocaleDetected(language))
     }
 
     override fun onPause() {

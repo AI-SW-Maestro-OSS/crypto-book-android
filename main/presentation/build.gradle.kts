@@ -18,6 +18,7 @@ dependencies {
     implementation(projects.watchlist.presentation)
     implementation(projects.diary.presentation)
     implementation(projects.core.presentation)
+    implementation(projects.core.ui)
 
     implementation(libs.androidx.appcompat)
 
@@ -26,7 +27,6 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
-    implementation(libs.kotlinx.atomicfu)
     implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.androidx.compose.material3.adaptive)

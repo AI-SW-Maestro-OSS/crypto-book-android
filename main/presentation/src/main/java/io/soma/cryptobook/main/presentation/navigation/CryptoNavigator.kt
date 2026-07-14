@@ -23,13 +23,6 @@ class CryptoNavigator(val state: NavigationState) {
         state.backStack.add(key)
     }
 
-    fun popWhileAndPush(key: NavKey, predicate: (NavKey) -> Boolean) {
-        while (state.backStack.isNotEmpty() && predicate(state.backStack.last())) {
-            state.backStack.removeLastOrNull()
-        }
-        state.backStack.add(key)
-    }
-
     private fun goToTopLevel(key: NavKey) {
         state.backStack.apply {
             if (key == state.startKey) {
@@ -39,13 +32,6 @@ class CryptoNavigator(val state: NavigationState) {
             }
             add(key)
         }
-    }
-
-    /**
-     * 딥링크에서 기존 화면을 replace하지 않고 바로 위에 추가하는 경우를 위한 함수
-     */
-    fun add(key: NavKey) {
-        state.backStack.add(key)
     }
 
     fun goBack() {
