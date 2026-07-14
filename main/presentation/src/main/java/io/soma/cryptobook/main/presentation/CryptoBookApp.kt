@@ -39,6 +39,7 @@ import io.soma.cryptobook.main.presentation.navigation.NavCommand
 import io.soma.cryptobook.main.presentation.navigation.NavCommandSource
 import io.soma.cryptobook.navigation.NavigationState
 import io.soma.cryptobook.navigation.rememberNavigationState
+import io.soma.cryptobook.search.presentation.navigation.SearchNavKey
 import io.soma.cryptobook.search.presentation.navigation.searchEntry
 import io.soma.cryptobook.settings.presentation.navigation.settingsEntry
 import io.soma.cryptobook.watchlist.presentation.navigation.watchlistEntry
@@ -133,7 +134,12 @@ fun CryptoBookApp(
                 ),
                 entryProvider = entryProvider {
                     settingsEntry()
-                    homeEntry()
+                    homeEntry(
+                        onNavigateToCoinDetail = { symbol ->
+                            navigator.navigateTo(CoinDetailNavKey(symbol))
+                        },
+                        onNavigateToSearch = { navigator.navigateTo(SearchNavKey) },
+                    )
                     watchlistEntry()
                     diaryEntry()
                     coinDetailEntry(navigator::goBack)

@@ -1,5 +1,6 @@
 package io.soma.cryptobook.home.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -34,23 +36,55 @@ import io.soma.cryptobook.core.presentation.format.SymbolFormatter
 import io.soma.cryptobook.core.presentation.format.TickSizePriceFormatter
 import io.soma.cryptobook.core.presentation.format.VolumeFormatter
 import io.soma.cryptobook.core.presentation.jank.TrackScrollJank
+import io.soma.cryptobook.core.ui.EventsEffect
 import java.math.BigDecimal
 
+/**
+ * The Home screen.
+ */
 @Composable
-fun HomeRoute(modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+fun HomeScreen(
+    onNavigateToCoinDetail: (String) -> Unit,
+    onNavigateToSearch: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
+) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    HomeScreen(
-        state = uiState,
-        onEvent = viewModel::handleEvent,
+    EventsEffect(viewModel = viewModel) { event ->
+        when (event) {
+            is HomeEvent.NavigateToCoinDetail -> onNavigateToCoinDetail(event.symbol)
+
+            HomeEvent.NavigateToSearch -> onNavigateToSearch()
+
+            is HomeEvent.ShowToast -> {
+                Toast
+                    .makeText(
+                        context,
+                        event.text.toString(context.resources),
+                        Toast.LENGTH_SHORT,
+                    )
+                    .show()
+            }
+        }
+    }
+
+    HomeScreenContent(
+        state = state,
+        onSearchClick = { viewModel.trySendAction(HomeAction.SearchClick) },
+        onCoinClick = { symbol -> viewModel.trySendAction(HomeAction.CoinClick(symbol)) },
+        onSortClick = { column -> viewModel.trySendAction(HomeAction.SortClick(column)) },
         modifier = modifier,
     )
 }
 
 @Composable
-internal fun HomeScreen(
-    state: HomeUiState,
-    onEvent: (HomeEvent) -> Unit,
+internal fun HomeScreenContent(
+    state: HomeState,
+    onSearchClick: () -> Unit,
+    onCoinClick: (String) -> Unit,
+    onSortClick: (CoinSortColumn) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
@@ -65,7 +99,7 @@ internal fun HomeScreen(
                     CryptoStandardIconButton(
                         vectorIconRes = CryptoDrawable.ic_search,
                         contentDescription = "search",
-                        onClick = { onEvent(HomeEvent.SearchIconClick) },
+                        onClick = onSearchClick,
                         modifier = Modifier,
                     )
                 },
@@ -109,18 +143,18 @@ internal fun HomeScreen(
                 volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
                 priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
                 changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
-                onSymbolClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.SYMBOL)) },
-                onVolumeClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.VOLUME)) },
-                onPriceClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.PRICE)) },
-                onChangeClick = { onEvent(HomeEvent.OnSortClick(CoinSortColumn.CHANGE)) },
-                onCoinClick = { symbol -> onEvent(HomeEvent.OnCoinClicked(symbol)) },
+                onSymbolClick = { onSortClick(CoinSortColumn.SYMBOL) },
+                onVolumeClick = { onSortClick(CoinSortColumn.VOLUME) },
+                onPriceClick = { onSortClick(CoinSortColumn.PRICE) },
+                onChangeClick = { onSortClick(CoinSortColumn.CHANGE) },
+                onCoinClick = onCoinClick,
                 lazyListState = lazyListState,
             )
         }
     }
 }
 
-private fun HomeUiState.sortDirectionFor(column: CoinSortColumn): SortDirection =
+private fun HomeState.sortDirectionFor(column: CoinSortColumn): SortDirection =
     if (sortColumn != column) {
         SortDirection.None
     } else {
@@ -155,50 +189,70 @@ private fun CoinItem.toCoinListItemData(usdKrwExchangeRate: BigDecimal): CoinLis
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeScreenPreview() {
+private fun HomeScreenContentPreview() {
     val sampleCoins = listOf(
-        CoinItem("BTCUSDT", "", BigDecimal("68500.52"), 2.35, quoteVolume = BigDecimal("1240000000")),
-        CoinItem("ETHUSDT", "", BigDecimal("3500.25"), -1.75, quoteVolume = BigDecimal("850400000")),
+        CoinItem(
+            "BTCUSDT",
+            "",
+            BigDecimal("68500.52"),
+            2.35,
+            quoteVolume = BigDecimal("1240000000"),
+        ),
+        CoinItem(
+            "ETHUSDT",
+            "",
+            BigDecimal("3500.25"),
+            -1.75,
+            quoteVolume = BigDecimal("850400000"),
+        ),
         CoinItem("BNBUSDT", "", BigDecimal("580.10"), 0.0, quoteVolume = BigDecimal("120700000")),
         CoinItem("SOLUSDT", "", BigDecimal("145.30"), 5.20, quoteVolume = BigDecimal("67800000")),
         CoinItem("XRPUSDT", "", BigDecimal("0.52"), -0.85, quoteVolume = BigDecimal("45300000")),
     )
 
-    HomeScreen(
-        state = HomeUiState(coins = sampleCoins, usdKrwExchangeRate = BigDecimal("1350")),
-        onEvent = {},
+    HomeScreenContent(
+        state = HomeState(coins = sampleCoins, usdKrwExchangeRate = BigDecimal("1350")),
+        onSearchClick = {},
+        onCoinClick = {},
+        onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeScreenLoadingPreview() {
-    HomeScreen(
-        state = HomeUiState(isLoading = true),
-        onEvent = {},
+private fun HomeScreenContentLoadingPreview() {
+    HomeScreenContent(
+        state = HomeState(isLoading = true),
+        onSearchClick = {},
+        onCoinClick = {},
+        onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeScreenErrorPreview() {
-    HomeScreen(
-        state = HomeUiState(errorMsg = CryptoString.crypto_error_network.asText()),
-        onEvent = {},
+private fun HomeScreenContentErrorPreview() {
+    HomeScreenContent(
+        state = HomeState(errorMsg = CryptoString.crypto_error_network.asText()),
+        onSearchClick = {},
+        onCoinClick = {},
+        onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeScreenRealtimeWarningPreview() {
-    HomeScreen(
-        state = HomeUiState(
+private fun HomeScreenContentRealtimeWarningPreview() {
+    HomeScreenContent(
+        state = HomeState(
             realtimeStatusMessage = CryptoString.crypto_realtime_recovering.asText(),
         ),
-        onEvent = {},
+        onSearchClick = {},
+        onCoinClick = {},
+        onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
     )
 }
