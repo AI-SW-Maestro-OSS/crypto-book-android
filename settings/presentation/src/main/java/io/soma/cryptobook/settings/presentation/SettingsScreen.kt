@@ -6,16 +6,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.component.appbar.CryptoMediumTopAppBar
 import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
-import io.soma.cryptobook.core.designsystem.component.snackbar.CryptoSnackbarHost
-import io.soma.cryptobook.core.designsystem.component.snackbar.model.rememberCryptoSnackbarHostState
 import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.domain.model.AppTheme
@@ -24,7 +23,6 @@ import io.soma.cryptobook.core.domain.model.CoinSortDirection
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
 import io.soma.cryptobook.core.domain.model.UserData
-import io.soma.cryptobook.core.presentation.mvi.observe
 import io.soma.cryptobook.settings.presentation.component.CryptoSettingCard
 import io.soma.cryptobook.settings.presentation.component.CryptoSettingDivider
 import io.soma.cryptobook.settings.presentation.component.CryptoSettingSelectionRow
@@ -33,18 +31,12 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Locale
 
+/**
+ * The Settings screen.
+ */
 @Composable
-fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
-    val snackbarHostState = rememberCryptoSnackbarHostState()
-    val resources = LocalContext.current.resources
-    val (state, dispatch) = viewModel.observe { effect ->
-        when (effect) {
-            is SettingsContract.Effect.ShowSnackbar -> snackbarHostState.showSnackbar(
-                message = effect.message.toString(resources),
-                actionLabel = effect.actionLabel?.toString(resources),
-            )
-        }
-    }
+fun SettingsScreen(modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
 
     CryptoScaffold(
         modifier = modifier,
@@ -53,19 +45,28 @@ fun SettingsRoute(modifier: Modifier = Modifier, viewModel: SettingsViewModel = 
                 title = "Settings",
             )
         },
-        snackbarHost = { CryptoSnackbarHost(snackbarHostState) },
     ) {
-        SettingsScreen(
-            state = state.value,
-            onEvent = dispatch,
+        SettingsScreenContent(
+            state = state,
+            onAppThemeSelect = { appTheme ->
+                viewModel.trySendAction(SettingsAction.AppThemeSelect(appTheme))
+            },
+            onCurrencyUnitSelect = { currencyUnit ->
+                viewModel.trySendAction(SettingsAction.CurrencyUnitSelect(currencyUnit))
+            },
+            onLanguageSelect = { language ->
+                viewModel.trySendAction(SettingsAction.LanguageSelect(language))
+            },
         )
     }
 }
 
 @Composable
-internal fun SettingsScreen(
-    state: SettingsContract.State,
-    onEvent: (SettingsContract.Event) -> Unit,
+internal fun SettingsScreenContent(
+    state: SettingsState,
+    onAppThemeSelect: (AppTheme) -> Unit,
+    onCurrencyUnitSelect: (CurrencyUnit) -> Unit,
+    onLanguageSelect: (Language) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val currentLanguage = state.userData?.language ?: Language.SYSTEM
@@ -95,9 +96,7 @@ internal fun SettingsScreen(
                     stringResource(CryptoString.crypto_settings_theme_dark),
                 ),
                 selectedIndex = themeOptions.indexOf(currentAppTheme),
-                onOptionSelected = { index ->
-                    onEvent(SettingsContract.Event.SetAppTheme(themeOptions[index]))
-                },
+                onOptionSelected = { index -> onAppThemeSelect(themeOptions[index]) },
             )
 
             CryptoSettingDivider()
@@ -111,9 +110,7 @@ internal fun SettingsScreen(
                     stringResource(CryptoString.crypto_settings_currency_won),
                 ),
                 selectedIndex = currencyOptions.indexOf(currentCurrency),
-                onOptionSelected = { index ->
-                    onEvent(SettingsContract.Event.SetCurrencyUnit(currencyOptions[index]))
-                },
+                onOptionSelected = { index -> onCurrencyUnitSelect(currencyOptions[index]) },
             )
 
             CryptoSettingDivider()
@@ -128,9 +125,7 @@ internal fun SettingsScreen(
                     stringResource(CryptoString.crypto_settings_language_korean_native),
                 ),
                 selectedIndex = languageOptions.indexOf(currentLanguage),
-                onOptionSelected = { index ->
-                    onEvent(SettingsContract.Event.SetLanguage(languageOptions[index]))
-                },
+                onOptionSelected = { index -> onLanguageSelect(languageOptions[index]) },
             )
         }
 
@@ -142,7 +137,7 @@ internal fun SettingsScreen(
                 CryptoString.crypto_settings_exchange_rate_updated_now,
             ),
             onRefreshClick = {
-                // TODO: Add refresh event
+                // TODO: Add refresh action
             },
         )
     }
@@ -160,9 +155,9 @@ private fun formatExchangeRate(rate: BigDecimal?): String {
 
 @Preview(showBackground = true)
 @Composable
-private fun SettingsScreenPreview() {
-    SettingsScreen(
-        state = SettingsContract.State(
+private fun SettingsScreenContentPreview() {
+    SettingsScreenContent(
+        state = SettingsState(
             userData = UserData(
                 language = Language.KOREAN,
                 currencyUnit = CurrencyUnit.DOLLAR,
@@ -175,6 +170,8 @@ private fun SettingsScreenPreview() {
             ),
             isLoading = false,
         ),
-        onEvent = {},
+        onAppThemeSelect = {},
+        onCurrencyUnitSelect = {},
+        onLanguageSelect = {},
     )
 }

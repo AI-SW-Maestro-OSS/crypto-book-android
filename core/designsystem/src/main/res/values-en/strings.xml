@@ -23,8 +23,6 @@
     <string name="crypto_settings_exchange_rate_loading">Loading…</string>
     <string name="crypto_settings_exchange_rate_format">1 USD = %1$s WON</string>
     <string name="crypto_settings_exchange_rate_refresh_cd">Refresh exchange rate</string>
-    <string name="crypto_settings_test_snackbar_message">This is a test snackbar message</string>
-    <string name="crypto_settings_test_snackbar_action">OK</string>
 
     <!-- Realtime status (shared by Home & Coin detail) -->
     <string name="crypto_realtime_recovering">Reconnecting realtime…</string>

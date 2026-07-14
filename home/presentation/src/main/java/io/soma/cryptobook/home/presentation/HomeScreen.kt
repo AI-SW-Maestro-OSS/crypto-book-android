@@ -70,26 +70,6 @@ fun HomeScreen(
         }
     }
 
-    HomeScreenContent(
-        state = state,
-        onSearchClick = { viewModel.trySendAction(HomeAction.SearchClick) },
-        onCoinClick = { symbol -> viewModel.trySendAction(HomeAction.CoinClick(symbol)) },
-        onSortClick = { column -> viewModel.trySendAction(HomeAction.SortClick(column)) },
-        modifier = modifier,
-    )
-}
-
-@Composable
-internal fun HomeScreenContent(
-    state: HomeState,
-    onSearchClick: () -> Unit,
-    onCoinClick: (String) -> Unit,
-    onSortClick: (CoinSortColumn) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val lazyListState = rememberLazyListState()
-    TrackScrollJank(scrollableState = lazyListState, stateName = "home:coinList")
-
     CryptoScaffold(
         modifier = modifier,
         topBar = {
@@ -99,58 +79,75 @@ internal fun HomeScreenContent(
                     CryptoStandardIconButton(
                         vectorIconRes = CryptoDrawable.ic_search,
                         contentDescription = "search",
-                        onClick = onSearchClick,
+                        onClick = { viewModel.trySendAction(HomeAction.SearchClick) },
                         modifier = Modifier,
                     )
                 },
             )
         },
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(CryptoTheme.colorScheme.background.secondary),
-        ) {
-            state.realtimeStatusMessage?.let { msg ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFF3CD))
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(text = msg(), color = Color(0xFF8A6D3B))
-                }
-            }
+        HomeScreenContent(
+            state = state,
+            onCoinClick = { symbol -> viewModel.trySendAction(HomeAction.CoinClick(symbol)) },
+            onSortClick = { column -> viewModel.trySendAction(HomeAction.SortClick(column)) },
+        )
+    }
+}
 
-            // Error message
-            state.errorMsg?.let { msg ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Red.copy(alpha = 0.1f))
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(text = msg(), color = Color.Red)
-                }
-            }
+@Composable
+internal fun HomeScreenContent(
+    state: HomeState,
+    onCoinClick: (String) -> Unit,
+    onSortClick: (CoinSortColumn) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val lazyListState = rememberLazyListState()
+    TrackScrollJank(scrollableState = lazyListState, stateName = "home:coinList")
 
-            CryptoCoinListSection(
-                coins = state.coins.map { it.toCoinListItemData(state.usdKrwExchangeRate) },
-                isLoading = state.isLoading,
-                symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
-                volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
-                priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
-                changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
-                onSymbolClick = { onSortClick(CoinSortColumn.SYMBOL) },
-                onVolumeClick = { onSortClick(CoinSortColumn.VOLUME) },
-                onPriceClick = { onSortClick(CoinSortColumn.PRICE) },
-                onChangeClick = { onSortClick(CoinSortColumn.CHANGE) },
-                onCoinClick = onCoinClick,
-                lazyListState = lazyListState,
-            )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(CryptoTheme.colorScheme.background.secondary),
+    ) {
+        state.realtimeStatusMessage?.let { msg ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFF3CD))
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(text = msg(), color = Color(0xFF8A6D3B))
+            }
         }
+
+        // Error message
+        state.errorMsg?.let { msg ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red.copy(alpha = 0.1f))
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(text = msg(), color = Color.Red)
+            }
+        }
+
+        CryptoCoinListSection(
+            coins = state.coins.map { it.toCoinListItemData(state.usdKrwExchangeRate) },
+            isLoading = state.isLoading,
+            symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
+            volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
+            priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
+            changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
+            onSymbolClick = { onSortClick(CoinSortColumn.SYMBOL) },
+            onVolumeClick = { onSortClick(CoinSortColumn.VOLUME) },
+            onPriceClick = { onSortClick(CoinSortColumn.PRICE) },
+            onChangeClick = { onSortClick(CoinSortColumn.CHANGE) },
+            onCoinClick = onCoinClick,
+            lazyListState = lazyListState,
+        )
     }
 }
 
@@ -212,7 +209,6 @@ private fun HomeScreenContentPreview() {
 
     HomeScreenContent(
         state = HomeState(coins = sampleCoins, usdKrwExchangeRate = BigDecimal("1350")),
-        onSearchClick = {},
         onCoinClick = {},
         onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
@@ -224,7 +220,6 @@ private fun HomeScreenContentPreview() {
 private fun HomeScreenContentLoadingPreview() {
     HomeScreenContent(
         state = HomeState(isLoading = true),
-        onSearchClick = {},
         onCoinClick = {},
         onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
@@ -236,7 +231,6 @@ private fun HomeScreenContentLoadingPreview() {
 private fun HomeScreenContentErrorPreview() {
     HomeScreenContent(
         state = HomeState(errorMsg = CryptoString.crypto_error_network.asText()),
-        onSearchClick = {},
         onCoinClick = {},
         onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),
@@ -250,7 +244,6 @@ private fun HomeScreenContentRealtimeWarningPreview() {
         state = HomeState(
             realtimeStatusMessage = CryptoString.crypto_realtime_recovering.asText(),
         ),
-        onSearchClick = {},
         onCoinClick = {},
         onSortClick = {},
         modifier = Modifier.background(CryptoTheme.colorScheme.background.primary),

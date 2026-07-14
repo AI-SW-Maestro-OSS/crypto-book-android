@@ -28,8 +28,6 @@
     <string name="crypto_settings_exchange_rate_loading">불러오는 중…</string>
     <string name="crypto_settings_exchange_rate_format">1 USD = %1$s 원</string>
     <string name="crypto_settings_exchange_rate_refresh_cd">환율 새로고침</string>
-    <string name="crypto_settings_test_snackbar_message">스낵바 테스트 메시지입니다</string>
-    <string name="crypto_settings_test_snackbar_action">확인</string>
 
     <!-- Realtime status (shared by Home & Coin detail) -->
     <string name="crypto_realtime_recovering">실시간 연결을 복구하는 중입니다</string>

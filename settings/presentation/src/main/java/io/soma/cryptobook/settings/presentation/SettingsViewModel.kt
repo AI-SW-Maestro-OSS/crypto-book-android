@@ -2,97 +2,94 @@ package io.soma.cryptobook.settings.presentation
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.soma.cryptobook.core.designsystem.resource.CryptoString
-import io.soma.cryptobook.core.designsystem.util.asText
 import io.soma.cryptobook.core.domain.model.AppTheme
 import io.soma.cryptobook.core.domain.model.CurrencyUnit
 import io.soma.cryptobook.core.domain.model.Language
-import io.soma.cryptobook.core.domain.navigation.AppPage
-import io.soma.cryptobook.core.domain.navigation.NavigationHelper
+import io.soma.cryptobook.core.domain.model.UserData
 import io.soma.cryptobook.core.domain.usecase.GetUserDataUseCase
 import io.soma.cryptobook.core.domain.usecase.SetLanguageUseCase
-import io.soma.cryptobook.core.presentation.message.MessageHelper
-import io.soma.cryptobook.core.presentation.mvi.BaseViewModel
+import io.soma.cryptobook.core.ui.BaseViewModel
 import io.soma.cryptobook.settings.domain.usecase.SetAppThemeUseCase
 import io.soma.cryptobook.settings.domain.usecase.SetPriceCurrencyUseCase
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for the Settings screen.
+ */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val navigationHelper: NavigationHelper,
-    private val messageHelper: MessageHelper,
-    private val getUserDataUseCase: GetUserDataUseCase,
+    getUserDataUseCase: GetUserDataUseCase,
     private val setLanguageUseCase: SetLanguageUseCase,
     private val setPriceCurrencyUseCase: SetPriceCurrencyUseCase,
     private val setAppThemeUseCase: SetAppThemeUseCase,
-) : BaseViewModel<SettingsContract.State, SettingsContract.Event, SettingsContract.Effect>(
-    SettingsContract.State(),
-),
-    SettingsContract.ViewModel {
-    override fun event(event: SettingsContract.Event) {
-        when (event) {
-            is SettingsContract.Event.SetLanguage -> onLanguageChanged(event.language)
-
-            is SettingsContract.Event.SetCurrencyUnit -> onPriceCurrencyChanged(
-                event.currencyUnit,
-            )
-
-            is SettingsContract.Event.SetAppTheme -> onAppThemeChanged(event.appTheme)
-
-            is SettingsContract.Event.NavigateToHome -> navigateToHome()
-
-            is SettingsContract.Event.ShowLoadingMessage -> showLoadingMessage()
-
-            is SettingsContract.Event.ShowSnackbarMessage -> showSnackbarMessage()
-        }
-    }
+) : BaseViewModel<SettingsState, SettingsEvent, SettingsAction>(
+    initialState = SettingsState(),
+) {
 
     init {
-        observeUserData()
-    }
-
-    private fun observeUserData() {
         getUserDataUseCase()
-            .onEach { userData ->
-                updateState { state ->
-                    state.copy(userData = userData, isLoading = false)
-                }
-            }
+            .map { SettingsAction.Internal.ReceiveUserData(userData = it) }
+            .onEach(::sendAction)
             .launchIn(viewModelScope)
     }
 
-    private fun onLanguageChanged(language: Language) = viewModelScope.launch {
-        setLanguageUseCase(language)
+    override fun handleAction(action: SettingsAction) {
+        when (action) {
+            is SettingsAction.AppThemeSelect -> handleAppThemeSelect(action)
+            is SettingsAction.CurrencyUnitSelect -> handleCurrencyUnitSelect(action)
+            is SettingsAction.LanguageSelect -> handleLanguageSelect(action)
+            is SettingsAction.Internal.ReceiveUserData -> handleReceiveUserData(action)
+        }
     }
 
-    private fun onPriceCurrencyChanged(currencyUnit: CurrencyUnit) = viewModelScope.launch {
-        setPriceCurrencyUseCase(currencyUnit)
+    private fun handleAppThemeSelect(action: SettingsAction.AppThemeSelect) {
+        viewModelScope.launch { setAppThemeUseCase(action.appTheme) }
     }
 
-    private fun navigateToHome() = viewModelScope.launch {
-        navigationHelper.navigate(AppPage.Home)
+    private fun handleCurrencyUnitSelect(action: SettingsAction.CurrencyUnitSelect) {
+        viewModelScope.launch { setPriceCurrencyUseCase(action.currencyUnit) }
     }
 
-    private fun onAppThemeChanged(appTheme: AppTheme) = viewModelScope.launch {
-        setAppThemeUseCase(appTheme)
+    private fun handleLanguageSelect(action: SettingsAction.LanguageSelect) {
+        viewModelScope.launch { setLanguageUseCase(action.language) }
     }
 
-    private fun showLoadingMessage() = viewModelScope.launch {
-        messageHelper.showLoading()
-        delay(3000L)
-        messageHelper.hideLoading()
+    private fun handleReceiveUserData(action: SettingsAction.Internal.ReceiveUserData) {
+        mutableStateFlow.update {
+            it.copy(userData = action.userData, isLoading = false)
+        }
     }
+}
 
-    private fun showSnackbarMessage() {
-        emitEffect(
-            SettingsContract.Effect.ShowSnackbar(
-                message = CryptoString.crypto_settings_test_snackbar_message.asText(),
-                actionLabel = CryptoString.crypto_settings_test_snackbar_action.asText(),
-            ),
-        )
+/**
+ * State for the Settings screen.
+ */
+data class SettingsState(val userData: UserData? = null, val isLoading: Boolean = true)
+
+/**
+ * One-shot UI events for the Settings screen. The screen currently has none.
+ */
+sealed class SettingsEvent
+
+/**
+ * User and system actions for the Settings screen.
+ */
+sealed class SettingsAction {
+    data class AppThemeSelect(val appTheme: AppTheme) : SettingsAction()
+
+    data class CurrencyUnitSelect(val currencyUnit: CurrencyUnit) : SettingsAction()
+
+    data class LanguageSelect(val language: Language) : SettingsAction()
+
+    /**
+     * Internal actions dispatched by the ViewModel from coroutines.
+     */
+    sealed class Internal : SettingsAction() {
+        data class ReceiveUserData(val userData: UserData) : Internal()
     }
 }

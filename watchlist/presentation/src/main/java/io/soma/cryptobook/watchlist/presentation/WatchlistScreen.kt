@@ -67,12 +67,20 @@ fun WatchlistScreen(
         }
     }
 
-    WatchlistScreenContent(
-        state = state,
-        onCoinClick = { symbol -> viewModel.trySendAction(WatchlistAction.CoinClick(symbol)) },
-        onSortClick = { column -> viewModel.trySendAction(WatchlistAction.SortClick(column)) },
+    CryptoScaffold(
         modifier = modifier,
-    )
+        topBar = {
+            CryptoMediumTopAppBar(
+                title = stringResource(CryptoString.crypto_top_level_watchlist),
+            )
+        },
+    ) {
+        WatchlistScreenContent(
+            state = state,
+            onCoinClick = { symbol -> viewModel.trySendAction(WatchlistAction.CoinClick(symbol)) },
+            onSortClick = { column -> viewModel.trySendAction(WatchlistAction.SortClick(column)) },
+        )
+    }
 }
 
 @Composable
@@ -85,59 +93,50 @@ internal fun WatchlistScreenContent(
     val lazyListState = rememberLazyListState()
     TrackScrollJank(scrollableState = lazyListState, stateName = "watchlist:coinList")
 
-    CryptoScaffold(
-        modifier = modifier,
-        topBar = {
-            CryptoMediumTopAppBar(
-                title = stringResource(CryptoString.crypto_top_level_watchlist),
-            )
-        },
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(CryptoTheme.colorScheme.background.secondary),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(CryptoTheme.colorScheme.background.secondary),
-        ) {
-            state.realtimeStatusMessage?.let { msg ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFF3CD))
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(text = msg(), color = Color(0xFF8A6D3B))
-                }
+        state.realtimeStatusMessage?.let { msg ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFF3CD))
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(text = msg(), color = Color(0xFF8A6D3B))
             }
-
-            state.errorMsg?.let { msg ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Red.copy(alpha = 0.1f))
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(text = msg(), color = Color.Red)
-                }
-            }
-
-            CryptoCoinListSection(
-                coins = state.coins.map { it.toCoinListItemData(state.usdKrwExchangeRate) },
-                isLoading = state.isLoading,
-                symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
-                volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
-                priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
-                changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
-                onSymbolClick = { onSortClick(CoinSortColumn.SYMBOL) },
-                onVolumeClick = { onSortClick(CoinSortColumn.VOLUME) },
-                onPriceClick = { onSortClick(CoinSortColumn.PRICE) },
-                onChangeClick = { onSortClick(CoinSortColumn.CHANGE) },
-                onCoinClick = onCoinClick,
-                lazyListState = lazyListState,
-                emptyContent = { WatchlistEmpty() },
-            )
         }
+
+        state.errorMsg?.let { msg ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red.copy(alpha = 0.1f))
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(text = msg(), color = Color.Red)
+            }
+        }
+
+        CryptoCoinListSection(
+            coins = state.coins.map { it.toCoinListItemData(state.usdKrwExchangeRate) },
+            isLoading = state.isLoading,
+            symbolSort = state.sortDirectionFor(CoinSortColumn.SYMBOL),
+            volumeSort = state.sortDirectionFor(CoinSortColumn.VOLUME),
+            priceSort = state.sortDirectionFor(CoinSortColumn.PRICE),
+            changeSort = state.sortDirectionFor(CoinSortColumn.CHANGE),
+            onSymbolClick = { onSortClick(CoinSortColumn.SYMBOL) },
+            onVolumeClick = { onSortClick(CoinSortColumn.VOLUME) },
+            onPriceClick = { onSortClick(CoinSortColumn.PRICE) },
+            onChangeClick = { onSortClick(CoinSortColumn.CHANGE) },
+            onCoinClick = onCoinClick,
+            lazyListState = lazyListState,
+            emptyContent = { WatchlistEmpty() },
+        )
     }
 }
 
