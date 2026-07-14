@@ -13,10 +13,7 @@ import androidx.compose.ui.unit.dp
 import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 
 @Composable
-fun SearchEmptyContent(
-    viewState: SearchContract.State.ViewState.Empty,
-    modifier: Modifier = Modifier,
-) {
+fun SearchEmptyContent(viewState: SearchState.ViewState.Empty, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,

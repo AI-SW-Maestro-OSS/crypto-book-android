@@ -2,13 +2,16 @@ package io.soma.cryptobook.search.presentation.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import io.soma.cryptobook.search.presentation.SearchRoute
+import io.soma.cryptobook.search.presentation.SearchScreen
 
-fun EntryProviderScope<NavKey>.searchEntry(onBack: () -> Unit, onCoinClick: (String) -> Unit) {
+fun EntryProviderScope<NavKey>.searchEntry(
+    onNavigateBack: () -> Unit,
+    onNavigateToCoinDetail: (String) -> Unit,
+) {
     entry<SearchNavKey> {
-        SearchRoute(
-            onBack = onBack,
-            onCoinClick = onCoinClick,
+        SearchScreen(
+            onNavigateBack = onNavigateBack,
+            onNavigateToCoinDetail = onNavigateToCoinDetail,
         )
     }
 }

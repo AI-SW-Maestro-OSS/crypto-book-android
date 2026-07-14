@@ -4,85 +4,93 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.soma.cryptobook.core.designsystem.component.appbar.CryptoSearchTopAppBar
 import io.soma.cryptobook.core.designsystem.component.appbar.NavigationIcon
 import io.soma.cryptobook.core.designsystem.component.scaffold.CryptoScaffold
 import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
-import io.soma.cryptobook.core.presentation.mvi.observe
-import io.soma.cryptobook.search.presentation.SearchContract.Effect
-import io.soma.cryptobook.search.presentation.SearchContract.Event
-import io.soma.cryptobook.search.presentation.SearchContract.State
+import io.soma.cryptobook.core.ui.EventsEffect
 
+/**
+ * The Search screen.
+ */
 @Composable
-fun SearchRoute(
+fun SearchScreen(
+    onNavigateBack: () -> Unit,
+    onNavigateToCoinDetail: (String) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
-    onBack: () -> Unit,
-    onCoinClick: (String) -> Unit,
 ) {
-    val (state, dispatch) = viewModel.observe { effect ->
-        when (effect) {
-            Effect.NavigateBack -> onBack()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
 
-            is Effect.NavigateToCoinDetail -> {
-                onCoinClick(effect.coinName)
-            }
+    EventsEffect(viewModel = viewModel) { event ->
+        when (event) {
+            SearchEvent.NavigateBack -> onNavigateBack()
+            is SearchEvent.NavigateToCoinDetail -> onNavigateToCoinDetail(event.coinName)
         }
     }
 
     BackHandler {
-        dispatch(Event.OnBackClicked)
+        viewModel.trySendAction(SearchAction.BackClick)
     }
 
-    SearchScreen(
-        state = state.value,
-        onEvent = dispatch,
-    )
-}
-
-@Composable
-fun SearchScreen(state: State, onEvent: (Event) -> Unit, modifier: Modifier = Modifier) {
     CryptoScaffold(
+        modifier = modifier,
         topBar = {
             CryptoSearchTopAppBar(
                 searchTerm = state.searchTerm,
                 placeholder = "Search",
                 onSearchTermChange = { searchTerm ->
-                    onEvent(Event.OnSearchTermChanged(searchTerm))
+                    viewModel.trySendAction(SearchAction.SearchTermChange(searchTerm))
                 },
                 navigationIcon = NavigationIcon(
                     navigationIcon = painterResource(id = CryptoDrawable.ic_arrow_back),
                     navigationIconContentDescription = "Back",
-                    onNavigationIconClick = { onEvent(Event.OnBackClicked) },
+                    onNavigationIconClick = {
+                        viewModel.trySendAction(SearchAction.BackClick)
+                    },
                 ),
                 clearIconContentDescription = "clear",
             )
         },
     ) {
-        when (val viewState = state.viewState) {
-            State.ViewState.Loading -> {
-                Text("Loading..")
-            }
+        SearchScreenContent(
+            state = state,
+            onItemClick = { coinName -> viewModel.trySendAction(SearchAction.ItemClick(coinName)) },
+        )
+    }
+}
 
-            is State.ViewState.Empty -> SearchEmptyContent(
-                viewState = viewState,
-                modifier = Modifier.fillMaxSize(),
+@Composable
+internal fun SearchScreenContent(
+    state: SearchState,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (val viewState = state.viewState) {
+        SearchState.ViewState.Loading -> {
+            Text("Loading..", modifier = modifier)
+        }
+
+        is SearchState.ViewState.Empty -> SearchEmptyContent(
+            viewState = viewState,
+            modifier = modifier.fillMaxSize(),
+        )
+
+        is SearchState.ViewState.Error -> {
+            Text(viewState.message, modifier = modifier)
+        }
+
+        is SearchState.ViewState.Content -> {
+            SearchContent(
+                items = viewState.items,
+                onItemClick = onItemClick,
+                modifier = modifier,
             )
-
-            is State.ViewState.Error -> {
-                Text(viewState.message)
-            }
-
-            is State.ViewState.Content -> {
-                SearchContent(
-                    items = viewState.items,
-                    onItemClick = { symbol ->
-                        onEvent(Event.OnListItemClick(symbol))
-                    },
-                )
-            }
         }
     }
 }

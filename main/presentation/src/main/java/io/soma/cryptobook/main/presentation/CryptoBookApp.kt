@@ -148,8 +148,8 @@ fun CryptoBookApp(
                     diaryEntry()
                     coinDetailEntry(onNavigateBack = navigator::goBack)
                     searchEntry(
-                        onBack = navigator::goBack,
-                        onCoinClick = { coinName ->
+                        onNavigateBack = navigator::goBack,
+                        onNavigateToCoinDetail = { coinName ->
                             navigator.navigateTo(CoinDetailNavKey(coinName))
                         },
                     )
