@@ -3,7 +3,7 @@ package io.soma.cryptobook.coindetail.presentation.mapper
 import io.soma.cryptobook.coindetail.domain.model.CoinDetailVO
 import io.soma.cryptobook.coindetail.domain.model.OrderBookLevelVO
 import io.soma.cryptobook.coindetail.domain.model.OrderBookVO
-import io.soma.cryptobook.coindetail.presentation.CoinDetailContract
+import io.soma.cryptobook.coindetail.presentation.CoinDetailState
 import io.soma.cryptobook.coindetail.presentation.OrderBookUiModel
 import io.soma.cryptobook.coindetail.presentation.component.ORDER_BOOK_ROW_COUNT
 import io.soma.cryptobook.coindetail.presentation.component.OrderBookEntry
@@ -34,7 +34,7 @@ class CoinDetailPresentationModelMapper @Inject constructor() {
         imageUrl: String,
         isLoading: Boolean = false,
         errorMsg: Text? = null,
-    ): CoinDetailContract.State = CoinDetailContract.State(
+    ): CoinDetailState = CoinDetailState(
         symbol = vo.symbol,
         imageUrl = imageUrl,
         currentPrice = formatPrice(vo.currentPrice, vo.tickSize),

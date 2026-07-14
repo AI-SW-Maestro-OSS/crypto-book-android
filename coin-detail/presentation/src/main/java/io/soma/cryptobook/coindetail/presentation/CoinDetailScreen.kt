@@ -1,5 +1,6 @@
 package io.soma.cryptobook.coindetail.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,22 +16,22 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.helpingstar.kandle.data.FinancialChartModelProducer
-import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Effect
-import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.Event
-import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.State
-import io.soma.cryptobook.coindetail.presentation.CoinDetailContract.ViewModel
 import io.soma.cryptobook.coindetail.presentation.component.CoinCandlestickChart
 import io.soma.cryptobook.coindetail.presentation.component.MetricCardGridContainer
 import io.soma.cryptobook.coindetail.presentation.component.OrderBookSection
@@ -44,22 +45,47 @@ import io.soma.cryptobook.core.designsystem.resource.CryptoString
 import io.soma.cryptobook.core.designsystem.theme.resource.CryptoDrawable
 import io.soma.cryptobook.core.designsystem.theme.theme.CryptoTheme
 import io.soma.cryptobook.core.designsystem.util.asText
-import io.soma.cryptobook.core.presentation.mvi.observe
+import io.soma.cryptobook.core.ui.EventsEffect
 
+/**
+ * The Coin Detail screen.
+ *
+ * Navigation 3 does not surface route arguments through [androidx.lifecycle.SavedStateHandle], so
+ * [coinName] is handed to the ViewModel through its assisted factory instead.
+ */
 @Composable
-fun CoinDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: ViewModel) {
-    val (state, dispatch) = viewModel.observe { effect ->
-        when (effect) {
-            Effect.NavigateBack -> onBack()
+fun CoinDetailScreen(
+    coinName: String,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: CoinDetailViewModel = hiltViewModel(
+        creationCallback = { factory: CoinDetailViewModel.Factory -> factory.create(coinName) },
+    ),
+) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    EventsEffect(viewModel = viewModel) { event ->
+        when (event) {
+            CoinDetailEvent.NavigateBack -> onNavigateBack()
+
+            is CoinDetailEvent.ShowToast -> {
+                Toast
+                    .makeText(
+                        context,
+                        event.text.toString(context.resources),
+                        Toast.LENGTH_SHORT,
+                    )
+                    .show()
+            }
         }
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
-
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
-                dispatch(Event.OnScreenStarted)
+                viewModel.trySendAction(CoinDetailAction.ScreenStart)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -68,21 +94,6 @@ fun CoinDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel
         }
     }
 
-    CoinDetailScreen(
-        state = state.value,
-        chartProducer = viewModel.chartProducer,
-        onEvent = dispatch,
-        modifier = modifier,
-    )
-}
-
-@Composable
-internal fun CoinDetailScreen(
-    state: State,
-    chartProducer: FinancialChartModelProducer,
-    onEvent: (Event) -> Unit,
-    modifier: Modifier = Modifier,
-) {
     CryptoScaffold(
         modifier = modifier,
         topBar = {
@@ -93,7 +104,9 @@ internal fun CoinDetailScreen(
                     navigationIconContentDescription = stringResource(
                         CryptoString.crypto_coin_detail_back_cd,
                     ),
-                    onNavigationIconClick = { onEvent(Event.OnBackClicked) },
+                    onNavigationIconClick = {
+                        viewModel.trySendAction(CoinDetailAction.BackClick)
+                    },
                 ),
                 actions = {
                     CryptoStandardIconButton(
@@ -105,54 +118,66 @@ internal fun CoinDetailScreen(
                         contentDescription = stringResource(
                             CryptoString.crypto_coin_detail_favorite_cd,
                         ),
-                        onClick = { onEvent(Event.OnFavoriteClicked) },
+                        onClick = { viewModel.trySendAction(CoinDetailAction.FavoriteClick) },
                         modifier = Modifier,
                     )
                 },
             )
         },
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            state.realtimeStatusMessage?.let { message ->
+        CoinDetailScreenContent(
+            state = state,
+            chartProducer = viewModel.chartProducer,
+        )
+    }
+}
+
+@Composable
+internal fun CoinDetailScreenContent(
+    state: CoinDetailState,
+    chartProducer: FinancialChartModelProducer,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+    ) {
+        state.realtimeStatusMessage?.let { message ->
+            Text(
+                text = message(),
+                color = Color(0xFF8A6D3B),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFF3CD))
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+        }
+
+        when {
+            state.isLoading -> {
+                CircularProgressIndicator()
+            }
+
+            state.errorMsg != null -> {
                 Text(
-                    text = message(),
-                    color = Color(0xFF8A6D3B),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFF3CD))
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    text = state.errorMsg(),
+                    color = CryptoTheme.colorScheme.status.error,
                 )
             }
 
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator()
-                }
-
-                state.errorMsg != null -> {
-                    Text(
-                        text = state.errorMsg(),
-                        color = CryptoTheme.colorScheme.status.error,
-                    )
-                }
-
-                else -> {
-                    CoinDetailContent(
-                        state = state,
-                        chartProducer = chartProducer,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+            else -> {
+                CoinDetailBody(
+                    state = state,
+                    chartProducer = chartProducer,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
 }
 
 @Composable
-private fun CoinDetailContent(
-    state: State,
+private fun CoinDetailBody(
+    state: CoinDetailState,
     chartProducer: FinancialChartModelProducer,
     modifier: Modifier = Modifier,
 ) {
@@ -210,9 +235,9 @@ private fun CoinDetailContent(
 
 @Preview(showBackground = true)
 @Composable
-private fun CoinDetailScreenPreview() {
-    CoinDetailScreen(
-        state = State(
+private fun CoinDetailScreenContentPreview() {
+    CoinDetailScreenContent(
+        state = CoinDetailState(
             symbol = "BTCUSDT",
             imageUrl = "",
             currentPrice = "$73,500.89",
@@ -225,42 +250,38 @@ private fun CoinDetailScreenPreview() {
             isLoading = false,
         ),
         chartProducer = remember { FinancialChartModelProducer() },
-        onEvent = {},
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun CoinDetailScreenLoadingPreview() {
-    CoinDetailScreen(
-        state = State(isLoading = true),
+private fun CoinDetailScreenContentLoadingPreview() {
+    CoinDetailScreenContent(
+        state = CoinDetailState(isLoading = true),
         chartProducer = remember { FinancialChartModelProducer() },
-        onEvent = {},
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun CoinDetailScreenErrorPreview() {
-    CoinDetailScreen(
-        state = State(
+private fun CoinDetailScreenContentErrorPreview() {
+    CoinDetailScreenContent(
+        state = CoinDetailState(
             isLoading = false,
             errorMsg = CryptoString.crypto_coin_detail_connection_error_state.asText(),
         ),
         chartProducer = remember { FinancialChartModelProducer() },
-        onEvent = {},
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun CoinDetailScreenRealtimeWarningPreview() {
-    CoinDetailScreen(
-        state = State(
+private fun CoinDetailScreenContentRealtimeWarningPreview() {
+    CoinDetailScreenContent(
+        state = CoinDetailState(
             isLoading = false,
             realtimeStatusMessage = CryptoString.crypto_realtime_recovering.asText(),
         ),
         chartProducer = remember { FinancialChartModelProducer() },
-        onEvent = {},
     )
 }

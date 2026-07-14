@@ -1,21 +1,14 @@
 package io.soma.cryptobook.coindetail.presentation.navigation
 
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import io.soma.cryptobook.coindetail.presentation.CoinDetailRoute
-import io.soma.cryptobook.coindetail.presentation.CoinDetailViewModel
+import io.soma.cryptobook.coindetail.presentation.CoinDetailScreen
 
-fun EntryProviderScope<NavKey>.coinDetailEntry(onBack: () -> Unit) {
+fun EntryProviderScope<NavKey>.coinDetailEntry(onNavigateBack: () -> Unit) {
     entry<CoinDetailNavKey> { key ->
-        val coinName = key.coinName
-        CoinDetailRoute(
-            onBack = onBack,
-            viewModel = hiltViewModel(
-                creationCallback = { factory: CoinDetailViewModel.Factory ->
-                    factory.create(coinName)
-                },
-            ),
+        CoinDetailScreen(
+            coinName = key.coinName,
+            onNavigateBack = onNavigateBack,
         )
     }
 }
