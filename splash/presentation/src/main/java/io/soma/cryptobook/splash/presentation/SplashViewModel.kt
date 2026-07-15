@@ -9,8 +9,6 @@ import io.soma.cryptobook.core.domain.repository.CoinRepository
 import io.soma.cryptobook.core.domain.usecase.RefreshExchangeRateUseCase
 import io.soma.cryptobook.core.domain.usecase.RefreshTickSizesIfRequiredUseCase
 import io.soma.cryptobook.splash.domain.usecase.CheckUpdateRequirementUseCase
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,55 +28,67 @@ class SplashViewModel @Inject constructor(
     val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
 
     init {
+        checkUpdateRequirement()
+        prefetchCoinPrices()
+        refreshExchangeRate()
+        refreshTickSizes()
+    }
+
+    /**
+     * Gates the splash: the app cannot decide between the main screen and the update
+     * screen until the version check resolves, so this is the only work awaited before
+     * leaving [SplashUiState.Loading].
+     */
+    private fun checkUpdateRequirement() {
         viewModelScope.launch {
             val currentVersion = buildInfoManager.versionName
-
-            val versionCheckJob = async {
-                runCatching {
-                    checkUpdateRequirementUseCase(currentVersion)
-                }.getOrDefault(false)
-            }
-            val prefetchJob = async {
-                coinRepository.getCoinPrices()
-                    .handle(
-                        onSuccess = {
-                            android.util.Log.d("SplashViewModel", "코인 가격 프리패치 성공")
-                        },
-                        onFailure = { error ->
-                            android.util.Log.e("SplashViewModel", "코인 가격 프리패치 실패: $error")
-                        },
-                    )
-            }
-
-            val exchangeRateJob = async {
-                runCatching { refreshExchangeRateUseCase() }
-                    .onFailure { e ->
-                        android.util.Log.e("SplashViewModel", "환율 갱신 실패: ${e.message}", e)
-                    }
-                    .onSuccess {
-                        android.util.Log.d("SplashViewModel", "환율 갱신 성공")
-                    }
-            }
-
-            val tickSizeJob = async {
-                runCatching { refreshTickSizesIfRequiredUseCase() }
-                    .onFailure { e ->
-                        android.util.Log.e("SplashViewModel", "tickSize 갱신 실패: ${e.message}", e)
-                    }
-                    .onSuccess {
-                        android.util.Log.d("SplashViewModel", "tickSize 갱신 성공")
-                    }
-            }
-
-            val delayJob = async { delay(2000) }
-
-            val isUpdateRequired = versionCheckJob.await()
-            prefetchJob.await()
-            exchangeRateJob.await()
-            tickSizeJob.await()
-            delayJob.await()
+            val isUpdateRequired = runCatching {
+                checkUpdateRequirementUseCase(currentVersion)
+            }.getOrDefault(false)
 
             _uiState.value = SplashUiState.Success(isUpdateRequired = isUpdateRequired)
+        }
+    }
+
+    /**
+     * Background warm-up. The home screen re-fetches and observes this data reactively,
+     * so it must not block the splash from clearing.
+     */
+    private fun prefetchCoinPrices() {
+        viewModelScope.launch {
+            coinRepository.getCoinPrices()
+                .handle(
+                    onSuccess = {
+                        android.util.Log.d("SplashViewModel", "코인 가격 프리패치 성공")
+                    },
+                    onFailure = { error ->
+                        android.util.Log.e("SplashViewModel", "코인 가격 프리패치 실패: $error")
+                    },
+                )
+        }
+    }
+
+    private fun refreshExchangeRate() {
+        viewModelScope.launch {
+            runCatching { refreshExchangeRateUseCase() }
+                .onFailure { e ->
+                    android.util.Log.e("SplashViewModel", "환율 갱신 실패: ${e.message}", e)
+                }
+                .onSuccess {
+                    android.util.Log.d("SplashViewModel", "환율 갱신 성공")
+                }
+        }
+    }
+
+    private fun refreshTickSizes() {
+        viewModelScope.launch {
+            runCatching { refreshTickSizesIfRequiredUseCase() }
+                .onFailure { e ->
+                    android.util.Log.e("SplashViewModel", "tickSize 갱신 실패: ${e.message}", e)
+                }
+                .onSuccess {
+                    android.util.Log.d("SplashViewModel", "tickSize 갱신 성공")
+                }
         }
     }
 }
